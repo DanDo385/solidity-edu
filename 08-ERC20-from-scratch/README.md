@@ -7,47 +7,43 @@
 - Implement ERC20 interface from scratch
 - Compare manual implementation vs OpenZeppelin
 - Understand approval/allowance mechanics
-- Learn about approval race conditions
+- Learn about approval race condition vulnerability
 - Implement token economics patterns
 
 ## 📚 Key Concepts
 
-### ERC20 Standard
+### ERC20 Required Functions
 
-Required functions:
-- `totalSupply()`
-- `balanceOf(address)`
-- `transfer(address, uint256)`
-- `approve(address, uint256)`
-- `allowance(address, address)`
-- `transferFrom(address, address, uint256)`
+```solidity
+totalSupply() → uint256
+balanceOf(address) → uint256
+transfer(address, uint256) → bool
+approve(address, uint256) → bool
+allowance(address, address) → uint256
+transferFrom(address, address, uint256) → bool
+```
 
-### Approval Mechanics
+### Required Events
 
-Two-step pattern for third-party transfers:
-1. Owner approves spender for amount
-2. Spender transfers on owner's behalf
+```solidity
+event Transfer(address indexed from, address indexed to, uint256 value);
+event Approval(address indexed owner, address indexed spender, uint256 value);
+```
 
-### Common Pitfalls
+## 📝 Tasks
 
-- Approval race condition
-- Unchecked transfers
-- Missing events
-- Integer overflow (pre-0.8.0)
-
-## 🔧 What You'll Build
-
-A contract demonstrating:
-- Full ERC20 implementation
-- Comparison with OpenZeppelin
-- Gas optimization techniques
-- Security best practices
+```bash
+cd 08-ERC20-from-scratch
+forge test -vvv
+forge test --gas-report
+```
 
 ## ✅ Status
 
-🚧 **Scaffold** - Complete Projects 01-07 first
+✅ **Complete** - Implement your own token!
 
 ## 🚀 Next Steps
 
-After completing this project:
-- Move to [Project 09: ERC721 NFT](../09-ERC721-NFT-from-scratch/)
+- Move to [Project 09: ERC721 NFT from Scratch](../09-ERC721-NFT-from-scratch/)
+- Study OpenZeppelin ERC20
+- Add extensions (burnable, mintable, pausable)

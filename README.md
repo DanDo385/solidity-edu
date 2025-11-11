@@ -75,24 +75,30 @@ Each project is a standalone Foundry workspace with:
 |---|---------|----------|--------|
 | 01 | [Datatypes & Storage](./01-datatypes-and-storage/) | `uint`, `mapping`, storage vs memory, gas costs | ✅ Complete |
 | 02 | [Functions & Payable](./02-functions-and-payable/) | `payable`, `receive()`, `fallback()`, ETH transfers | ✅ Complete |
-| 03 | [Events & Logging](./03-events-and-logging/) | `event`, `emit`, indexed parameters, off-chain indexing | 🚧 Scaffold |
+| 03 | [Events & Logging](./03-events-and-logging/) | `event`, `emit`, indexed parameters, off-chain indexing | ✅ Complete |
 
 ### Intermediate (Projects 4-6)
 
 | # | Project | Concepts | Status |
 |---|---------|----------|--------|
-| 04 | [Modifiers & Access Control](./04-modifiers-and-restrictions/) | Custom modifiers, `onlyOwner`, role-based access | 🚧 Scaffold |
-| 05 | [Errors & Reverts](./05-errors-and-reverts/) | `require()`, `revert()`, custom errors, gas optimization | 🚧 Scaffold |
-| 06 | [Mappings, Arrays & Gas](./06-mappings-arrays-and-gas/) | Storage slot hashing, iteration costs, optimization | 🚧 Scaffold |
+| 04 | [Modifiers & Access Control](./04-modifiers-and-restrictions/) | Custom modifiers, `onlyOwner`, role-based access | ✅ Complete |
+| 05 | [Errors & Reverts](./05-errors-and-reverts/) | `require()`, `revert()`, custom errors, gas optimization | ✅ Complete |
+| 06 | [Mappings, Arrays & Gas](./06-mappings-arrays-and-gas/) | Storage slot hashing, iteration costs, optimization | ✅ Complete |
 
 ### Advanced (Projects 7-10)
 
 | # | Project | Concepts | Status |
 |---|---------|----------|--------|
-| 07 | [Reentrancy & Security](./07-reentrancy-and-security/) | Classic reentrancy attack, checks-effects-interactions | 🚧 Scaffold |
-| 08 | [ERC20 from Scratch](./08-ERC20-from-scratch/) | Token standard, manual implementation vs OpenZeppelin | 🚧 Scaffold |
-| 09 | [ERC721 NFT](./09-ERC721-NFT-from-scratch/) | NFT standard, metadata, approval model, mint races | 🚧 Scaffold |
-| 10 | [Upgradeability & Proxies](./10-upgradeability-and-proxies/) | UUPS proxy pattern, storage collisions, EIP-1967 | 🚧 Scaffold |
+| 07 | [Reentrancy & Security](./07-reentrancy-and-security/) | Classic reentrancy attack, checks-effects-interactions | ✅ Complete |
+| 08 | [ERC20 from Scratch](./08-ERC20-from-scratch/) | Token standard, manual implementation vs OpenZeppelin | ✅ Complete |
+| 09 | [ERC721 NFT](./09-ERC721-NFT-from-scratch/) | NFT standard, metadata, approval model, mint races | ✅ Complete |
+| 10 | [Upgradeability & Proxies](./10-upgradeability-and-proxies/) | UUPS proxy pattern, storage collisions, EIP-1967 | ✅ Complete |
+
+### Expert (Project 11)
+
+| # | Project | Concepts | Status |
+|---|---------|----------|--------|
+| 11 | [ERC-4626 Tokenized Vault](./11-ERC4626-tokenized-vault/) | Vault standard, share math, yield strategies, DeFi | ✅ Complete |
 
 ## 🎓 How to Use This Repository
 

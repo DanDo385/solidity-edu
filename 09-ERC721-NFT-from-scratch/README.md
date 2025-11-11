@@ -7,46 +7,45 @@
 - Implement ERC721 interface from scratch
 - Handle token metadata and URIs
 - Implement safe transfer callbacks
-- Understand mint race conditions
+- Understand mint race conditions and front-running
 - Integrate IPFS metadata
 
 ## 📚 Key Concepts
 
-### ERC721 Standard
+### ERC721 Core Functions
 
-Non-fungible tokens (NFTs):
-- Each token is unique (tokenId)
-- Ownership tracking per token
-- Approval model (approve vs approveAll)
-- Metadata URIs (IPFS, on-chain, etc.)
+```solidity
+balanceOf(address owner) → uint256
+ownerOf(uint256 tokenId) → address
+safeTransferFrom(address from, address to, uint256 tokenId)
+transferFrom(address from, address to, uint256 tokenId)
+approve(address to, uint256 tokenId)
+setApprovalForAll(address operator, bool approved)
+getApproved(uint256 tokenId) → address
+isApprovedForAll(address owner, address operator) → bool
+```
 
-### Safe Transfers
+### Safe Transfer vs Transfer
 
-`safeTransferFrom` vs `transferFrom`:
-- Safe version calls recipient contract
+`safeTransferFrom` checks if recipient can receive NFTs:
 - Prevents tokens stuck in contracts
-- Implements ERC721Receiver interface
+- Calls `onERC721Received` on recipient if contract
+- Reverts if recipient doesn't implement interface
 
-### Common Patterns
+## 📝 Tasks
 
-- Enumerable extension
-- Metadata extension
-- Royalties (ERC2981)
-- Soul-bound tokens
-
-## 🔧 What You'll Build
-
-A contract demonstrating:
-- Full ERC721 implementation
-- Metadata handling
-- Minting mechanisms
-- Safe transfer patterns
+```bash
+cd 09-ERC721-NFT-from-scratch
+forge test -vvv
+```
 
 ## ✅ Status
 
-🚧 **Scaffold** - Complete Projects 01-08 first
+✅ **Complete** - Create your own NFTs!
 
 ## 🚀 Next Steps
 
-After completing this project:
 - Move to [Project 10: Upgradeability & Proxies](../10-upgradeability-and-proxies/)
+- Study OpenZeppelin ERC721
+- Add metadata extension
+- Implement royalties (ERC2981)

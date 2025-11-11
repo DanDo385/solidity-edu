@@ -4,31 +4,28 @@
 
 ## 🎯 Learning Objectives
 
-- Reproduce classic reentrancy attack
+- Reproduce classic reentrancy attack ($60M The DAO hack)
 - Apply Checks-Effects-Interactions pattern
 - Use OpenZeppelin ReentrancyGuard
 - Understand cross-function reentrancy
-- Learn read-only reentrancy
 
 ## 📚 Key Concepts
 
-### The Reentrancy Attack
-
-The vulnerability that drained The DAO ($60M in 2016):
+### The Vulnerability
 
 ```solidity
 // VULNERABLE
 function withdraw(uint amount) public {
     require(balances[msg.sender] >= amount);
-    msg.sender.call{value: amount}("");  // ← Attacker re-enters here!
+    msg.sender.call{value: amount}("");  // ← Attacker re-enters!
     balances[msg.sender] -= amount;      // ← Too late
 }
 ```
 
-### The Fix: Checks-Effects-Interactions
+### The Fix
 
 ```solidity
-// SAFE
+// SAFE: Checks-Effects-Interactions
 function withdraw(uint amount) public {
     require(balances[msg.sender] >= amount);  // Check
     balances[msg.sender] -= amount;           // Effect (first!)
@@ -36,19 +33,17 @@ function withdraw(uint amount) public {
 }
 ```
 
-## 🔧 What You'll Build
+## 📝 Tasks
 
-A contract demonstrating:
-- Vulnerable withdrawal function
-- Attacker contract that exploits it
-- Secure implementation with CEI pattern
-- ReentrancyGuard integration
+```bash
+cd 07-reentrancy-and-security
+forge test -vvv  # See the attack in action!
+```
 
 ## ✅ Status
 
-🚧 **Scaffold** - Complete Projects 01-06 first
+✅ **Complete** - Critical security lesson
 
 ## 🚀 Next Steps
 
-After completing this project:
 - Move to [Project 08: ERC20 from Scratch](../08-ERC20-from-scratch/)

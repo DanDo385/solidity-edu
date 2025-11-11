@@ -8,7 +8,6 @@
 - Analyze iteration costs for arrays
 - Recognize DoS vectors in unbounded loops
 - Implement gas-optimized data structures
-- Choose between mappings and arrays appropriately
 
 ## 📚 Key Concepts
 
@@ -16,32 +15,27 @@
 
 ```solidity
 mapping(address => uint256) balances;  // Slot 0
-// Actual storage: keccak256(abi.encodePacked(key, 0))
+// Storage location: keccak256(abi.encodePacked(key, 0))
 ```
 
-- O(1) access
-- No iteration possible
-- Conceptually infinite size
-
-### Array Risks
+### Array Dangers
 
 - Unbounded growth → DoS
 - Iteration costs scale linearly
 - Consider mappings + events instead
 
-## 🔧 What You'll Build
+## 📝 Tasks
 
-A contract demonstrating:
-- Storage slot calculations
-- Array vs mapping trade-offs
-- Gas optimization techniques
-- DoS prevention patterns
+```bash
+cd 06-mappings-arrays-and-gas
+forge test --gas-report
+forge snapshot
+```
 
 ## ✅ Status
 
-🚧 **Scaffold** - Complete Projects 01-05 first
+✅ **Complete** - Ready to learn
 
 ## 🚀 Next Steps
 
-After completing this project:
 - Move to [Project 07: Reentrancy & Security](../07-reentrancy-and-security/)

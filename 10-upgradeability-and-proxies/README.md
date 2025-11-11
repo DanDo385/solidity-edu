@@ -14,7 +14,7 @@
 
 ### Why Proxies?
 
-Smart contracts are immutable by default:
+Smart contracts are immutable:
 - Cannot change code after deployment
 - Bugs are permanent
 - Feature additions impossible
@@ -24,32 +24,39 @@ Proxies enable upgradeability:
 - Proxy delegates calls to implementation
 - Can swap implementation while preserving state
 
-### Proxy Patterns
+### Storage Collisions
 
-- **Transparent Proxy**: Admin vs user routing
-- **UUPS**: Upgrade logic in implementation
-- **Beacon Proxy**: Multiple proxies, one implementation
-- **Diamond Pattern**: Multiple implementations
+The biggest risk in proxy patterns:
 
-### Dangers
+```solidity
+// Implementation V1
+contract ImplementationV1 {
+    uint256 public value;  // Slot 0
+}
 
-- Storage collisions
-- Initialization vulnerabilities
-- Centralization risks
-- Complexity footguns
+// Implementation V2 - WRONG!
+contract ImplementationV2 {
+    address public owner;  // Slot 0 collision!
+    uint256 public value;  // Now in slot 1
+}
+```
 
-## 🔧 What You'll Build
+Use EIP-1967 storage slots to avoid collisions.
 
-A contract demonstrating:
-- UUPS proxy implementation
-- Proper storage layout
-- Upgrade mechanisms
-- Storage collision prevention
+## 📝 Tasks
+
+```bash
+cd 10-upgradeability-and-proxies
+forge test -vvv
+```
 
 ## ✅ Status
 
-🚧 **Scaffold** - Complete Projects 01-09 first
+✅ **Complete** - Advanced pattern!
 
-## 🚀 Completion
+## 🚀 Next Steps
 
-Congratulations on completing all 10 projects! You now have a solid foundation in Solidity and smart contract development.
+- Move to [Project 11: ERC-4626 Tokenized Vault](../11-ERC4626-tokenized-vault/)
+- Study OpenZeppelin upgradeable contracts
+- Understand transparent vs UUPS patterns
+- Learn about initialization vs constructors
