@@ -1,0 +1,17 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "forge-std/Script.sol";
+import "../src/solution/ERC721NFTSolution.sol";
+
+contract DeployERC721NFT is Script {
+    function run() external {
+        uint256 deployerPrivateKey = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
+        vm.startBroadcast(deployerPrivateKey);
+        
+        ERC721NFTSolution nft = new ERC721NFTSolution("My NFT", "MNFT");
+        console.log("ERC721 NFT deployed at:", address(nft));
+        
+        vm.stopBroadcast();
+    }
+}
