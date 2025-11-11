@@ -1,6 +1,6 @@
 # Project Summary & Learning Tracker
 
-Use this document to track your progress through the 11 mini-projects.
+Use this document to track your progress through the 14 mini-projects.
 
 ## 📊 Completion Status
 
@@ -17,8 +17,11 @@ Use this document to track your progress through the 11 mini-projects.
 | 09 - ERC721 NFT | Complete | NFT standard, metadata, approvals | 4-5 hours | - |
 | 10 - Upgradeability & Proxies | Complete | UUPS proxy, storage collisions | 5-6 hours | - |
 | 11 - ERC-4626 Tokenized Vault | Complete | Vault standard, share math, DeFi yield | 5-6 hours | - |
+| 12 - ERC-1155 Multi-Token | Complete | Multi-token standard, batch operations, gaming | 5-6 hours | - |
+| 13 - ERC-777 Advanced Token | Complete | Hooks, operators, advanced fungible tokens | 5-6 hours | - |
+| 14 - ERC-1400 Security Token | Complete | RWAs, compliance, partitions, KYC/AML | 5-6 hours | - |
 
-**Total Estimated Time**: 35-45 hours
+**Total Estimated Time**: 50-65 hours
 
 ## 🎯 Learning Objectives by Project
 
@@ -98,7 +101,7 @@ Use this document to track your progress through the 11 mini-projects.
 - Avoid storage collision bugs
 - Use EIP-1967 storage slots correctly
 
-### Expert Track (Project 11)
+### Expert Track (Projects 11-14)
 
 #### Project 11: ERC-4626 Tokenized Vault
 **Core Concepts**:
@@ -108,6 +111,30 @@ Use this document to track your progress through the 11 mini-projects.
 - Learn vault security patterns (inflation attack, donation attack)
 - Understand real-world DeFi yield strategies
 
+#### Project 12: ERC-1155 Multi-Token Standard
+**Core Concepts**:
+- Implement ERC-1155 multi-token standard
+- Handle both fungible and non-fungible tokens in one contract
+- Master batch transfer operations for gas efficiency
+- Implement safe transfer callbacks
+- Understand gaming/metaverse use cases
+
+#### Project 13: ERC-777 Advanced Token
+**Core Concepts**:
+- Implement ERC-777 with hooks and operators
+- Understand tokensToSend and tokensReceived callbacks
+- Master operator permission model
+- Learn backwards compatibility with ERC-20
+- Identify reentrancy risks from hooks
+
+#### Project 14: ERC-1400 Security Token
+**Core Concepts**:
+- Implement ERC-1400 for tokenized real-world assets
+- Master partition-based token management
+- Implement KYC/AML compliance features
+- Handle transfer restrictions and whitelisting
+- Understand document management for regulatory compliance
+
 ## 📚 Additional Resources
 
 - [Solidity Documentation](https://docs.soliditylang.org/)
@@ -115,11 +142,14 @@ Use this document to track your progress through the 11 mini-projects.
 - [Foundry Book](https://book.getfoundry.sh/)
 - [Ethereum.org Developer Docs](https://ethereum.org/en/developers/docs/)
 - [Smart Contract Security Best Practices](https://consensys.github.io/smart-contract-best-practices/)
-- [EIP-4626 Specification](https://eips.ethereum.org/EIPS/eip-4626)
+- [EIP-4626 Specification (Tokenized Vaults)](https://eips.ethereum.org/EIPS/eip-4626)
+- [EIP-1155 Specification (Multi-Token)](https://eips.ethereum.org/EIPS/eip-1155)
+- [EIP-777 Specification (Advanced Token)](https://eips.ethereum.org/EIPS/eip-777)
+- [EIP-1400 Specification (Security Tokens)](https://github.com/ethereum/EIPs/issues/1411)
 
 ## 🎓 Completion Checklist
 
-After completing all 11 projects, you should be able to:
+After completing all 14 projects, you should be able to:
 
 - [ ] Read and understand production Solidity code
 - [ ] Identify common security vulnerabilities
@@ -130,8 +160,10 @@ After completing all 11 projects, you should be able to:
 - [ ] Deploy contracts to testnets and mainnet
 - [ ] Verify contracts on Etherscan
 - [ ] Build full-stack dApps with smart contract backends
-- [ ] Implement token standards (ERC-20, ERC-721, ERC-4626)
+- [ ] Implement token standards (ERC-20, ERC-721, ERC-777, ERC-1155, ERC-1400, ERC-4626)
 - [ ] Design and implement DeFi protocols
+- [ ] Build compliance-ready security tokens for RWAs
+- [ ] Create gaming/metaverse multi-token systems
 
 ## 🚀 Next Steps After Completion
 
@@ -145,6 +177,6 @@ After completing all 11 projects, you should be able to:
 
 ---
 
-**Congratulations on completing the Solidity 10x Mini-Projects (now 11!)** 🎉
+**Congratulations on completing the Solidity 10x Mini-Projects (now 14!)** 🎉
 
 You've built a strong foundation in Solidity and smart contract development. Keep building, stay secure, and never stop learning!

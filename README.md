@@ -94,11 +94,14 @@ Each project is a standalone Foundry workspace with:
 | 09 | [ERC721 NFT](./09-ERC721-NFT-from-scratch/) | NFT standard, metadata, approval model, mint races | ✅ Complete |
 | 10 | [Upgradeability & Proxies](./10-upgradeability-and-proxies/) | UUPS proxy pattern, storage collisions, EIP-1967 | ✅ Complete |
 
-### Expert (Project 11)
+### Expert (Projects 11-14)
 
 | # | Project | Concepts | Status |
 |---|---------|----------|--------|
 | 11 | [ERC-4626 Tokenized Vault](./11-ERC4626-tokenized-vault/) | Vault standard, share math, yield strategies, DeFi | ✅ Complete |
+| 12 | [ERC-1155 Multi-Token](./12-ERC1155-multi-token/) | Multi-token standard, batch ops, gaming/metaverse | ✅ Complete |
+| 13 | [ERC-777 Advanced Token](./13-ERC777-advanced-token/) | Hooks, operators, advanced fungible tokens | ✅ Complete |
+| 14 | [ERC-1400 Security Tokens](./14-ERC1400-security-token/) | RWAs, compliance, partitions, KYC/AML | ✅ Complete |
 
 ## 🎓 How to Use This Repository
 
