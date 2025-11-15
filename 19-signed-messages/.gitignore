@@ -1,0 +1,23 @@
+# Compiler output
+out/
+cache/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Dependencies
+lib/
+
+# Broadcast logs
+broadcast/
+
+# Testing artifacts
+coverage/
+lcov.info

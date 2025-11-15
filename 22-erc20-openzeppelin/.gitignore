@@ -1,0 +1,19 @@
+# Compiler files
+cache/
+out/
+
+# Dependencies
+lib/
+
+# Node
+node_modules/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

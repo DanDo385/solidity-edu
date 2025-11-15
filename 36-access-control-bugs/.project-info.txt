@@ -1,0 +1,65 @@
+PROJECT 36: ACCESS CONTROL BUGS
+================================
+
+OVERVIEW:
+Educational project teaching common access control vulnerabilities in Solidity.
+Covers real-world attack patterns and secure implementation practices.
+
+FILES CREATED:
+==============
+
+1. README.md (444 lines)
+   - Comprehensive guide to access control vulnerabilities
+   - Covers 7 major vulnerability types
+   - Real-world examples (Parity Wallet, Rubixi)
+   - OpenZeppelin best practices
+   - Security tips and resources
+
+2. src/Project36.sol (470 lines)
+   - 8 vulnerable contract templates
+   - TODO-driven learning approach
+   - Exploit contract templates
+   - Guided hints for each vulnerability
+
+3. src/solution/Project36Solution.sol (789 lines)
+   - Complete vulnerable implementations
+   - Complete secure implementations
+   - Working exploit contracts
+   - OpenZeppelin integration examples
+   - Detailed comments explaining each vulnerability
+
+4. test/Project36.t.sol (722 lines)
+   - 30+ comprehensive test cases
+   - Tests for all 8 vulnerability types
+   - Exploit demonstrations
+   - Fix verifications
+   - Edge case coverage
+
+5. script/DeployProject36.s.sol (372 lines)
+   - Main deployment script
+   - Vulnerable-only deployment
+   - Secure-only deployment
+   - Deploy and fund script
+   - Interactive demo script
+
+VULNERABILITY TYPES COVERED:
+=============================
+1. Uninitialized Owner
+2. Missing Access Control Modifiers
+3. tx.origin vs msg.sender
+4. Role Escalation
+5. Public Initialization Functions
+6. Constructor vs Initializer Issues
+7. Unprotected Delegatecall
+8. Missing Access Control on Critical Functions
+
+EDUCATIONAL FEATURES:
+=====================
+- Side-by-side vulnerable and secure implementations
+- Working exploits demonstrating each attack
+- Comprehensive test coverage
+- Real-world case studies
+- OpenZeppelin best practices
+- Interactive demo scripts
+
+TOTAL: 2,797 lines of educational Solidity code

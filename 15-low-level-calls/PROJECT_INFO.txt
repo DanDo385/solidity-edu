@@ -1,0 +1,125 @@
+Project 15: Low-Level Calls - Complete Implementation
+=====================================================
+
+Created Files:
+--------------
+1. README.md (295 lines)
+   - Comprehensive guide to call(), delegatecall(), and staticcall()
+   - Storage context explanations with visualizations
+   - Return data handling examples
+   - Gas forwarding details
+   - Security best practices
+   - Real-world examples and security incidents
+
+2. src/Project15.sol (166 lines)
+   - Skeleton file with TODOs for students
+   - 11 contract templates:
+     * TargetContract - Basic call target
+     * Caller - Demonstrates call()
+     * DelegateTarget - For delegatecall testing
+     * DelegateCaller - Demonstrates delegatecall()
+     * VulnerableProxy - Storage corruption example
+     * MaliciousImplementation - Attack demonstration
+     * SafeProxy - Correct proxy pattern
+     * SafeImplementation - Safe implementation
+     * StaticCallExample - Read-only calls
+     * ReturnDataExample - Return data handling
+     * (Additional utility contracts)
+
+3. src/solution/Project15Solution.sol (606 lines)
+   - Fully implemented solution with 11 complete contracts
+   - Detailed comments and documentation
+   - Security warnings throughout
+   - All three call types demonstrated
+   - Storage corruption examples (educational)
+   - Safe proxy pattern implementation
+   - Gas forwarding demonstrations
+
+4. test/Project15.t.sol (514 lines)
+   - 33 comprehensive test functions:
+     * 7 call() tests
+     * 4 staticcall() tests
+     * 3 delegatecall() tests
+     * 3 storage corruption tests
+     * 3 return data tests
+     * 4 gas forwarding tests
+     * 2 comparison tests
+     * 4 edge case tests
+     * 2 security tests
+     * 2 fuzz tests
+   - Visual console logging for demonstrations
+   - Attack scenario demonstrations
+
+5. script/DeployProject15.s.sol (198 lines)
+   - Complete deployment script
+   - Live demonstrations of each call type
+   - Storage corruption attack demo
+   - Educational warnings and explanations
+   - Interactive demo contracts
+
+6. foundry.toml
+   - Solidity ^0.8.20 configuration
+   - Optimizer settings
+   - Standard formatting rules
+
+Key Learning Points:
+-------------------
+1. call() - Executes in target's context
+   - Modifies target's storage
+   - msg.sender changes to caller
+   - Use for external contract calls
+
+2. delegatecall() - Executes in caller's context
+   - Modifies caller's storage (DANGEROUS!)
+   - msg.sender preserved
+   - Requires exact storage layout matching
+   - Use for proxy patterns
+
+3. staticcall() - Read-only execution
+   - Reverts on state changes
+   - Safe for untrusted contracts
+   - Use for view/pure functions
+
+4. Storage Corruption
+   - Demonstrates misaligned storage layouts
+   - Shows how delegatecall can corrupt storage
+   - Provides safe proxy pattern alternative
+
+5. Security Best Practices
+   - Always check return values
+   - Bubble up errors properly
+   - Match storage layouts for delegatecall
+   - Use staticcall for untrusted reads
+   - Understand gas forwarding (63/64 rule)
+
+Test Coverage:
+-------------
+- Basic call success/failure
+- Value transfers
+- Gas limiting
+- Error bubbling
+- Multiple return values
+- Static call enforcement
+- Delegate call storage modification
+- Storage corruption attacks
+- Safe proxy patterns
+- Gas forwarding behavior
+- Edge cases (EOA, empty calls)
+- Fuzz testing
+
+Security Warnings:
+-----------------
+⚠️  VulnerableProxy is INTENTIONALLY vulnerable
+⚠️  MaliciousImplementation demonstrates attacks
+⚠️  Never use delegatecall without storage alignment
+⚠️  Always check return values from low-level calls
+⚠️  Use staticcall for untrusted read operations
+
+Usage:
+------
+cd 15-low-level-calls
+forge test -vvv               # Run all tests with verbose output
+forge test --mt test_Storage  # Run storage corruption tests
+forge script script/DeployProject15.s.sol # Deploy contracts
+
+Total Lines of Code: 1,779 lines (excluding this file)

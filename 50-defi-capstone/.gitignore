@@ -1,0 +1,41 @@
+# Foundry
+cache/
+out/
+broadcast/
+
+# Dependencies
+lib/
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+lcov.info
+*.lcov
+
+# Gas reports
+.gas-snapshot
+gas-report.txt
+
+# Documentation
+docs/
+
+# Misc
+*.log
+.cache
+.certora_*
