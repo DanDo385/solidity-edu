@@ -1,0 +1,22 @@
+# Environment variables
+.env
+
+# Foundry
+out/
+cache/
+broadcast/
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Deployment artifacts
+deployment-info.json

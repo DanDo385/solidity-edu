@@ -1,0 +1,62 @@
+PROJECT 32: INTEGER OVERFLOW LABS (PRE-0.8)
+===========================================
+
+Created: 2025-11-15
+Solidity Version: ^0.8.20
+Framework: Foundry
+
+DESCRIPTION:
+Comprehensive educational project teaching integer overflow/underflow 
+vulnerabilities that affected Solidity before version 0.8.0. Includes 
+real-world exploits (BeautyChain, SMT), SafeMath implementation, and 
+modern 0.8+ protections.
+
+FILES CREATED:
+  - README.md (539 lines) - Comprehensive learning guide
+  - QUICK_START.md (305 lines) - Quick start guide
+  - CHEAT_SHEET.md (484 lines) - Quick reference
+  - src/Project32.sol (388 lines) - Skeleton with TODOs
+  - src/solution/Project32Solution.sol (754 lines) - Complete solution
+  - test/Project32.t.sol (702 lines) - Comprehensive tests
+  - script/DeployProject32.s.sol (282 lines) - Deployment script
+
+TOTAL: 3,454 lines of educational content
+
+KEY FEATURES:
+  ✓ Simulates pre-0.8 behavior with unchecked blocks
+  ✓ Complete SafeMath library implementation
+  ✓ Real exploit reproductions (BeautyChain, SMT)
+  ✓ Safe vs unsafe unchecked patterns
+  ✓ Gas optimization examples
+  ✓ 30+ comprehensive tests
+  ✓ Advanced scenarios (time locks, voting, interest)
+
+LEARNING OBJECTIVES:
+  1. Understand overflow/underflow mechanics
+  2. Study historical exploits and their impact
+  3. Implement SafeMath library from scratch
+  4. Compare pre-0.8 vs 0.8+ behavior
+  5. Learn when unchecked blocks are safe vs dangerous
+  6. Master gas optimization techniques
+
+CONTRACTS:
+  - VulnerableToken: Simulates pre-0.8 vulnerabilities
+  - SafeToken: Uses SafeMath for protection
+  - ModernToken: Relies on 0.8+ automatic checks
+  - UncheckedExamples: Safe and unsafe patterns
+  - AdvancedOverflowScenarios: Complex scenarios
+
+TESTS INCLUDE:
+  ✓ Underflow/overflow exploits
+  ✓ BeautyChain exploit reproduction
+  ✓ SMT exploit reproduction
+  ✓ SafeMath protection verification
+  ✓ 0.8+ automatic check verification
+  ✓ Gas cost comparisons
+  ✓ Edge case testing
+  ✓ Fuzz testing
+
+USAGE:
+  forge test              # Run all tests
+  forge test -vvv         # Verbose output
+  forge test --gas-report # With gas reporting

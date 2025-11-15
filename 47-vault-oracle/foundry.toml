@@ -1,0 +1,30 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"
+
+# Optimizer settings
+optimizer = true
+optimizer_runs = 200
+
+# Additional settings
+via_ir = false
+verbosity = 3
+
+# Remappings for dependencies
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@chainlink/=lib/chainlink/",
+    "forge-std/=lib/forge-std/src/"
+]
+
+# Test configuration
+[profile.default.fuzz]
+runs = 256
+max_test_rejects = 65536
+
+# RPC endpoints (set via environment variables)
+[rpc_endpoints]
+mainnet = "${MAINNET_RPC_URL}"
+sepolia = "${SEPOLIA_RPC_URL}"

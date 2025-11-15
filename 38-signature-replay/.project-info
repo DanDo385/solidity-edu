@@ -1,0 +1,25 @@
+Project 38: Signature Replay Attack
+====================================
+
+Location: /home/user/solidity-edu/38-signature-replay/
+
+Files Created:
+- README.md (312 lines) - Comprehensive educational guide
+- foundry.toml - Foundry configuration
+- src/Project38.sol (400 lines) - Skeleton with TODOs
+- src/solution/Project38Solution.sol (729 lines) - Complete solution
+- test/Project38.t.sol (600 lines) - 16 comprehensive tests
+- script/DeployProject38.s.sol (221 lines) - Deployment scripts
+
+Total: 2,262 lines of educational Solidity code
+
+Quick Start:
+------------
+1. Read README.md for background
+2. Study src/Project38.sol for vulnerabilities
+3. Try to exploit VulnerableBank
+4. Implement fixes in SecureBank
+5. Compare with src/solution/Project38Solution.sol
+6. Run tests: forge test --match-path test/Project38.t.sol -vvv
+
+Builds on: Project 19 (Signed Messages & EIP-712)

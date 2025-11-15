@@ -1,0 +1,107 @@
+PROJECT 14: ABI ENCODING & FUNCTION SELECTORS
+==============================================
+
+CREATED FILES:
+--------------
+✓ README.md (252 lines)
+  - Comprehensive guide on ABI encoding methods
+  - Security implications and best practices
+  - Real-world examples and vulnerabilities
+  - Detailed comparison tables
+  - Resource links
+
+✓ src/ABIEncoding.sol (111 lines)
+  - Skeleton contract with 45 TODO items
+  - Well-structured learning path
+  - Clear function signatures
+  - Educational comments
+
+✓ src/solution/ABIEncodingSolution.sol (283 lines)
+  - Complete implementation with extensive documentation
+  - Security warnings and best practices
+  - 15+ fully documented functions
+  - Real-world examples
+
+✓ test/ABIEncoding.t.sol (411 lines)
+  - 22 comprehensive test cases
+  - Collision demonstrations
+  - Security vulnerability tests
+  - Gas comparison tests
+  - Real-world attack scenarios
+
+✓ script/Deploy.s.sol (75 lines)
+  - Deployment script with live demonstrations
+  - Console output showing encoding differences
+  - Interactive learning through deployment
+
+✓ foundry.toml
+  - Project configuration for Solidity ^0.8.20
+
+TOTAL: 1,132+ lines of educational content
+
+KEY LEARNING CONCEPTS:
+----------------------
+1. ABI Encoding Methods
+   - abi.encode (safe, padded)
+   - abi.encodePacked (compact, risky)
+   - abi.encodeWithSignature
+   - abi.encodeWithSelector
+
+2. Function Selectors
+   - 4-byte selector calculation
+   - Selector collision risks
+   - Manual function routing
+   - EVM function dispatching
+
+3. Security Vulnerabilities
+   - Hash collision attacks
+   - Signature replay vulnerabilities
+   - encodePacked dangers
+   - Safe hashing practices
+
+4. Practical Skills
+   - When to use each encoding method
+   - Gas optimization with selectors
+   - Fallback function routing
+   - Low-level call data manipulation
+
+TEST COVERAGE:
+--------------
+✓ Encoding comparison tests
+✓ Hash collision demonstrations
+✓ Function selector calculations
+✓ Fallback routing validation
+✓ Security vulnerability scenarios
+✓ Gas usage comparisons
+✓ Type encoding comparisons
+✓ Real-world attack simulations
+
+EDUCATIONAL FEATURES:
+---------------------
+- 45 TODO items for hands-on learning
+- Extensive inline documentation
+- Security warnings throughout
+- Real-world vulnerability examples
+- Gas optimization tips
+- Best practices guidance
+- Interactive console demonstrations
+
+USAGE:
+------
+cd /home/user/solidity-edu/14-abi-encoding
+forge test -vvv                    # Run all tests with verbose output
+forge test --gas-report            # See gas comparisons
+forge test --match-test Collision  # Run collision tests only
+forge script script/Deploy.s.sol   # Deploy with demonstrations
+
+ADVANCED TOPICS COVERED:
+------------------------
+- Birthday paradox and selector collisions
+- EIP-712 typed data hashing
+- Proxy pattern encoding
+- Meta-transaction encoding
+- Storage optimization
+- Low-level assembly operations
+
+This project provides complete, production-quality educational materials
+for understanding ABI encoding and function selectors in Solidity.
