@@ -62,7 +62,7 @@ Total: 65 bytes
 ### Signing Process
 
 ```solidity
-// Off-chain (JavaScript):
+// Off-chain (TypeScript):
 const messageHash = ethers.utils.keccak256(message);
 const signature = await signer.signMessage(messageHash);
 // signature = 0x... (130 hex chars = 65 bytes)

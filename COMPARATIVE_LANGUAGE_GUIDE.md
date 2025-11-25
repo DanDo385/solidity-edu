@@ -1,4 +1,4 @@
-# Comparative Language Guide: Solidity vs Python, Rust, Go, and JavaScript
+# Comparative Language Guide: Solidity vs TypeScript, Go, and Rust
 
 ## Table of Contents
 1. [Introduction](#introduction)
@@ -15,19 +15,19 @@
 
 ## Introduction
 
-Solidity is a unique language designed specifically for writing smart contracts on blockchain platforms like Ethereum. While it borrows syntax from popular languages like JavaScript and Python, its execution model, constraints, and security considerations are fundamentally different. This guide helps developers transitioning from Python, Rust, Go, or JavaScript understand these differences.
+Solidity is a unique language designed specifically for writing smart contracts on blockchain platforms like Ethereum. While it borrows syntax from popular languages like TypeScript, its execution model, constraints, and security considerations are fundamentally different. This guide helps developers transitioning from TypeScript, Go, or Rust understand these differences.
 
 ### Key Differences at a Glance
 
-| Aspect | Solidity | Python | Rust | Go | JavaScript |
-|--------|----------|--------|------|----|----|
-| **Type System** | Static, Strong | Dynamic | Static, Strong | Static, Strong | Dynamic |
-| **Compilation** | Bytecode/EVM | Interpreted | LLVM Compiled | Native Compiled | JIT/Interpreted |
-| **Paradigm** | Object-Oriented | Multi-paradigm | Systems Programming | Simple Systems | Functional/OO |
-| **Immutability** | Enforced for state | Optional | Enforced | Enforced | Optional |
-| **Gas Costs** | Yes (unique) | No | No | No | No |
-| **Concurrency** | None | Threading/Async | Fearless Concurrency | Goroutines | Async/Await |
-| **Memory Model** | Persistent Storage | Automatic GC | Manual+Borrow Checker | Automatic GC | Automatic GC |
+| Aspect | Solidity | TypeScript | Rust | Go |
+|--------|----------|------------|------|-----|
+| **Type System** | Static, Strong, Fixed-size | Static, Strong, Inferred | Static, Strong | Static, Strong |
+| **Compilation** | Bytecode/EVM | Transpiled to JS | LLVM Compiled | Native Compiled |
+| **Paradigm** | Object-Oriented | Multi-paradigm | Systems Programming | Simple Systems |
+| **Immutability** | Enforced for state | Optional (const/readonly) | Enforced | Enforced |
+| **Gas Costs** | Yes (unique) | No | No | No |
+| **Concurrency** | None | Async/Await | Fearless Concurrency | Goroutines |
+| **Memory Model** | Persistent Storage | Automatic GC | Manual+Borrow Checker | Automatic GC |
 
 ---
 
@@ -46,8 +46,8 @@ uint256 public balance = 1000;      // 0 to 2^256-1 (default uint)
 int8 public temperature = -5;       // -128 to 127
 int256 public balance = -1000;
 
-// No arbitrary precision integers like Python
-// uint has fixed size - overflow/underflow is critical concern
+// Fixed-size integers - overflow/underflow is critical concern
+// Solidity 0.8+ automatically checks for overflow
 ```
 
 **Python**
@@ -89,19 +89,19 @@ var balance big.Int
 balance.SetString("1000", 10)
 ```
 
-**JavaScript**
-```javascript
-// JavaScript has only Number type (IEEE 754 double)
-let counter = 0;              // 64-bit floating point
-let temperature = 20;
-let balance = 1000;
+**TypeScript**
+```typescript
+// TypeScript has strong typing with number type
+let counter: number = 0;              // 64-bit floating point
+let temperature: number = 20;
+let balance: number = 1000;
 
 // BigInt for arbitrary precision
-let balance = 1000n;          // BigInt literal
-let counter = BigInt(256);
+let balance: bigint = 1000n;          // BigInt literal
+let counter: bigint = BigInt(256);
 
-// No compile-time type checking
-balance = "string";           // Valid JavaScript!
+// Compile-time type checking
+balance = "string";           // TypeScript error: Type 'string' is not assignable to type 'number'
 ```
 
 ### Boolean and Address Types
@@ -148,16 +148,16 @@ type Address [20]byte
 owner := Address{0x74, 0x2d, ...}
 ```
 
-**JavaScript**
-```javascript
-const isActive = true;
+**TypeScript**
+```typescript
+const isActive: boolean = true;
 
 // Address as string
-const owner = "0x742d35Cc6634C0532925a3b844Bc9e7595f42bE";
+const owner: string = "0x742d35Cc6634C0532925a3b844Bc9e7595f42bE";
 
 // With ethers.js library
 import { ethers } from "ethers";
-const owner = ethers.getAddress("0x742d35...");
+const owner: string = ethers.getAddress("0x742d35...");
 ```
 
 ### Complex Types
@@ -257,30 +257,34 @@ const (
 )
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 // Arrays
-let numbers = [];
+let numbers: number[] = [];
 
 // Objects (mappings)
-const balances = {};
-const nested = {};
+const balances: Record<string, number> = {};
+const nested: Record<string, Record<number, boolean>> = {};
 
 // Classes (like structs)
 class User {
-    constructor(name, balance, active) {
+    name: string;
+    balance: number;
+    active: boolean;
+
+    constructor(name: string, balance: number, active: boolean) {
         this.name = name;
         this.balance = balance;
         this.active = active;
     }
 }
 
-// Enums (simulated)
-const Status = {
-    PENDING: 1,
-    ACTIVE: 2,
-    COMPLETED: 3,
-};
+// Enums
+enum Status {
+    PENDING = 1,
+    ACTIVE = 2,
+    COMPLETED = 3,
+}
 ```
 
 ---
@@ -410,15 +414,15 @@ func (e WithdrawalError) Error() string {
 }
 ```
 
-**JavaScript**
-```javascript
-async withdraw(amount) {
-    // JavaScript uses exceptions and try/catch
+**TypeScript**
+```typescript
+async withdraw(amount: number): Promise<void> {
+    // TypeScript uses exceptions and try/catch
     if (amount <= 0) {
         throw new Error("Amount must be positive");
     }
 
-    const balance = this.balances[this.user] || 0;
+    const balance: number = this.balances[this.user] || 0;
     if (amount > balance) {
         throw new InsufficientFundsError("Insufficient balance");
     }
@@ -431,12 +435,12 @@ async withdraw(amount) {
         this.balances[this.user] -= amount;
         await transferFunds(amount);
     } catch (error) {
-        throw new Error(`Transfer failed: ${error.message}`);
+        throw new Error(`Transfer failed: ${(error as Error).message}`);
     }
 }
 
 class InsufficientFundsError extends Error {
-    constructor(message) {
+    constructor(message: string) {
         super(message);
         this.name = "InsufficientFundsError";
     }
@@ -573,18 +577,21 @@ func (m *MemoryDemo) updateStruct(data *SomeStruct) {
 }
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 class MemoryDemo {
+    count: number;
+    balances: Record<string, number>;
+
     constructor() {
         this.count = 0;
         this.balances = {};
     }
 
-    processData() {
-        // Variables on heap (JS stack mostly holds references)
-        const tempArray = new Array(10).fill(0);
-        const tempString = "temporary";
+    processData(): void {
+        // Variables on heap (TypeScript stack mostly holds references)
+        const tempArray: number[] = new Array(10).fill(0);
+        const tempString: string = "temporary";
 
         this.processArray(tempArray);
 
@@ -592,11 +599,11 @@ class MemoryDemo {
         // Everything is reference unless primitive
     }
 
-    processArray(arr) {
+    processArray(arr: number[]): void {
         arr[0] = 100;  // Modifies the array
     }
 
-    updateStruct(data) {
+    updateStruct(data: { value: number }): void {
         data.value = 100;  // Modifies the object
     }
 }
@@ -610,7 +617,7 @@ class MemoryDemo {
 | **Python** | Primitives | Objects | Yes | Everything is object |
 | **Rust** | Values (owned) | Heap | No | Borrow checker |
 | **Go** | Values | Heap | Yes | Escape analysis |
-| **JavaScript** | Primitives | Objects | Yes | Hidden class optimization |
+| **TypeScript** | Primitives | Objects | Yes | Hidden class optimization |
 
 ---
 
@@ -766,35 +773,37 @@ func NewFunctionDemo() *FunctionDemo {
 }
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 class FunctionDemo {
+    private count: number = 0;
+
     constructor() {
         this.count = 0;
     }
 
     // Public method
-    increment() {
+    increment(): void {
         this.count++;
     }
 
-    // "Private" method (convention with #)
-    #internalIncrement() {
+    // Private method
+    private internalIncrement(): void {
         this.count++;
     }
 
     // Getter
-    get countValue() {
+    get countValue(): number {
         return this.count;
     }
 
     // Static method
-    static add(a, b) {
+    static add(a: number, b: number): number {
         return a + b;
     }
 
     // Async function
-    async fetchData() {
+    async fetchData(): Promise<Response> {
         return await fetch('/data');
     }
 }
@@ -903,10 +912,13 @@ func (m *ModifierDemo) requireOwner() error {
 }
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 class ModifierDemo {
-    async withdraw() {
+    private caller: string;
+    private owner: string;
+
+    async withdraw(): Promise<void> {
         try {
             await this.requireOwner();
             await this.withReentrancyGuard(async () => {
@@ -917,10 +929,15 @@ class ModifierDemo {
         }
     }
 
-    async requireOwner() {
+    private async requireOwner(): Promise<void> {
         if (this.caller !== this.owner) {
             throw new Error("Only owner");
         }
+    }
+
+    private async withReentrancyGuard(fn: () => Promise<void>): Promise<void> {
+        // Implementation
+        await fn();
     }
 }
 ```
@@ -1105,43 +1122,52 @@ type CompleteToken struct {
 }
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 class Ownable {
+    protected owner: string | null;
+    protected caller: string;
+
     constructor() {
         this.owner = null;
+        this.caller = "";
     }
 
-    requireOwner() {
+    requireOwner(): void {
         if (this.caller !== this.owner) {
             throw new Error("Only owner");
         }
     }
 
-    renounceOwnership() {
+    renounceOwnership(): void {
         this.requireOwner();
         this.owner = null;
     }
 }
 
 class Token extends Ownable {
+    name: string;
+    totalSupply: number;
+
     constructor() {
         super();
         this.name = "MyToken";
         this.totalSupply = 0;
     }
 
-    burn() {
+    burn(): void {
         this.requireOwner();
     }
 }
 
 class Pausable {
+    private paused: boolean;
+
     constructor() {
         this.paused = false;
     }
 
-    requireNotPaused() {
+    requireNotPaused(): void {
         if (this.paused) {
             throw new Error("Paused");
         }
@@ -1149,12 +1175,14 @@ class Pausable {
 }
 
 class CompleteToken extends Token {
+    private pausable: Pausable;
+
     constructor() {
         super();
         this.pausable = new Pausable();
     }
 
-    transfer() {
+    transfer(): void {
         this.pausable.requireNotPaused();
     }
 }
@@ -1285,35 +1313,32 @@ type MyToken struct {
 }
 ```
 
-**JavaScript**
-```javascript
-class IERC20 {
-    transfer(to, amount) {
-        throw new Error("Not implemented");
-    }
-
-    balanceOf(account) {
-        throw new Error("Not implemented");
-    }
+**TypeScript**
+```typescript
+abstract class IERC20 {
+    abstract transfer(to: string, amount: number): boolean;
+    abstract balanceOf(account: string): number;
 }
 
 class ERC20 extends IERC20 {
+    protected balances: Record<string, number>;
+
     constructor() {
         super();
         this.balances = {};
     }
 
-    transfer(to, amount) {
+    transfer(to: string, amount: number): boolean {
         return true;
     }
 
-    balanceOf(account) {
+    balanceOf(account: string): number {
         return this.balances[account] || 0;
     }
 }
 
 class MyToken extends ERC20 {
-    mint(to, amount) {
+    mint(to: string, amount: number): void {
         this.balances[to] = (this.balances[to] || 0) + amount;
     }
 }
@@ -1490,27 +1515,27 @@ func (d *AsyncDemo) ConcurrentOperations(ctx context.Context) {
 }
 ```
 
-**JavaScript - Promise/Async Example**
-```javascript
+**TypeScript - Promise/Async Example**
+```typescript
 class AsyncDemo {
-    async calculate() {
-        let result = 0;
+    async calculate(): Promise<number> {
+        let result: number = 0;
         for (let i = 0; i < 1000; i++) {
             if (i % 100 === 0) {
                 // Yield control
-                await new Promise(resolve => setTimeout(resolve, 0));
+                await new Promise<void>(resolve => setTimeout(resolve, 0));
             }
             result += i;
         }
         return result;
     }
 
-    async callOtherService(url) {
-        const response = await fetch(url);
+    async callOtherService(url: string): Promise<any> {
+        const response: Response = await fetch(url);
         return await response.json();
     }
 
-    async concurrentOperations() {
+    async concurrentOperations(): Promise<[number, any, any]> {
         // Run multiple operations concurrently
         const [r1, r2, r3] = await Promise.all([
             this.calculate(),
@@ -1587,56 +1612,64 @@ Testing approaches vary significantly across languages due to their different pa
 ### Unit Testing
 
 **Solidity - Hardhat**
-```javascript
-// tests/MyToken.test.js
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+```typescript
+// tests/MyToken.test.ts
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { Contract, Signer } from "ethers";
 
 describe("MyToken", function () {
-    let token;
-    let owner, addr1, addr2;
+    let token: Contract;
+    let owner: Signer, addr1: Signer, addr2: Signer;
+    let ownerAddress: string, addr1Address: string, addr2Address: string;
 
     beforeEach(async function () {
         [owner, addr1, addr2] = await ethers.getSigners();
+        ownerAddress = await owner.getAddress();
+        addr1Address = await addr1.getAddress();
+        addr2Address = await addr2.getAddress();
         const MyToken = await ethers.getContractFactory("MyToken");
         token = await MyToken.deploy();
     });
 
     describe("Minting", function () {
         it("Should mint tokens to owner", async function () {
-            await token.mint(owner.address, 100);
-            expect(await token.balanceOf(owner.address)).to.equal(100);
+            await token.mint(ownerAddress, 100);
+            expect(await token.balanceOf(ownerAddress)).to.equal(100);
         });
 
         it("Should only allow owner to mint", async function () {
             await expect(
-                token.connect(addr1).mint(addr1.address, 100)
+                token.connect(addr1).mint(addr1Address, 100)
             ).to.be.revertedWith("Only owner");
         });
     });
 
     describe("Transfers", function () {
         beforeEach(async function () {
-            await token.mint(owner.address, 100);
+            await token.mint(ownerAddress, 100);
         });
 
         it("Should transfer tokens", async function () {
-            await token.transfer(addr1.address, 50);
-            expect(await token.balanceOf(addr1.address)).to.equal(50);
-            expect(await token.balanceOf(owner.address)).to.equal(50);
+            await token.transfer(addr1Address, 50);
+            expect(await token.balanceOf(addr1Address)).to.equal(50);
+            expect(await token.balanceOf(ownerAddress)).to.equal(50);
         });
     });
 });
 ```
 
 **Solidity - Truffle**
-```javascript
-// test/MyToken.test.js
-const MyToken = artifacts.require("MyToken");
+```typescript
+// test/MyToken.test.ts
+import { artifacts, contract } from "hardhat";
+import { Contract } from "ethers";
 
-contract("MyToken", accounts => {
+const MyToken = await artifacts.readArtifact("MyToken");
+
+contract("MyToken", (accounts: string[]) => {
     const [owner, addr1, addr2] = accounts;
-    let token;
+    let token: Contract;
 
     beforeEach(async () => {
         token = await MyToken.new();
@@ -1652,7 +1685,7 @@ contract("MyToken", accounts => {
         try {
             await token.mint(addr1, 100, { from: addr1 });
             assert.fail("Should have thrown");
-        } catch (error) {
+        } catch (error: any) {
             assert(error.message.includes("Only owner"));
         }
     });
@@ -1791,11 +1824,11 @@ func BenchmarkMint(b *testing.B) {
 // Run benchmarks: go test -bench=.
 ```
 
-**JavaScript - Jest**
-```javascript
+**TypeScript - Jest**
+```typescript
 describe("MyToken", () => {
-    let token;
-    let owner, addr1, addr2;
+    let token: MyToken;
+    let owner: string, addr1: string, addr2: string;
 
     beforeEach(() => {
         token = new MyToken();
@@ -1829,15 +1862,15 @@ describe("MyToken", () => {
 });
 ```
 
-**JavaScript - Mocha + Chai**
-```javascript
-const { expect } = require("chai");
-const MyToken = require("../src/MyToken");
+**TypeScript - Mocha + Chai**
+```typescript
+import { expect } from "chai";
+import { MyToken } from "../src/MyToken";
 
 describe("MyToken", function() {
-    let token;
-    let owner = "0x123...";
-    let addr1 = "0x456...";
+    let token: MyToken;
+    let owner: string = "0x123...";
+    let addr1: string = "0x456...";
 
     beforeEach(function() {
         token = new MyToken();
@@ -1958,15 +1991,15 @@ import (
 )
 ```
 
-**JavaScript/Node.js**
+**TypeScript/Node.js**
 ```json
 // package.json
+// @node (18.11-18.13)
 {
   "name": "smart-contracts",
   "version": "1.0.0",
-  "type": "module",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.11.0 <=18.13.0"
   },
   "dependencies": {
     "ethers": "^6.0.0",
@@ -1975,17 +2008,21 @@ import (
   },
   "devDependencies": {
     "hardhat": "^2.14.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
     "chai": "^4.3.0",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
   },
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "deploy": "hardhat run scripts/deploy.js"
+    "deploy": "hardhat run scripts/deploy.ts"
   }
 }
 
-// Import in JavaScript
+// Import in TypeScript
 import { ethers } from "ethers";
 import { MyToken__factory } from "./typechain";
 ```
@@ -1998,7 +2035,7 @@ import { MyToken__factory } from "./typechain";
 | **Python** | pip/pipenv/poetry | requirements.lock | PyPI |
 | **Rust** | Cargo | Cargo.lock | crates.io |
 | **Go** | go mod | go.mod/go.sum | pkg.go.dev |
-| **JavaScript** | npm/yarn/pnpm | package-lock.json | npmjs.com |
+| **TypeScript** | npm/yarn/pnpm | package-lock.json | npmjs.com |
 
 ---
 
@@ -2287,15 +2324,15 @@ func safe() {
 }
 ```
 
-### JavaScript Security: Dynamic Types and Scope
+### TypeScript Security: Type Safety and Scope
 
-**JavaScript Security Issues**
-```javascript
+**TypeScript Security Issues**
+```typescript
 // VULNERABILITY: String concatenation for sensitive operations
 class VulnerableWallet {
-    transfer(to, amount) {
+    transfer(to: string, amount: number): void {
         // WRONG: Building transaction string
-        const tx = `transfer(${to}, ${amount})`;
+        const tx: string = `transfer(${to}, ${amount})`;
         // Could be exploited!
     }
 }
@@ -2304,32 +2341,32 @@ class VulnerableWallet {
 import { ethers } from "ethers";
 
 class SecureWallet {
-    async transfer(to, amount) {
+    async transfer(to: string, amount: bigint): Promise<void> {
         const tx = await this.contract.transfer(to, amount);
-        return await tx.wait();
+        await tx.wait();
     }
 }
 
 // VULNERABILITY: Global scope pollution
-var globalState = 0;  // WRONG: Creates global variable
+let globalState: number = 0;  // WRONG: Creates global variable
 
-function increment() {
+function increment(): void {
     globalState++;  // Modifies global
 }
 
 // FIX: Use closures and modules
 const counter = (() => {
-    let count = 0;  // Private variable
+    let count: number = 0;  // Private variable
 
     return {
-        increment() { count++; },
-        get: () => count,
+        increment(): void { count++; },
+        get(): number { return count; },
     };
 })();
 
-// VULNERABILITY: Type coercion bugs
+// VULNERABILITY: Type coercion bugs (less common in TypeScript)
 class VulnerableCheck {
-    isValid(value) {
+    isValid(value: any): boolean {
         if (value == "0") return true;  // Type coercion!
         return false;
     }
@@ -2339,26 +2376,26 @@ class VulnerableCheck {
 isValid(false);  // true (== is loose)
 isValid([]);     // true (== coerces)
 
-// FIX: Use strict equality
+// FIX: Use strict equality and proper types
 class SafeCheck {
-    isValid(value) {
-        if (value === "0") return true;  // Strict equality
+    isValid(value: string | number): boolean {
+        if (value === "0" || value === 0) return true;  // Strict equality
         return false;
     }
 }
 
 // VULNERABILITY: Promise handling
 class VulnerableAsync {
-    async fetchData() {
-        const data = fetch(url);  // Forgot await!
+    async fetchData(): Promise<any> {
+        const data: Promise<Response> = fetch(url);  // Forgot await!
         return data.json();  // Error!
     }
 }
 
 // FIX: Proper async/await
 class SafeAsync {
-    async fetchData() {
-        const response = await fetch(url);
+    async fetchData(): Promise<any> {
+        const response: Response = await fetch(url);
         return await response.json();
     }
 }
@@ -2526,32 +2563,34 @@ func performanceDemo() {
 // - Garbage collection overhead minimal
 ```
 
-**JavaScript**
-```javascript
+**TypeScript**
+```typescript
 // JIT compiled, garbage collected
 // Performance varies by V8 optimization
 
 class PerformanceDemo {
+    items: number[];
+
     constructor() {
         this.items = [];
     }
 
-    simpleOperation() {
-        let total = 0;
+    simpleOperation(): number {
+        let total: number = 0;
         for (let i = 0; i < 100; i++) {
             total += i;
         }
         return total;
     }
 
-    listOperations() {
+    listOperations(): void {
         for (let i = 0; i < 1000; i++) {
             this.items.push(i);
         }
     }
 
     // Array methods often optimized
-    builtinSum() {
+    builtinSum(): number {
         return Array.from({length: 1000}, (_, i) => i)
             .reduce((a, b) => a + b, 0);
     }
@@ -2572,7 +2611,7 @@ console.timeEnd("simple");
 
 ### Performance Comparison Table
 
-| Operation | Solidity | Python | Rust | Go | JavaScript |
+| Operation | Solidity | Python | Rust | Go | TypeScript |
 |-----------|----------|--------|------|----|----|
 | **Simple Arithmetic** | 3-5 gas | μs | ns | ns | μs |
 | **Array Push** | 20,000+ gas | μs | ns | ns | ns |
@@ -2609,13 +2648,13 @@ console.timeEnd("simple");
 - **State Management**: Permanent state (storage) is unique to blockchain
 - **Testing**: Requires specific blockchain testing tools (Hardhat, Truffle)
 
-### Coming from JavaScript
+### Coming from TypeScript
 
-- **Types**: Mandatory strong typing - no dynamic types like JavaScript
+- **Types**: Similar strong typing, but Solidity types are fixed-size and more restrictive
 - **Async/Await**: Not available - use callbacks or multi-step transactions
-- **Numbers**: Integers are fixed-size - overflow is a major concern
-- **Scope**: All functions can be called externally - careful with visibility
-- **Gas**: Every operation has a cost - write efficient code
+- **Numbers**: Integers are fixed-size - overflow is a major concern (unlike TypeScript's number)
+- **Scope**: All functions can be called externally - careful with visibility modifiers
+- **Gas**: Every operation has a cost - write efficient code (unlike TypeScript where performance is less critical)
 
 ---
 

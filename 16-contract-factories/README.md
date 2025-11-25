@@ -161,13 +161,13 @@ function deploy(bytes32 salt, bytes memory bytecode) public returns (address add
 
 You can predict addresses before deployment using the same formula:
 
-### JavaScript Example
+### TypeScript Example
 
-```javascript
-const { ethers } = require('ethers');
+```typescript
+import { ethers } from 'ethers';
 
-function predictAddress(factoryAddress, salt, initCodeHash) {
-    return ethers.utils.getCreate2Address(
+function predictAddress(factoryAddress: string, salt: string, initCodeHash: string): string {
+    return ethers.getCreate2Address(
         factoryAddress,
         salt,
         initCodeHash
@@ -175,12 +175,12 @@ function predictAddress(factoryAddress, salt, initCodeHash) {
 }
 
 // Usage
-const factory = "0x1234...";
-const salt = ethers.utils.id("my-salt");
-const initCode = MyContract.bytecode;
-const initCodeHash = ethers.utils.keccak256(initCode);
+const factory: string = "0x1234...";
+const salt: string = ethers.id("my-salt");
+const initCode: string = MyContract.bytecode;
+const initCodeHash: string = ethers.keccak256(initCode);
 
-const predicted = predictAddress(factory, salt, initCodeHash);
+const predicted: string = predictAddress(factory, salt, initCodeHash);
 ```
 
 ### Solidity Example
@@ -407,16 +407,16 @@ function deploy(bytes32 salt, bytes memory bytecode) public {
 
 ```bash
 # Run tests
-forge test --match-path test/Project16.t.sol -vvv
+forge test --match-path test/ContractFactory.t.sol -vvv
 
 # Check skeleton
 forge build
 
 # See solution
-cat src/solution/Project16Solution.sol
+cat src/solution/ContractFactorySolution.sol
 
 # Deploy
-forge script script/DeployProject16.s.sol --rpc-url $RPC_URL --broadcast
+forge script script/DeployContractFactory.s.sol --rpc-url $RPC_URL --broadcast
 ```
 
 ## Additional Resources

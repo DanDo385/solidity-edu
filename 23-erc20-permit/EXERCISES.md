@@ -427,15 +427,15 @@ function batchPermit(PermitData[] calldata permits) external {
 
 Write a script to create permit signatures off-chain:
 
-```javascript
-// In JavaScript/TypeScript
+```typescript
+// In TypeScript
 async function createPermitSignature(
-    token,
-    owner,
-    spender,
-    value,
-    deadline
-) {
+    token: any,
+    owner: string,
+    spender: string,
+    value: bigint,
+    deadline: number
+): Promise<{ v: number; r: string; s: string }> {
     // TODO: Get domain separator
     // TODO: Get nonce
     // TODO: Create EIP-712 signature

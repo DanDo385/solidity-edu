@@ -1,6 +1,6 @@
 # EIP-712 Signing Guide
 
-This guide shows you how to create EIP-712 signatures off-chain using JavaScript/TypeScript with ethers.js.
+This guide shows you how to create EIP-712 signatures off-chain using TypeScript with ethers.js.
 
 ## Table of Contents
 - [Setup](#setup)
@@ -27,7 +27,7 @@ EIP-712 signatures require three components:
 ### 1. Domain
 Identifies the signing context (contract, chain, version):
 
-```javascript
+```typescript
 const domain = {
     name: 'Project19',
     version: '1',
@@ -39,7 +39,7 @@ const domain = {
 ### 2. Types
 Defines the structure of your data:
 
-```javascript
+```typescript
 const types = {
     Permit: [
         { name: 'owner', type: 'address' },
@@ -56,7 +56,7 @@ const types = {
 ### 3. Value
 The actual data to sign:
 
-```javascript
+```typescript
 const value = {
     owner: '0x...',
     spender: '0x...',
@@ -70,12 +70,12 @@ const value = {
 
 ### Example 1: Permit Signature
 
-```javascript
+```typescript
 import { ethers } from 'ethers';
 
-async function signPermit() {
+async function signPermit(): Promise<{ signature: string; v: number; r: string; s: string }> {
     // Create wallet (or use browser wallet)
-    const privateKey = '0x...';
+    const privateKey: string = '0x...';
     const wallet = new ethers.Wallet(privateKey);
 
     // Define domain
@@ -123,8 +123,8 @@ async function signPermit() {
 
 ### Example 2: Meta-Transaction Signature
 
-```javascript
-async function signMetaTx() {
+```typescript
+async function signMetaTx(): Promise<{ v: number; r: string; s: string }> {
     const wallet = new ethers.Wallet('0x...');
 
     const domain = {
@@ -161,8 +161,8 @@ async function signMetaTx() {
 
 ### Example 3: Voucher Signature (Admin)
 
-```javascript
-async function createVoucher(claimer, amount) {
+```typescript
+async function createVoucher(claimer: string, amount: bigint): Promise<{ v: number; r: string; s: string }> {
     const adminWallet = new ethers.Wallet('0x...'); // Admin's private key
 
     const domain = {
@@ -205,10 +205,10 @@ async function createVoucher(claimer, amount) {
 
 The API is slightly different in v5:
 
-```javascript
+```typescript
 import { ethers } from 'ethers';
 
-async function signPermitV5() {
+async function signPermitV5(): Promise<{ v: number; r: string; s: string }> {
     const wallet = new ethers.Wallet('0x...');
 
     const domain = {
@@ -254,10 +254,16 @@ async function signPermitV5() {
 
 ### Off-Chain Verification
 
-```javascript
+```typescript
 import { ethers } from 'ethers';
 
-function verifySignature(domain, types, value, signature, expectedSigner) {
+function verifySignature(
+    domain: any,
+    types: any,
+    value: any,
+    signature: string,
+    expectedSigner: string
+): boolean {
     // Recover signer from signature
     const recoveredAddress = ethers.verifyTypedData(
         domain,
@@ -281,8 +287,15 @@ console.log('Signature valid:', isValid);
 
 After signing off-chain, submit to contract:
 
-```javascript
-async function submitPermit(contract, owner, spender, value, deadline, signature) {
+```typescript
+async function submitPermit(
+    contract: any,
+    owner: string,
+    spender: string,
+    value: bigint,
+    deadline: number,
+    signature: string
+): Promise<void> {
     const sig = ethers.Signature.from(signature);
 
     const tx = await contract.permit(
@@ -304,7 +317,7 @@ async function submitPermit(contract, owner, spender, value, deadline, signature
 
 ### 1. Wrong Domain Name or Version
 
-```javascript
+```typescript
 // ❌ Wrong - doesn't match contract
 const domain = {
     name: 'MyContract', // Contract uses 'Project19'
@@ -322,7 +335,7 @@ const domain = {
 
 ### 2. Wrong Chain ID
 
-```javascript
+```typescript
 // ❌ Wrong - signing for mainnet but deploying on testnet
 const domain = {
     chainId: 1, // Mainnet
@@ -340,7 +353,7 @@ const domain = {
 
 ### 3. Wrong Verifying Contract
 
-```javascript
+```typescript
 // ❌ Wrong - using wrong contract address
 const domain = {
     verifyingContract: '0x0000...', // Wrong address
@@ -357,27 +370,27 @@ const domain = {
 
 ### 4. Expired Deadline
 
-```javascript
+```typescript
 // ❌ Wrong - already expired
-const deadline = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+const deadline: number = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
 
 // ✅ Correct - future timestamp
-const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+const deadline: number = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
 ```
 
 ### 5. Wrong Nonce
 
-```javascript
+```typescript
 // ❌ Wrong - not checking current nonce
-const nonce = 0; // Might be wrong if user already used signatures
+const nonce: number = 0; // Might be wrong if user already used signatures
 
 // ✅ Correct - query contract for current nonce
-const nonce = await contract.nonces(userAddress);
+const nonce: bigint = await contract.nonces(userAddress);
 ```
 
 ### 6. Type Mismatch
 
-```javascript
+```typescript
 // ❌ Wrong - type doesn't match contract
 const types = {
     Permit: [
@@ -402,7 +415,7 @@ const types = {
 
 ### 7. Field Order Matters
 
-```javascript
+```typescript
 // The order of fields in types MUST match the order in your Solidity struct
 // Solidity: Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)
 
@@ -429,16 +442,16 @@ const types = {
 
 ## Complete Integration Example
 
-```javascript
+```typescript
 import { ethers } from 'ethers';
 
-async function main() {
+async function main(): Promise<void> {
     // Setup
     const provider = new ethers.JsonRpcProvider('http://localhost:8545');
     const wallet = new ethers.Wallet('0x...', provider);
 
-    const contractAddress = '0x...';
-    const contractABI = [...]; // Your contract ABI
+    const contractAddress: string = '0x...';
+    const contractABI: any[] = [...]; // Your contract ABI
     const contract = new ethers.Contract(contractAddress, contractABI, wallet);
 
     // Get current nonce
@@ -450,9 +463,9 @@ async function main() {
     console.log('Chain ID:', network.chainId);
 
     // Prepare permit
-    const spender = '0x...';
-    const value = ethers.parseEther('100');
-    const deadline = Math.floor(Date.now() / 1000) + 3600;
+    const spender: string = '0x...';
+    const value: bigint = ethers.parseEther('100');
+    const deadline: number = Math.floor(Date.now() / 1000) + 3600;
 
     // Define EIP-712 components
     const domain = {
@@ -521,13 +534,13 @@ main().catch(console.error);
 
 ## Browser Integration (MetaMask)
 
-```javascript
-async function signWithMetaMask() {
+```typescript
+async function signWithMetaMask(): Promise<string> {
     // Request account access
-    const accounts = await window.ethereum.request({
+    const accounts: string[] = await (window as any).ethereum.request({
         method: 'eth_requestAccounts'
     });
-    const userAddress = accounts[0];
+    const userAddress: string = accounts[0];
 
     // Get provider
     const provider = new ethers.BrowserProvider(window.ethereum);

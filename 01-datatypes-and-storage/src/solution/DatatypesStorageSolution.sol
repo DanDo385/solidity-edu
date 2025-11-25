@@ -11,46 +11,72 @@ pragma solidity ^0.8.20;
  *      - Gas-efficient struct packing
  *      - Common patterns and best practices
  *
- * TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPW
- * Q                        CONCEPTUAL OVERVIEW                                Q
- * ZPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP]
+ * ????????????????????????????????????????????????????????????????????????????
+ *                        CONCEPTUAL OVERVIEW
+ * ????????????????????????????????????????????????????????????????????????????
  *
  * SOLIDITY TYPE SYSTEM: Why so strict?
- * PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
- * Unlike Python/JavaScript (dynamic typing), Solidity requires explicit types
- * because the EVM (Ethereum Virtual Machine) needs to:
+ * ????????????????????????????????????
+ * 
+ * REAL-WORLD ANALOGY: Solidity types are like numbered lockers in a gym.
+ * Each locker (variable) has a fixed size (type) and can only hold items that
+ * fit exactly. Unlike TypeScript/Go/Rust where storage is flexible, Solidity
+ * requires exact sizes because every node on the blockchain must compute the
+ * same storage layout.
+ *
+ * Unlike TypeScript/Go/Rust (static typing with inference), Solidity requires
+ * explicit types and sizes because the EVM (Ethereum Virtual Machine) needs to:
  *   1. Calculate exact gas costs at compile time
  *   2. Determine storage layout deterministically
  *   3. Prevent type confusion attacks
  *   4. Enable all nodes to compute identical state
  *
  * COMPARISON TO OTHER LANGUAGES:
- * PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
- * Python:   x = 42; x = "hello"  # Dynamic, type changes OK
- * JavaScript: let x = 42; x = "hi"; // Also dynamic
- * Rust:     let x: u256 = 42;  // Static, but with inference
- * Go:       var x uint256 = 42  // Static, explicit
- * Solidity: uint256 x = 42;  // Static, explicit, NO inference
+ * ????????????????????????????????
+ * 
+ * TypeScript:
+ *   let x: number = 42;  // Static typing with inference
+ *   x = "hello";  // Compile error ?
+ *
+ * Go:
+ *   var x uint256 = 42  // Static, explicit types
+ *   x = "hello"  // Compile error ?
+ *
+ * Rust:
+ *   let x: u256 = 42;  // Static, strong inference
+ *   x = "hello";  // Compile error ?
+ *
+ * Solidity:
+ *   uint256 x = 42;  // Static, explicit, NO inference, fixed size
+ *   x = "hello";  // Compile error ?
+ *   // Must always specify type AND size
  *
  * STORAGE MODEL:
- * PPPPPPPPPPPPP
+ * ??????????????
+ * 
+ * REAL-WORLD ANALOGY: Storage slots are like numbered lockers in a gym.
+ * Each locker (slot) can hold exactly 32 bytes (256 bits). You can pack
+ * multiple small items (variables) into one locker if they fit, saving money
+ * (gas). Reading/writing to lockers costs money - first access is expensive
+ * (cold), subsequent accesses are cheaper (warm).
+ *
  * Every contract has 2^256 storage slots (each 32 bytes / 256 bits)
  * State variables are packed into slots sequentially
  * Variables < 32 bytes can share slots if declared consecutively
  *
  * COSTS (as of 2024):
- * PPPPPPPPPPPPPPPPPP
- * - SSTORE (cold): ~20,000 gas (first write to slot)
- * - SSTORE (warm): ~5,000 gas (update existing slot)
- * - SLOAD (cold): ~2,100 gas (first read from slot)
- * - SLOAD (warm): ~100 gas (subsequent reads)
- * - Memory: ~3 gas per 32-byte word
- * - Calldata: cheapest, read-only from transaction data
+ * ????????????????????
+ * - SSTORE (cold): ~20,000 gas (first write to slot) - like renting a new locker
+ * - SSTORE (warm): ~5,000 gas (update existing slot) - like accessing your locker
+ * - SLOAD (cold): ~2,100 gas (first read from slot) - like opening a locker for first time
+ * - SLOAD (warm): ~100 gas (subsequent reads) - like quickly checking your locker
+ * - Memory: ~3 gas per 32-byte word - like using a temporary desk
+ * - Calldata: cheapest, read-only from transaction data - like reading a letter
  */
 contract DatatypesStorageSolution {
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ????????????????????????????????????????????????????????????????????????
     // STATE VARIABLES (Storage)
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ????????????????????????????????????????????????????????????????????????
 
     /**
      * @notice A simple unsigned integer (256 bits / 32 bytes)
@@ -60,11 +86,15 @@ contract DatatypesStorageSolution {
      *      unless used in structs for packing
      *
      * GAS COST: Writing this costs ~20,000 gas (first write)
+     * 
+     * REAL-WORLD ANALOGY: Like renting a storage unit - first time costs more
+     * (cold write), but accessing it later is cheaper (warm write).
      *
-     * COMPARISON:
-     *   Python: x = 42  (arbitrary precision, dynamic)
-     *   Rust: let x: u256 = 42;  (explicit, stack or heap)
-     *   Solidity: uint256 x = 42;  (explicit, blockchain storage)
+     * LANGUAGE COMPARISON:
+     *   TypeScript: let x: number = 42;  (static typing, no size concern)
+     *   Go: var x uint256 = 42  (static, explicit, size varies by platform)
+     *   Rust: let x: u256 = 42;  (static, explicit, size depends on target)
+     *   Solidity: uint256 x = 42;  (static, explicit, FIXED 256-bit size)
      */
     uint256 public number;
 
@@ -142,7 +172,7 @@ contract DatatypesStorageSolution {
      * GAS WARNING:
      *   - push(): ~20,000+ gas (cold storage write)
      *   - pop(): ~5,000 gas (sets last element to 0, refunds gas)
-     *   - Iterating large arrays can exceed block gas limit � DoS
+     *   - Iterating large arrays can exceed block gas limit ï¿½ DoS
      *
      * BEST PRACTICE: Limit array sizes or use off-chain indexing
      *
@@ -159,9 +189,9 @@ contract DatatypesStorageSolution {
      * @dev This struct is NOT packed (each field uses full slot)
      *
      * STORAGE LAYOUT (in mapping):
-     *   address: 20 bytes � occupies 32 bytes (slot 0 of struct)
-     *   uint256: 32 bytes � occupies 32 bytes (slot 1 of struct)
-     *   bool: 1 byte � occupies 32 bytes (slot 2 of struct)
+     *   address: 20 bytes ï¿½ occupies 32 bytes (slot 0 of struct)
+     *   uint256: 32 bytes ï¿½ occupies 32 bytes (slot 1 of struct)
+     *   bool: 1 byte ï¿½ occupies 32 bytes (slot 2 of struct)
      *
      * TOTAL: 96 bytes (3 slots) per User
      *
@@ -191,7 +221,7 @@ contract DatatypesStorageSolution {
      * @dev TOTAL: 64 bytes (2 slots) instead of 128 bytes (4 slots)
      *
      * PACKING RULES:
-     *   1. Variables pack if total size d 32 bytes
+     *   1. Variables pack if total size <= 32 bytes
      *   2. Packing ONLY works in structs, not global state variables
      *   3. Order matters! Solidity doesn't reorder
      *
@@ -199,16 +229,38 @@ contract DatatypesStorageSolution {
      *   Slot 0: [uint128 smallNumber1][uint128 smallNumber2]  (16+16=32 bytes)
      *   Slot 1: [uint64 timestamp][address user][bool flag]    (8+20+1=29 bytes)
      *
+     * GAS OPTIMIZATION: Why pack structs?
+     * - Unpacked version: 4 slots = 4 * 20,000 gas (cold) = 80,000 gas
+     * - Packed version: 2 slots = 2 * 20,000 gas (cold) = 40,000 gas
+     * - Savings: ~40,000 gas per struct write!
+     *
      * GAS SAVINGS: 2 slots vs 4 slots = ~10,000 gas saved per write!
      *
      * TRADE-OFF:
-     *    Saves storage gas
-     *   L Slightly more complex read/write operations
-     *   L Must access both values in slot to modify one (in some cases)
+     *   ✅ Saves storage gas
+     *   ❌ Slightly more complex read/write operations
+     *   ❌ Must access both values in slot to modify one (in some cases)
      *
-     * COMPARISON TO RUST:
-     *   Rust #[repr(packed)] does similar optimization
-     *   But Solidity's packing is automatic within structs
+     * ALTERNATIVE (unpacked):
+     *   struct UnpackedData {
+     *       uint128 smallNumber1;  // Slot 0 (wastes 16 bytes)
+     *       uint128 smallNumber2;  // Slot 1 (wastes 16 bytes)
+     *       uint64 timestamp;      // Slot 2 (wastes 24 bytes)
+     *       address user;          // Slot 3 (wastes 12 bytes)
+     *       bool flag;             // Slot 4 (wastes 31 bytes)
+     *   }
+     *   Total: 5 slots = 100,000 gas (cold) vs 2 slots = 40,000 gas
+     *   Savings: 60,000 gas (60% reduction!)
+     *
+     * REAL-WORLD ANALOGY: Like packing a suitcase efficiently - you can fit
+     * more items (data) in fewer suitcases (storage slots), saving space
+     * (gas) and money (transaction costs).
+     *
+     * LANGUAGE COMPARISON:
+     *   TypeScript: No packing - memory layout managed by JavaScript engine
+     *   Go: Struct fields aligned, but no explicit packing control
+     *   Rust: #[repr(packed)] does similar optimization
+     *   Solidity: Packing is automatic within structs, but order matters!
      */
     struct PackedData {
         uint128 smallNumber1; // 16 bytes
@@ -220,9 +272,9 @@ contract DatatypesStorageSolution {
         // ^^ These three pack into one 32-byte slot (8+20+1=29, <32)
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
     // EVENTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
 
     /**
      * @notice Emitted when number is updated
@@ -237,9 +289,9 @@ contract DatatypesStorageSolution {
 
     event UserRegistered(address indexed wallet, uint256 balance);
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
     // CONSTRUCTOR
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
 
     /**
      * @notice Initializes the contract
@@ -262,9 +314,9 @@ contract DatatypesStorageSolution {
         // constructor(address _owner) { owner = _owner; }
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
     // VALUE TYPE FUNCTIONS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
 
     /**
      * @notice Set the number value
@@ -277,20 +329,42 @@ contract DatatypesStorageSolution {
      *      - Event emission: ~2,000 gas
      *      TOTAL: ~45,000 gas (first call), ~28,000 gas (subsequent)
      *
+     * GAS OPTIMIZATION: Why cache oldNumber?
+     * - Reading number: 1 SLOAD = 100 gas (warm)
+     * - We use it for the event
+     * - If we read it twice: 2 SLOADs = 200 gas
+     * - Caching: 1 SLOAD + 1 MLOAD = 103 gas
+     * - Savings: ~97 gas
+     *
+     * ALTERNATIVE (less efficient):
+     *   emit NumberUpdated(number, _number);  // Reads number twice
+     *   number = _number;
+     *   This would cost more gas due to multiple storage reads
+     *
      * WHY PUBLIC?
      *   - Callable externally and internally
      *   - Generates automatic getter
      *   - Costs ~200 gas more than 'external' due to memory copying
      *
+     * ALTERNATIVE: Could use 'external' if never called internally
+     *   - Saves ~200 gas per call
+     *   - But can't call from within contract
+     *
      * VISIBILITY OPTIONS:
-     *   public: callable anywhere
+     *   public: callable anywhere (costs ~200 gas more for arrays)
      *   external: callable only from outside (cheaper for arrays)
      *   internal: callable only by this contract or derived contracts
      *   private: callable only by this contract
+     *
+     * REAL-WORLD ANALOGY: Like updating a value in a spreadsheet - you read
+     * the old value first (to log it), then write the new value. Caching the
+     * old value is like writing it on a sticky note so you don't have to
+     * look it up again.
      */
     function setNumber(uint256 _number) public {
-        uint256 oldNumber = number; // Read from storage (SLOAD)
-        number = _number; // Write to storage (SSTORE)
+        // GAS OPTIMIZATION: Cache storage read to avoid re-reading
+        uint256 oldNumber = number; // Read from storage (SLOAD: 100 gas warm)
+        number = _number; // Write to storage (SSTORE: 5,000 gas warm)
         emit NumberUpdated(oldNumber, _number); // Emit event for off-chain tracking
     }
 
@@ -321,19 +395,30 @@ contract DatatypesStorageSolution {
      *      If number == type(uint256).max, this reverts automatically
      *      Pre-0.8.0: Would silently wrap to 0 (overflow)
      *
+     * GAS OPTIMIZATION: Why use += instead of separate operations?
+     * - number += 1: 1 SLOAD + 1 SSTORE = ~5,100 gas (warm)
+     * - Alternative: uint256 temp = number; temp += 1; number = temp;
+     *   Costs: 1 SLOAD + 1 MLOAD + 1 ADD + 1 SSTORE = ~5,103 gas
+     * - Savings: Minimal (~3 gas), but += is cleaner
+     *
      * GAS: ~5,000 gas if slot is warm (already accessed)
      *
      * ALTERNATIVE PATTERNS:
-     *   unchecked { number += 1; }  // Disable overflow check, save gas
+     *   unchecked { number += 1; }  // Disable overflow check, save ~100 gas
      *   But DANGEROUS if overflow is possible!
+     *   Only use unchecked when you're CERTAIN overflow can't happen
+     *
+     * REAL-WORLD ANALOGY: Like incrementing a counter - you read the current
+     * value, add 1, and write it back. Using += does this in one operation.
      */
     function incrementNumber() public {
-        number += 1; // Checked arithmetic (safe, but costs gas)
+        // Checked arithmetic (safe, but costs ~100 gas for overflow check)
+        number += 1; // SLOAD (100) + ADD (3) + SSTORE (5,000) = ~5,103 gas (warm)
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
     // MAPPING FUNCTIONS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
 
     /**
      * @notice Set balance for an address
@@ -350,13 +435,27 @@ contract DatatypesStorageSolution {
      *   Slot = keccak256(abi.encodePacked(_address, 4))
      *   where 4 is the slot of the 'balances' mapping
      *
-     * GAS: ~20,000 gas (first write to this address)
-     *      ~5,000 gas (update existing balance)
+     * GAS OPTIMIZATION: Direct assignment vs read-modify-write
+     * - balances[_address] = _balance: 1 SSTORE = ~20,000 gas (cold) or ~5,000 (warm)
+     * - Alternative: uint256 old = balances[_address]; balances[_address] = _balance;
+     *   Costs: 1 SLOAD + 1 SSTORE = ~7,100 gas (warm)
+     * - Direct assignment saves: ~2,100 gas (no need to read if we're overwriting)
      *
-     * PYTHON EQUIVALENT:
-     *   balances[_address] = _balance
+     * GAS: ~20,000 gas (first write to this address - cold)
+     *      ~5,000 gas (update existing balance - warm)
+     *
+     * REAL-WORLD ANALOGY: Like writing a new value in a phone book - if you're
+     * replacing the entire entry, you don't need to read it first. Just write
+     * the new value directly.
+     *
+     * LANGUAGE COMPARISON:
+     *   TypeScript: balances.set(address, balance) - similar concept
+     *   Go: balances[address] = balance - similar syntax
+     *   Rust: balances.insert(address, balance) - similar concept
+     *   Solidity: balances[address] = balance - direct assignment
      */
     function setBalance(address _address, uint256 _balance) public {
+        // Direct assignment - no need to read first if we're overwriting
         balances[_address] = _balance; // SSTORE to calculated slot
     }
 
@@ -380,9 +479,9 @@ contract DatatypesStorageSolution {
         return balances[_address]; // SLOAD from calculated slot
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
     // ARRAY FUNCTIONS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+    // ════════════════════════════════════════════════════════════════════════
 
     /**
      * @notice Add a number to the numbers array
@@ -400,9 +499,9 @@ contract DatatypesStorageSolution {
      *   Element 1: keccak256(5) + 1
      *   ...
      *
-     * � DANGER: Unbounded growth!
+     * ï¿½ DANGER: Unbounded growth!
      *   If array grows too large, iterating over it can exceed block gas limit
-     *   � Contract becomes unusable (DoS)
+     *   ï¿½ Contract becomes unusable (DoS)
      *
      * BEST PRACTICE:
      *   - Limit array sizes
@@ -538,7 +637,7 @@ contract DatatypesStorageSolution {
      *   - Can be executed off-chain (no gas)
      *   - Can be executed locally by contracts (costs gas)
      *
-     * GAS: ~200 gas + (3 gas � array length)
+     * GAS: ~200 gas + (3 gas ï¿½ array length)
      *
      * PYTHON EQUIVALENT:
      *   def sum_array(arr):  # arr is passed by reference, but not stored
@@ -580,7 +679,7 @@ contract DatatypesStorageSolution {
      *
      * GAS COMPARISON:
      *   calldata: 100 gas (read-only, direct access)
-     *   memory: 3 gas � array length (copy entire array)
+     *   memory: 3 gas ï¿½ array length (copy entire array)
      *   storage: ~2,100 gas per element (if reading from state)
      */
     function getFirstElement(uint256[] calldata _arr) external pure returns (uint256) {
@@ -635,8 +734,8 @@ contract DatatypesStorageSolution {
      *   }
      *
      * GAS SAVINGS:
-     *   Without packing: 4 slots � 20,000 gas = 80,000 gas
-     *   With packing: 2 slots � 20,000 gas = 40,000 gas
+     *   Without packing: 4 slots ï¿½ 20,000 gas = 80,000 gas
+     *   With packing: 2 slots ï¿½ 20,000 gas = 40,000 gas
      *   SAVINGS: 50% reduction!
      */
     function getPackedDataExample()
@@ -687,7 +786,7 @@ contract DatatypesStorageSolution {
  *      Storage slot = keccak256(key, slot)
  *
  * 5. ARRAYS ARE DANGEROUS
- *      Unbounded growth � DoS
+ *      Unbounded growth ï¿½ DoS
  *      Iteration costs scale linearly
  *      Consider mappings + events instead
  *
@@ -712,8 +811,8 @@ contract DatatypesStorageSolution {
  * Q                          NEXT STEPS                                       Q
  * ZPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP]
  *
- * � Experiment with different data types in Remix
- * � Use `forge test --gas-report` to see actual gas costs
- * � Try modifying struct packing and observe gas differences
- * � Move to Project 02 to learn about functions and ETH handling
+ * ï¿½ Experiment with different data types in Remix
+ * ï¿½ Use `forge test --gas-report` to see actual gas costs
+ * ï¿½ Try modifying struct packing and observe gas differences
+ * ï¿½ Move to Project 02 to learn about functions and ETH handling
  */

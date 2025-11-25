@@ -7,7 +7,7 @@ This document provides an overview of the complete Project 19 implementation.
 ```
 19-signed-messages/
 ├── README.md                      # Main comprehensive guide
-├── SIGNING_GUIDE.md              # JavaScript/ethers.js signing guide
+├── SIGNING_GUIDE.md              # TypeScript/ethers.js signing guide
 ├── EXERCISES.md                  # Practice exercises and challenges
 ├── QUICK_REFERENCE.md            # Quick reference patterns
 ├── PROJECT_OVERVIEW.md           # This file
@@ -50,7 +50,7 @@ This document provides an overview of the complete Project 19 implementation.
 - Permit-style meta-transactions
 
 #### SIGNING_GUIDE.md
-**JavaScript/TypeScript implementation guide with:**
+**TypeScript implementation guide with:**
 - ethers.js v6 examples
 - ethers.js v5 examples
 - Domain, types, and value setup

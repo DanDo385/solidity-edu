@@ -66,7 +66,7 @@ contract FunctionsPayableSolution {
 
     /**
      * @notice Tracks deposited ETH for each address
-     * @dev Maps address ’ balance in wei
+     * @dev Maps address â€™ balance in wei
      *
      * WHY TRACK BALANCES?
      *   - Allows users to deposit and withdraw individually
@@ -241,18 +241,37 @@ contract FunctionsPayableSolution {
      *   - Saves gas for users
      *   - Cleaner event logs
      *
-     * GAS: ~45,000 gas (transaction base + SSTORE + event)
+     * GAS COST BREAKDOWN:
+     *   - Transaction base: ~21,000 gas
+     *   - SLOAD balance: ~100 gas (warm)
+     *   - SSTORE balance: ~5,000 gas (warm, non-zero to non-zero)
+     *   - Event: ~1,500 gas
+     *   - Total: ~27,600 gas
+     *
+     * GAS OPTIMIZATION: Why use += instead of separate read/write?
+     *   - balances[msg.sender] += msg.value: 1 SLOAD + 1 SSTORE = ~5,100 gas
+     *   - Alternative: uint256 bal = balances[msg.sender]; bal += msg.value; balances[msg.sender] = bal;
+     *     Costs: 1 SLOAD + 1 MLOAD + 1 SSTORE = ~5,103 gas
+     *   - Savings: ~3 gas (minimal, but += is cleaner)
+     *
+     * REAL-WORLD ANALOGY: Like depositing cash at a bank - the money goes
+     * into the bank's vault (contract balance), and your account balance
+     * (mapping) is updated to reflect the deposit.
      *
      * COMPARISON:
-     *   Python: No built-in money, would be just numbers
+     *   TypeScript: No built-in money, would be just numbers
+     *   Go: No built-in money, would be just numbers
+     *   Rust: No built-in money, would be just numbers
      *   Solidity: Real ETH, permanent blockchain state
      */
     function deposit() public payable {
         require(msg.value > 0, "Must send ETH");
 
         // SECURITY: No reentrancy risk here (no external calls)
+        // GAS: 1 SLOAD + 1 SSTORE = ~5,100 gas (warm)
         balances[msg.sender] += msg.value;
 
+        // GAS: Event emission = ~1,500 gas
         emit Deposited(msg.sender, msg.value);
     }
 
@@ -287,7 +306,7 @@ contract FunctionsPayableSolution {
      * @notice Withdraw ETH from your balance
      * @param _amount Amount to withdraw in wei
      *
-     * @dev   CRITICAL: Uses Checks-Effects-Interactions pattern
+     * @dev Â  CRITICAL: Uses Checks-Effects-Interactions pattern
      *
      * CHECKS-EFFECTS-INTERACTIONS PATTERN:
      * PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
@@ -325,31 +344,45 @@ contract FunctionsPayableSolution {
      *     - Future-proof
      *     - Returns (bool success, bytes data)
      *
-     * GAS: ~30,000 gas (SSTORE + external call + event)
+     * GAS COST BREAKDOWN:
+     *   - CHECKS: 1 SLOAD = ~100 gas (warm)
+     *   - EFFECTS: 1 SSTORE = ~5,000 gas (warm, non-zero to non-zero)
+     *   - INTERACTIONS: External call = ~2,100 gas base
+     *   - Event: ~1,500 gas
+     *   - Total: ~8,700 gas (excluding recipient gas)
+     *
+     * GAS OPTIMIZATION: Why update balance before external call?
+     *   - Prevents reentrancy attacks
+     *   - If external call re-enters, balance already updated
+     *   - Saves gas by preventing failed attack transactions
      */
     function withdraw(uint256 _amount) public {
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
         // 1. CHECKS: Validate all conditions
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
         require(_amount > 0, "Amount must be greater than 0");
+        // GAS: 1 SLOAD = ~100 gas (warm)
         require(balances[msg.sender] >= _amount, "Insufficient balance");
 
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
         // 2. EFFECTS: Update state BEFORE external interactions
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
+        // GAS: 1 SSTORE = ~5,000 gas (warm, non-zero to non-zero)
         balances[msg.sender] -= _amount;
 
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
         // 3. INTERACTIONS: External calls LAST
-        // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+        // ================================================================
 
         // Use .call{value:} for ETH transfer (NOT .transfer or .send)
+        // GAS: ~2,100 gas base + gas forwarded to recipient
         (bool success,) = payable(msg.sender).call{value: _amount}("");
 
         // Always check return value
         require(success, "Transfer failed");
 
         // Emit event for off-chain tracking
+        // GAS: Event emission = ~1,500 gas
         emit Withdrawn(msg.sender, _amount);
     }
 
@@ -647,8 +680,8 @@ contract FunctionsPayableSolution {
  * Q                          NEXT STEPS                                       Q
  * ZPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP]
  *
- * ’ Deploy to testnet and send real ETH
- * ’ Experiment with receive() vs fallback() by sending different calldata
- * ’ Study reentrancy attacks in Project 07
- * ’ Learn about events and logging in Project 03
+ * â€™ Deploy to testnet and send real ETH
+ * â€™ Experiment with receive() vs fallback() by sending different calldata
+ * â€™ Study reentrancy attacks in Project 07
+ * â€™ Learn about events and logging in Project 03
  */

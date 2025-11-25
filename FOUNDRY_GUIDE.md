@@ -19,19 +19,70 @@
 
 ## Getting Started with Foundry {#getting-started}
 
+> **Complete setup guide for Foundry, Anvil, and local development**
+
+This section will walk you through setting up your development environment, compiling your first contract, and deploying it to a local Anvil instance.
+
+### Prerequisites
+
+Before you begin, ensure you have:
+
+- **macOS, Linux, or Windows (WSL recommended)**
+- **Command line access** (Terminal, iTerm, PowerShell, etc.)
+- **Git** installed (`git --version`)
+- **Basic familiarity** with command line tools
+
 ### Installation
 
+Foundry is a fast, portable, and modular toolkit for Ethereum application development. It consists of three main tools:
+
+- **Forge**: Build, test, and deploy contracts
+- **Cast**: Interact with contracts and send transactions
+- **Anvil**: Local Ethereum node for testing
+
+#### Step 1: Install Foundry
+
 ```bash
-# Install Foundry using the official installer
+# Download and run the Foundry installer
 curl -L https://foundry.paradigm.xyz | bash
+```
 
-# Install the latest version of Foundry
+This will download and install `foundryup`, the Foundry version manager.
+
+#### Step 2: Initialize Foundry
+
+After installation, you need to add Foundry to your PATH. The installer will provide instructions, but typically:
+
+```bash
+# Add to your shell profile (~/.bashrc, ~/.zshrc, etc.)
+source ~/.foundry/bin/foundryup
+
+# Or restart your terminal
+```
+
+#### Step 3: Install Foundry Tools
+
+```bash
+# Install/update Foundry to the latest version
 foundryup
+```
 
-# Verify installation
+#### Step 4: Verify Installation
+
+```bash
+# Check that all tools are installed correctly
 forge --version
 cast --version
 anvil --version
+```
+
+You should see version numbers for each tool. If you see "command not found", make sure Foundry is in your PATH.
+
+**Expected Output:**
+```
+forge 0.2.0 (abc123 2024-01-01T00:00:00.000000000Z)
+cast 0.2.0 (abc123 2024-01-01T00:00:00.000000000Z)
+anvil 0.2.0 (abc123 2024-01-01T00:00:00.000000000Z)
 ```
 
 ### Project Structure
@@ -54,21 +105,121 @@ my-project/
     └── Counter.json
 ```
 
-### Quick Start
+### Project Setup
+
+#### Step 1: Clone the Repository
 
 ```bash
-# Create a new Foundry project
-forge init my-solidity-project
-cd my-solidity-project
+# Clone the repository
+git clone <repository-url>
+cd solidity-edu
+```
 
-# Install dependencies
+#### Step 2: Install Dependencies
+
+This project uses OpenZeppelin contracts. Install them:
+
+```bash
+# Install OpenZeppelin contracts
 forge install openzeppelin/openzeppelin-contracts --no-commit
+```
+
+**What this does:**
+- Downloads OpenZeppelin contracts to `lib/openzeppelin-contracts/`
+- Creates a git submodule (we use `--no-commit` to avoid committing it)
+- Makes contracts available for import
+
+### Compiling Contracts
+
+**IMPORTANT: Always compile before deploying!**
+
+Compilation checks for:
+- Syntax errors
+- Type errors
+- Missing imports
+- Compiler version compatibility
+
+```bash
+# From the project root
+forge build
+```
+
+**Expected Output:**
+```
+[⠊] Compiling...
+[⠊] Compiling 50 files with 0.8.20
+[⠊] Solc 0.8.20 finished in 2.34s
+Compiler run successful!
+```
+
+### Starting Anvil
+
+Anvil is Foundry's local Ethereum node. Think of it as a private blockchain running on your computer - like a test server for your contracts.
+
+```bash
+# Start Anvil in a terminal window
+anvil
+```
+
+**What you'll see:**
+```
+Available Accounts
+==================
+
+ACCOUNT #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (10000 ETH)
+Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+Listening on 127.0.0.1:8545
+```
+
+**Key Information:**
+- **RPC URL**: `http://localhost:8545` (default)
+- **Chain ID**: `31337` (default)
+- **10 accounts** pre-funded with 10,000 ETH each
+- **Instant mining** (no waiting for blocks)
+
+### Deploying to Anvil
+
+```bash
+# Navigate to a project
+cd 01-datatypes-and-storage
+
+# ALWAYS compile before deploying
+forge build
+
+# Deploy using the script
+forge script script/DeployDatatypesStorage.s.sol \
+  --broadcast \
+  --rpc-url http://localhost:8545
+```
+
+**Command Breakdown:**
+- `forge script`: Run a deployment script
+- `script/DeployDatatypesStorage.s.sol`: Path to script
+- `--broadcast`: Actually send transactions (without this, it's a dry run)
+- `--rpc-url http://localhost:8545`: Connect to Anvil
+
+### Quick Start Summary
+
+```bash
+# Install Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+
+# Setup project
+forge install openzeppelin/openzeppelin-contracts --no-commit
+
+# Compile
+forge build
+
+# Start Anvil (in separate terminal)
+anvil
+
+# Deploy to Anvil
+forge script script/Deploy[Contract].s.sol --broadcast --rpc-url http://localhost:8545
 
 # Run tests
 forge test
-
-# See current directory structure
-tree -L 2
 ```
 
 ---

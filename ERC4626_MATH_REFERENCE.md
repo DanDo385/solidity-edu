@@ -1775,7 +1775,7 @@ Attack no longer profitable!
 ### Testing Libraries
 
 - Foundry (Solidity testing)
-- Hardhat (JavaScript testing)
+- Hardhat (TypeScript testing)
 - Property-based testing: Echidna, Medusa
 
 ### Security Considerations

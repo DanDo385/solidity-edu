@@ -216,9 +216,9 @@ contract MyToken is ERC20 {
 
 ## Usage Examples
 
-### Off-Chain Signing (JavaScript)
+### Off-Chain Signing (TypeScript)
 
-```javascript
+```typescript
 const domain = {
     name: 'PermitToken',
     version: '1',
@@ -244,7 +244,7 @@ const value = {
     deadline: deadline
 };
 
-const signature = await signer._signTypedData(domain, types, value);
+const signature: string = await signer.signTypedData(domain, types, value);
 ```
 
 ### On-Chain Verification (Solidity)

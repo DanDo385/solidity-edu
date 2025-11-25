@@ -97,7 +97,7 @@ function permit(
 
 #### 1. Off-Chain: User Signs Permit
 
-```javascript
+```typescript
 // User's wallet (MetaMask, etc.)
 const domain = {
     name: 'MyToken',
@@ -125,8 +125,9 @@ const value = {
 };
 
 // User signs (no transaction, no gas)
-const signature = await signer._signTypedData(domain, types, value);
-const { v, r, s } = ethers.utils.splitSignature(signature);
+const signature: string = await signer.signTypedData(domain, types, value);
+const sig = ethers.Signature.from(signature);
+const { v, r, s } = { v: sig.v, r: sig.r, s: sig.s };
 ```
 
 #### 2. On-Chain: Contract Verifies and Approves

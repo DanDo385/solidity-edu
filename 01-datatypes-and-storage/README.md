@@ -1,8 +1,8 @@
-# Project 01: Datatypes & Storage =�
+# Project 01: Datatypes & Storage
 
 > **Master Solidity's type system and understand where your data lives**
 
-## <� Learning Objectives
+## Learning Objectives
 
 By completing this project, you will:
 
@@ -11,9 +11,9 @@ By completing this project, you will:
 3. **Master data locations**: `storage`, `memory`, and `calldata`
 4. **Analyze gas costs** of different data structures
 5. **Explain storage layout** and slot allocation
-6. **Compare** Solidity's approach with Python, Rust, and JavaScript
+6. **Compare** Solidity's approach with TypeScript, Go, and Rust
 
-## >� Why This Matters
+## Why This Matters
 
 **Python**: You can write `x = 42` then reassign `x = "hello"`. Types are dynamic.
 **Solidity**: You must declare `uint256 x = 42` and can *never* assign a string to `x`. Types are static and immutable.
@@ -25,7 +25,7 @@ By completing this project, you will:
 
 This is similar to Rust (safety through types) and Go (explicit types), but stricter than both because blockchain state must be deterministically reproducible.
 
-## =� Background: The EVM Storage Model
+## Background: The EVM Storage Model
 
 ### Storage Slots (256-bit)
 
@@ -41,8 +41,8 @@ Slot 2: [32 bytes]
 **Reading/writing storage is expensive**:
 - Cold read: 2,100 gas
 - Warm read: 100 gas
-- Write (zero � non-zero): 20,000 gas
-- Write (non-zero � non-zero): 5,000 gas
+- Write (zero ? non-zero): 20,000 gas
+- Write (non-zero ? non-zero): 5,000 gas
 
 **Compare to memory**: 3 gas per 32-byte word
 
@@ -57,16 +57,16 @@ function temp(uint256[] memory arr) public {
 }
 ```
 
-## =' What You'll Build
+## What You'll Build
 
 A contract demonstrating:
--  All major Solidity datatypes
--  Storage vs memory vs calldata differences
--  Gas-efficient struct packing
--  Mapping usage patterns
--  Array operations and costs
+- ✅ All major Solidity datatypes
+- ✅ Storage vs memory vs calldata differences
+- ✅ Gas-efficient struct packing
+- ✅ Mapping usage patterns
+- ✅ Array operations and costs
 
-## =� Tasks
+## Tasks
 
 ### Task 1: Implement the Skeleton Contract
 
@@ -119,18 +119,18 @@ forge snapshot --diff
 2. Add a third mapping - where does it get stored?
 3. Use `storage` instead of `memory` for an array - what breaks?
 
-## >� Test Coverage
+## Test Coverage
 
 The test suite covers:
 
--  Setting and getting values
--  Mapping operations (set, get, exists)
--  Array operations (push, pop, access)
--  Struct operations and packing
--  Data location behavior (memory vs storage)
--  Gas comparisons for different approaches
+- ✅ Setting and getting values
+- ✅ Mapping operations (set, get, exists)
+- ✅ Array operations (push, pop, access)
+- ✅ Struct operations and packing
+- ✅ Data location behavior (memory vs storage)
+- ✅ Gas comparisons for different approaches
 
-## =� Key Concepts
+## Key Concepts
 
 ### Value Types (Copied When Assigned)
 
@@ -157,22 +157,22 @@ arr2.push(5);                   // Only changes memory copy
 
 | Type | Storage | Memory | Calldata |
 |------|---------|--------|----------|
-| State variables |  (default) | L | L |
-| Function parameters |  (internal) |  |  (external) |
-| Local variables (reference types) |  |  | L |
-| Return values | L |  | L |
+| State variables | ✅ (default) | ❌ | ❌ |
+| Function parameters | ✅ (internal) | ✅ | ✅ (external) |
+| Local variables (reference types) | ✅ | ✅ | ❌ |
+| Return values | ❌ | ✅ | ❌ |
 
 **Special case**: `mapping` can ONLY exist in storage, never memory or calldata.
 
-## = Common Pitfalls
+## Common Pitfalls
 
 ### Pitfall 1: Forgetting Data Locations
 
 ```solidity
-// L WRONG: Will not compile
+// ❌ WRONG: Will not compile
 function bad(uint[] arr) public {}  // Missing data location
 
-//  CORRECT
+// ✅ CORRECT
 function good(uint[] memory arr) public {}
 ```
 
@@ -191,21 +191,21 @@ function badUpdate(uint index) public {
 
 function goodUpdate(uint index) public {
     User storage user = users[index];  // Storage REFERENCE
-    user.balance = 100;                // Changes persistent storage 
+    user.balance = 100;                // Changes persistent storage ✅
 }
 ```
 
 ### Pitfall 3: Inefficient Struct Packing
 
 ```solidity
-// L BAD: Uses 3 storage slots (96 bytes)
+// ❌ BAD: Uses 3 storage slots (96 bytes)
 struct BadPacking {
     uint256 a;  // Slot 0 (32 bytes)
     uint8 b;    // Slot 1 (1 byte, wastes 31 bytes)
     uint256 c;  // Slot 2 (32 bytes)
 }
 
-//  GOOD: Uses 2 storage slots (64 bytes)
+// ✅ GOOD: Uses 2 storage slots (64 bytes)
 struct GoodPacking {
     uint256 a;  // Slot 0 (32 bytes)
     uint256 c;  // Slot 1 (32 bytes)
@@ -213,9 +213,9 @@ struct GoodPacking {
 }
 ```
 
-**Rule**: Variables in a struct pack if their combined size d 32 bytes.
+**Rule**: Variables in a struct pack if their combined size <= 32 bytes.
 
-## < Language Comparisons
+## Language Comparisons
 
 ### Python
 ```python
@@ -225,19 +225,27 @@ x = "hello"  # Totally fine
 data = [1, "two", 3.0, True]  # Mixed types OK
 ```
 
-### JavaScript
-```javascript
-// Also dynamic, type coercion
-let x = 42;
-x = "hello";  // Fine
-const arr = [1, "two", true];  // Mixed types OK
+### TypeScript
+```typescript
+// Static typing with type inference
+let x: number = 42;
+// x = "hello";  // Compile error - type mismatch
+const arr: (number | string | boolean)[] = [1, "two", true];  // Union types OK
+```
+
+### Go
+```go
+// Static typing, explicit types
+var x uint256 = 42
+// x = "hello"  // Compile error
+arr := []uint32{1, 2, 3}  // Typed slices
 ```
 
 ### Rust
 ```rust
 // Static typing, but with type inference
 let x: u256 = 42;
-// x = "hello";  // Compile error 
+// x = "hello";  // Compile error ✅
 let arr: Vec<u32> = vec![1, 2, 3];  // Typed arrays
 ```
 
@@ -251,14 +259,14 @@ uint256[] memory arr = new uint256[](3);  // Must specify type AND location
 
 **Solidity is strictest because blockchain state must be deterministic across all nodes.**
 
-## =� Further Reading
+## =? Further Reading
 
 - [Solidity Docs: Types](https://docs.soliditylang.org/en/latest/types.html)
 - [Solidity Docs: Data Location](https://docs.soliditylang.org/en/latest/types.html#data-location)
 - [Understanding Storage Layout](https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html)
 - [Gas Costs Reference](https://www.evm.codes/)
 
-##  Completion Checklist
+## Completion Checklist
 
 - [ ] Implemented skeleton contract
 - [ ] All tests pass (`forge test`)
@@ -268,14 +276,14 @@ uint256[] memory arr = new uint256[](3);  // Must specify type AND location
 - [ ] Can explain storage vs memory vs calldata
 - [ ] Can calculate struct packing savings
 
-## =� Next Steps
+## Next Steps
 
 Once comfortable with datatypes and storage:
 - Move to [Project 02: Functions & Payable](../02-functions-and-payable/)
 - Experiment with the contract in Remix IDE
 - Try deploying to a testnet (see deployment script)
 
-## =� Pro Tips
+## Pro Tips
 
 1. **Always specify data locations** for reference types in functions
 2. **Use `calldata` for external function parameters** (cheapest)
@@ -285,4 +293,4 @@ Once comfortable with datatypes and storage:
 
 ---
 
-**Ready to code?** Open `src/DatatypesStorage.sol` and start implementing! =�
+**Ready to code?** Open `src/DatatypesStorage.sol` and start implementing! =?

@@ -438,13 +438,13 @@ selfdestruct(payable(targetContract));
 12-safe-eth-transfer/
 ├── README.md
 ├── src/
-│   ├── Project12.sol           # Skeleton with TODOs
+│   ├── SafeETHTransfer.sol           # Skeleton with TODOs
 │   └── solution/
-│       └── Project12Solution.sol # Complete implementation
+│       └── SafeETHTransferSolution.sol # Complete implementation
 ├── test/
-│   └── Project12.t.sol         # Comprehensive tests
+│   └── SafeETHTransfer.t.sol         # Comprehensive tests
 └── script/
-    └── DeployProject12.s.sol   # Deployment script
+    └── DeploySafeETHTransfer.s.sol   # Deployment script
 ```
 
 ---
@@ -452,10 +452,10 @@ selfdestruct(payable(targetContract));
 ## Getting Started
 
 1. Read this README thoroughly
-2. Study the skeleton contract in `src/Project12.sol`
+2. Study the skeleton contract in `src/SafeETHTransfer.sol`
 3. Try implementing the TODOs yourself
 4. Run tests: `forge test`
-5. Compare with solution in `src/solution/Project12Solution.sol`
-6. Deploy: `forge script script/DeployProject12.s.sol`
+5. Compare with solution in `src/solution/SafeETHTransferSolution.sol`
+6. Deploy: `forge script script/DeploySafeETHTransfer.s.sol`
 
 Happy learning!

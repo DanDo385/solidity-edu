@@ -378,16 +378,16 @@ Each implementation will include security considerations and proper testing.
 
 ```bash
 # Run tests
-forge test --match-path test/Project13.t.sol -vvv
+forge test --match-path test/BlockTimeLogic.t.sol -vvv
 
 # Run specific test
 forge test --match-test testRateLimit -vvv
 
 # Deploy
-forge script script/DeployProject13.s.sol --rpc-url <your-rpc> --broadcast
+forge script script/DeployBlockTimeLogic.s.sol --rpc-url <your-rpc> --broadcast
 
 # Test with gas report
-forge test --match-path test/Project13.t.sol --gas-report
+forge test --match-path test/BlockTimeLogic.t.sol --gas-report
 ```
 
 ## Success Criteria

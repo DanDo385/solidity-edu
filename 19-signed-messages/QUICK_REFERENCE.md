@@ -177,9 +177,9 @@ function verify(
 }
 ```
 
-## JavaScript Signing (ethers.js v6)
+## TypeScript Signing (ethers.js v6)
 
-```javascript
+```typescript
 const domain = {
     name: 'ContractName',
     version: '1',

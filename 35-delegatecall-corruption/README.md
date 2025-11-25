@@ -327,13 +327,13 @@ contract Complex {
 
 ### Computed Slots (EIP-1967)
 
-```javascript
+```typescript
 // Implementation slot
-const implSlot = BigInt(keccak256("eip1967.proxy.implementation")) - 1n;
+const implSlot: bigint = BigInt(keccak256("eip1967.proxy.implementation")) - 1n;
 // = 0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc
 
 // Admin slot
-const adminSlot = BigInt(keccak256("eip1967.proxy.admin")) - 1n;
+const adminSlot: bigint = BigInt(keccak256("eip1967.proxy.admin")) - 1n;
 // = 0xb53127684a568b3173ae13b9f8a6016e243e63b6e8ee1178d6a717850b5d6103
 ```
 

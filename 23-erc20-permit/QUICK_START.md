@@ -93,7 +93,7 @@ function permit(
 
 ### Creating a Permit Signature (Off-Chain)
 
-```javascript
+```typescript
 // In your frontend/tests
 const domain = {
     name: 'PermitToken',
@@ -120,7 +120,7 @@ const value = {
     deadline: Math.floor(Date.now() / 1000) + 3600
 };
 
-const signature = await signer._signTypedData(domain, types, value);
+const signature: string = await signer.signTypedData(domain, types, value);
 ```
 
 ## 6. Deploy Locally

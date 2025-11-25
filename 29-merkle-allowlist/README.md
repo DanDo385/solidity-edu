@@ -87,22 +87,22 @@ function setMerkleRoot(bytes32 _root) external {
 
 ## Creating Merkle Trees Off-Chain
 
-### Using JavaScript (ethers.js + merkletreejs)
+### Using TypeScript (ethers.js + merkletreejs)
 
-```javascript
-const { MerkleTree } = require('merkletreejs');
-const keccak256 = require('keccak256');
-const { ethers } = require('ethers');
+```typescript
+import { MerkleTree } from 'merkletreejs';
+import keccak256 from 'keccak256';
+import { ethers } from 'ethers';
 
 // 1. Define your allowlist
-const allowlist = [
+const allowlist: string[] = [
     "0x1111111111111111111111111111111111111111",
     "0x2222222222222222222222222222222222222222",
     "0x3333333333333333333333333333333333333333"
 ];
 
 // 2. Create leaf nodes (hash each address)
-const leafNodes = allowlist.map(addr =>
+const leafNodes: Buffer[] = allowlist.map(addr =>
     keccak256(ethers.solidityPacked(['address'], [addr]))
 );
 
@@ -110,13 +110,13 @@ const leafNodes = allowlist.map(addr =>
 const merkleTree = new MerkleTree(leafNodes, keccak256, { sortPairs: true });
 
 // 4. Get root hash
-const rootHash = merkleTree.getRoot();
+const rootHash: Buffer = merkleTree.getRoot();
 console.log("Merkle Root:", "0x" + rootHash.toString('hex'));
 
 // 5. Generate proof for an address
-const address = "0x1111111111111111111111111111111111111111";
-const leaf = keccak256(ethers.solidityPacked(['address'], [address]));
-const proof = merkleTree.getHexProof(leaf);
+const address: string = "0x1111111111111111111111111111111111111111";
+const leaf: Buffer = keccak256(ethers.solidityPacked(['address'], [address]));
+const proof: string[] = merkleTree.getHexProof(leaf);
 console.log("Proof:", proof);
 ```
 

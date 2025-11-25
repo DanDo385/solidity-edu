@@ -6,6 +6,11 @@ pragma solidity ^0.8.20;
  * @notice Complete implementation demonstrating ABI encoding, function selectors, and security
  * @dev Educational contract showing encoding methods and their security implications
  *
+ * REAL-WORLD ANALOGY: ABI encoding is like packaging data for shipping:
+ * - abi.encode: Like a padded box with labels - safe but takes more space
+ * - abi.encodePacked: Like cramming items tightly - efficient but can mix up items
+ * - Function selectors: Like shipping labels - tell the EVM which function to call
+ * 
  * Key Concepts Demonstrated:
  * 1. abi.encode vs abi.encodePacked - padding and collision risks
  * 2. Function selector calculation and usage
@@ -26,6 +31,22 @@ contract ABIEncodingSolution {
      * @param a First string to encode
      * @param b Second string to encode
      * @return Encoded bytes with ABI padding
+     * 
+     * GAS COST: abi.encode for dynamic types
+     * - Fixed-size types: 32 bytes each (padded)
+     * - Dynamic types: 32 bytes (offset) + 32 bytes (length) + padded data
+     * - For two strings "hello" (5 bytes each):
+     *   - Total: 32 (offset1) + 32 (offset2) + 32 (len1) + 32 (data1) + 32 (len2) + 32 (data2)
+     *   - = 192 bytes total
+     * - Gas: ~3 gas per byte = ~576 gas for encoding
+     * 
+     * TRADE-OFF:
+     *   ✅ Safe from collisions (padding prevents ambiguity)
+     *   ✅ Can decode back to original types
+     *   ❌ Larger size (more gas)
+     * 
+     * REAL-WORLD ANALOGY: Like putting each item in its own labeled box
+     * before shipping - safe but takes more space.
      */
     function demonstrateEncode(string memory a, string memory b) public returns (bytes memory) {
         bytes memory encoded = abi.encode(a, b);
@@ -39,6 +60,25 @@ contract ABIEncodingSolution {
      * @param a First string to encode
      * @param b Second string to encode
      * @return Tightly packed bytes without padding
+     * 
+     * GAS OPTIMIZATION: abi.encodePacked vs abi.encode
+     * - encodePacked: Only stores actual data (no padding)
+     * - For two strings "hello" (5 bytes each): 10 bytes total
+     * - encode: 192 bytes (as shown above)
+     * - Savings: ~182 bytes = ~546 gas per encoding!
+     * 
+     * SECURITY WARNING: Collision risk!
+     * - encodePacked("A", "BC") == encodePacked("AB", "C")
+     * - Both produce identical bytes: "ABC"
+     * - NEVER use for signatures or critical hashing!
+     * 
+     * WHEN TO USE encodePacked:
+     * - Single variable-length argument: Safe
+     * - Multiple fixed-size arguments: Safe
+     * - Multiple variable-length arguments: DANGEROUS!
+     * 
+     * REAL-WORLD ANALOGY: Like cramming items into one box without dividers -
+     * efficient but items can get mixed up if boundaries aren't clear.
      */
     function demonstrateEncodePacked(string memory a, string memory b) public returns (bytes memory) {
         bytes memory packed = abi.encodePacked(a, b);
@@ -125,7 +165,30 @@ contract ABIEncodingSolution {
      * @param amount Amount to transfer
      * @return Encoded function call data
      *
-     * GAS TIP: Pre-computing selectors saves gas compared to hashing the signature
+     * GAS OPTIMIZATION: Pre-computed selector vs encodeWithSignature
+     * - encodeWithSignature("transfer(address,uint256)", ...):
+     *   Costs: keccak256("transfer(address,uint256)") = ~30 gas + encoding
+     * - encodeWithSelector(0xa9059cbb, ...):
+     *   Costs: Just encoding (no hash calculation)
+     * - Savings: ~30 gas per call
+     * 
+     * GAS COST BREAKDOWN:
+     * - encodeWithSignature: ~30 (hash) + ~200 (encoding) = ~230 gas
+     * - encodeWithSelector: ~200 (encoding only) = ~200 gas
+     * - Savings: ~30 gas (13% reduction)
+     * 
+     * WHEN TO USE:
+     * - encodeWithSelector: When selector is known (common functions)
+     * - encodeWithSignature: When selector is dynamic or unknown
+     * 
+     * REAL-WORLD ANALOGY: Like using a pre-printed shipping label instead
+     * of writing it out each time - faster and cheaper.
+     * 
+     * LANGUAGE COMPARISON:
+     *   TypeScript: Function references (like pre-computed selectors)
+     *   Go: Function pointers (similar concept)
+     *   Rust: Function pointers or closures
+     *   Solidity: Selectors are like function pointers but encoded as bytes4
      */
     function encodeWithSelector(address to, uint256 amount) public pure returns (bytes memory) {
         // Gas efficient: use pre-computed selector
@@ -272,6 +335,14 @@ contract ABIEncodingSolution {
     /**
      * @notice Compares gas costs of different encoding methods
      * @dev Run with --gas-report to see differences
+     * 
+     * GAS COMPARISON SUMMARY:
+     * - abi.encode: More gas (larger output) but safe
+     * - abi.encodePacked: Less gas (smaller output) but collision risk
+     * - For production: Use abi.encode for hashing, encodePacked only when safe
+     * 
+     * REAL-WORLD ANALOGY: Like choosing between a padded shipping box
+     * (safe but expensive) vs a tight envelope (cheap but fragile).
      */
     function gasComparisonEncode(string memory a, string memory b) public pure returns (bytes memory) {
         return abi.encode(a, b);

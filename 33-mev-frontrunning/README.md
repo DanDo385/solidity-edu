@@ -236,10 +236,10 @@ The mempool is where pending transactions wait for inclusion in blocks.
 
 ### Mempool Monitoring Tools
 
-```javascript
+```typescript
 // Using ethers.js to monitor mempool
-provider.on("pending", (txHash) => {
-  provider.getTransaction(txHash).then((tx) => {
+provider.on("pending", (txHash: string) => {
+  provider.getTransaction(txHash).then((tx: any) => {
     // Analyze transaction
     if (isProfitableToFrontRun(tx)) {
       submitFrontRunningTx(tx);
@@ -433,7 +433,7 @@ function reveal(bytes memory data, bytes32 salt) external {
 
 Submit transactions privately to block builders.
 
-```javascript
+```typescript
 // Send transaction via Flashbots RPC
 const flashbotsProvider = await FlashbotsBundleProvider.create(
   provider,
