@@ -513,7 +513,7 @@ After completing all 50 projects, you should be able to:
 ### Path 1: Guided Learning (Recommended for beginners)
 
 1. **Read** the project README to understand objectives
-2. **Read** [SOLIDITY_BASICS.md](./SOLIDITY_BASICS.md) for quick reference
+2. **Read** [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) for quick reference
 3. **Attempt** the skeleton contract yourself
 4. **Run tests** to validate your implementation: `forge test`
 5. **Compare** your solution with `src/solution/` files
@@ -533,7 +533,7 @@ After completing all 50 projects, you should be able to:
 - Jump to any project's `solution/` folder
 - Read the comprehensive documentation
 - Use as a pattern library for your own contracts
-- Refer to specialized guides (ERC4626_MATH_REFERENCE.md, etc.)
+- Refer to specialized guides ([LEARNING_GUIDE.md](./LEARNING_GUIDE.md), [DEFI_REFERENCE.md](./DEFI_REFERENCE.md), [PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md))
 
 ---
 
@@ -601,9 +601,9 @@ cast storage <CONTRACT_ADDRESS> <SLOT>
 
 This repository includes extensive reference materials:
 
-- **[SOLIDITY_BASICS.md](./SOLIDITY_BASICS.md)** - Comprehensive Solidity fundamentals with examples, ASCII charts, and cross-language comparisons
-- **[ADVANCED_GUIDES.md](./ADVANCED_GUIDES.md)** - Foundry guide, gas optimization techniques, and security checklist
-- **[DEFI_REFERENCE.md](./DEFI_REFERENCE.md)** - DeFi attack vectors and ERC-4626 vault mathematics
+- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** - Complete learning reference covering Solidity basics, language comparisons (TypeScript/Go/Rust), Foundry development guide, gas optimization, and security checklist
+- **[DEFI_REFERENCE.md](./DEFI_REFERENCE.md)** - Comprehensive guide to DeFi attack vectors, vulnerabilities, and ERC-4626 vault mathematics
+- **[PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md)** - Project navigation guide, learning paths, naming standards, and implementation status tracking
 
 ---
 
