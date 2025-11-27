@@ -15,7 +15,7 @@ This guide consolidates project management documentation for navigating and trac
 
 # Project Summary & Learning Tracker
 
-Use this document to track your progress through the 11 mini-projects.
+Use this document to track your progress through the **50 projects**.
 
 ## 📊 Completion Status
 
@@ -33,7 +33,9 @@ Use this document to track your progress through the 11 mini-projects.
 | 10 - Upgradeability & Proxies | Complete | UUPS proxy, storage collisions | 5-6 hours | - |
 | 11 - ERC-4626 Tokenized Vault | Complete | Vault standard, share math, DeFi yield | 5-6 hours | - |
 
-**Total Estimated Time**: 35-45 hours
+**Total Estimated Time**: 150-200 hours for complete mastery
+
+> **Note**: This section shows a sample of projects. See the [Complete Project Curriculum](../README.md#-complete-50-project-curriculum) in README.md for all 50 projects.
 
 ## 🎯 Learning Objectives by Project
 
@@ -134,7 +136,7 @@ Use this document to track your progress through the 11 mini-projects.
 
 ## 🎓 Completion Checklist
 
-After completing all 11 projects, you should be able to:
+After completing all 50 projects, you should be able to:
 
 - [ ] Read and understand production Solidity code
 - [ ] Identify common security vulnerabilities
@@ -160,9 +162,9 @@ After completing all 11 projects, you should be able to:
 
 ---
 
-**Congratulations on completing the Solidity 10x Mini-Projects (now 11!)** 🎉
+**Congratulations on completing the Solidity 50-Project Mastery Curriculum!** 🎉
 
-You've built a strong foundation in Solidity and smart contract development. Keep building, stay secure, and never stop learning!
+You've built a comprehensive foundation in Solidity and smart contract development. Keep building, stay secure, and never stop learning!
 
 ---
 

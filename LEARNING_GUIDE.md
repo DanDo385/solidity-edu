@@ -36,6 +36,45 @@
 
 ---
 
+## 🚀 Quick Navigation
+
+**Need to find something fast?**
+- [Data Types](#data-types) - All Solidity types explained
+- [Functions](#functions) - Function syntax and patterns
+- [Storage vs Memory](#data-locations) - Critical gas optimization
+- [Foundry Commands](#forge-commands) - Testing and deployment
+- [Gas Optimization](#storage-optimization) - Save gas with these patterns
+- [Security Checklist](#reentrancy--state-management) - Security best practices
+
+**Jump to:**
+- [Part 1: Solidity Basics](#part-1-solidity-basics)
+- [Part 2: Language Comparisons](#part-2-language-comparisons)
+- [Part 3: Foundry Development](#part-3-foundry-development)
+- [Part 4: Gas Optimization](#part-4-gas-optimization)
+- [Part 5: Security Checklist](#part-5-security-checklist)
+
+## 📖 When to Use This Guide
+
+**Use LEARNING_GUIDE.md when:**
+- ✅ Learning Solidity syntax for the first time
+- ✅ Comparing Solidity to other languages you know
+- ✅ Looking up Foundry commands and patterns
+- ✅ Optimizing gas costs
+- ✅ Reviewing security best practices
+- ✅ Quick reference while coding
+
+**Don't use this guide for:**
+- ❌ Project-specific implementation details (see project READMEs in [main repository](../README.md))
+- ❌ DeFi attack vectors (see [DEFI_REFERENCE.md](../DEFI_REFERENCE.md))
+- ❌ Project navigation (see [PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md))
+
+**Related Documentation:**
+- **[README.md](../README.md)** - Main entry point, project overview
+- **[DEFI_REFERENCE.md](../DEFI_REFERENCE.md)** - DeFi attacks and ERC-4626 vault mathematics
+- **[PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md)** - Learning paths and project dependencies
+
+---
+
 # Solidity Basics - Quick Reference Guide
 
 > **Quick lookup for syntax, types, and common patterns**

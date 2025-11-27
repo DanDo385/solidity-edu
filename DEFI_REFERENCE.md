@@ -30,6 +30,47 @@ This guide consolidates DeFi attack vectors and ERC-4626 vault mathematics refer
 
 ---
 
+## 📊 Executive Summary
+
+This guide covers **12 major DeFi attack vectors** and **ERC-4626 vault mathematics**.
+
+**Attack Vectors Covered:**
+1. **Reentrancy Attacks** - Most common vulnerability
+2. **Flashloan Attacks** - Large-scale exploits
+3. **Oracle Manipulation** - Price feed attacks
+4. **Front-running and MEV** - Transaction ordering
+5. **Sandwich Attacks** - DEX manipulation
+6. **Price Manipulation** - AMM exploits
+7. **Governance Attacks** - Voting manipulation
+8. **Signature Replay** - Cross-chain attacks
+9. **Integer Overflow/Underflow** - Math errors (low frequency after Solidity 0.8.0)
+10. **Access Control Exploits** - Permission bugs
+11. **Denial of Service (DoS)** - Gas griefing
+12. **Vault Inflation Attacks** - ERC-4626 specific
+
+**ERC-4626 Mathematics:**
+- Share calculation formulas
+- Rounding modes and precision
+- Function specifications
+- Edge cases and singularities
+
+**Related Projects:**
+- **Project 11**: [Reentrancy & Security](../07-reentrancy-and-security/) - Learn CEI pattern
+- **Project 31**: [Reentrancy Lab](../31-reentrancy-lab/) - Hands-on attack simulation
+- **Project 33**: [MEV & Front-Running](../33-mev-frontrunning/) - MEV exploitation
+- **Project 34**: [Oracle Manipulation](../34-oracle-manipulation/) - Oracle attacks
+- **Project 38**: [Signature Replay](../38-signature-replay/) - Signature attacks
+- **Project 41**: [ERC-4626 Base Vault](../11-ERC4626-tokenized-vault/) - Vault implementation
+- **Project 42**: [Vault Precision](../42-vault-precision/) - Rounding and precision
+- **Project 44**: [Inflation Attack Demo](../44-inflation-attack/) - Inflation attack mitigation
+
+**Related Documentation:**
+- **[README.md](../README.md)** - Main entry point, project overview
+- **[LEARNING_GUIDE.md](../LEARNING_GUIDE.md)** - Solidity syntax and Foundry guide
+- **[PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md)** - Learning paths and dependencies
+
+---
+
 # DeFi Attacks Reference Guide
 
 A comprehensive guide to common DeFi attack vectors, vulnerabilities, and mitigation strategies for Solidity developers.

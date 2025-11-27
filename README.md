@@ -7,6 +7,7 @@
 
 - [What Makes This Different](#-what-makes-this-different)
 - [Learning Philosophy](#-learning-philosophy)
+- [Where to Start?](#-where-to-start)
 - [Quick Start](#-quick-start)
 - [Complete Project Curriculum](#-complete-50-project-curriculum)
 - [Learning Tracks & Paths](#-learning-tracks--paths)
@@ -15,6 +16,7 @@
 - [How to Use This Repository](#-how-to-use-this-repository)
 - [Development Workflow](#-development-workflow)
 - [Documentation](#-comprehensive-documentation)
+- [Common Questions](#-common-questions)
 - [Learning Outcomes](#-learning-outcomes)
 
 ---
@@ -44,6 +46,33 @@ Every pattern includes:
 - **Comparisons**: How other languages solve the same problem
 - **Storage Diagrams**: Visual representation of memory layout
 - **Gas Analysis**: Concrete cost measurements
+
+---
+
+## 🎯 Where to Start?
+
+**New to Solidity?**
+1. Read [Quick Start](#-quick-start) below to set up Foundry
+2. Start with [Project 01: Datatypes & Storage](./01-datatypes-and-storage/)
+3. Follow [Track 1: Complete Beginner](#track-1-complete-beginner) path
+4. Use [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) as your reference companion
+
+**Experienced Developer?**
+1. Review [Projects 01-05](#-beginner-foundations-projects-1-10) quickly to understand Solidity-specific concepts
+2. Jump to [Track 2: Experienced Developer](#track-2-experienced-developer) path
+3. Use [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) for quick syntax lookup
+4. Reference [DEFI_REFERENCE.md](./DEFI_REFERENCE.md) when building DeFi protocols
+
+**Want to Build Something Specific?**
+- **Token?** → See [Path A: "I Want to Build a Token"](#path-a-i-want-to-build-a-token)
+- **NFT?** → See [Path B: "I Want to Build an NFT"](#path-b-i-want-to-build-an-nft)
+- **Vault?** → See [Path C: "I Want to Build a Vault"](#path-c-i-want-to-build-a-vault)
+- **Security?** → See [Path D: "I Want to Learn Security"](#path-d-i-want-to-learn-security)
+
+**Need Quick Reference?**
+- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** - Solidity syntax, Foundry commands, gas optimization
+- **[DEFI_REFERENCE.md](./DEFI_REFERENCE.md)** - DeFi attacks, ERC-4626 vault mathematics
+- **[PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md)** - Project navigation, dependencies, progress tracking
 
 ---
 
@@ -599,11 +628,72 @@ cast storage <CONTRACT_ADDRESS> <SLOT>
 
 ## 📚 Comprehensive Documentation
 
-This repository includes extensive reference materials:
+This repository includes extensive reference materials organized by purpose:
 
-- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** - Complete learning reference covering Solidity basics, language comparisons (TypeScript/Go/Rust), Foundry development guide, gas optimization, and security checklist
-- **[DEFI_REFERENCE.md](./DEFI_REFERENCE.md)** - Comprehensive guide to DeFi attack vectors, vulnerabilities, and ERC-4626 vault mathematics
-- **[PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md)** - Project navigation guide, learning paths, naming standards, and implementation status tracking
+### Learning Resources
+
+- **[LEARNING_GUIDE.md](./LEARNING_GUIDE.md)** (8,000+ lines)
+  - **Part 1**: Solidity basics (data types, functions, storage, patterns)
+  - **Part 2**: Language comparisons (TypeScript/Go/Rust vs Solidity)
+  - **Part 3**: Foundry development (testing, deployment, advanced patterns)
+  - **Part 4**: Gas optimization (storage, functions, loops, advanced techniques)
+  - **Part 5**: Security checklist (reentrancy, access control, testing, deployment)
+  - **Use when**: Learning syntax, comparing concepts, optimizing gas, security review
+
+### DeFi Reference
+
+- **[DEFI_REFERENCE.md](./DEFI_REFERENCE.md)** (4,700+ lines)
+  - **Part 1**: DeFi attack vectors (reentrancy, flashloans, oracle manipulation, MEV, etc.)
+  - **Part 2**: ERC-4626 vault mathematics (share calculations, rounding, precision)
+  - **Use when**: Building vaults, understanding attacks, implementing ERC-4626
+
+### Project Management
+
+- **[PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md)**
+  - Learning tracks and paths
+  - Project dependencies and prerequisites
+  - Naming standards and implementation status
+  - **Use when**: Planning your learning path, tracking progress
+
+### Quick Reference Guide
+
+| Need Help With | Check This |
+|---------------|------------|
+| Solidity syntax | [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) Part 1 |
+| Foundry commands | [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) Part 3 |
+| Gas optimization | [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) Part 4 |
+| Security patterns | [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) Part 5 |
+| DeFi attacks | [DEFI_REFERENCE.md](./DEFI_REFERENCE.md) Part 1 |
+| Vault math | [DEFI_REFERENCE.md](./DEFI_REFERENCE.md) Part 2 |
+| Project navigation | [PROJECT_MANAGEMENT.md](./PROJECT_MANAGEMENT.md) |
+
+---
+
+## ❓ Common Questions
+
+**Q: Do I need to complete all 50 projects?**  
+A: No! Choose a learning track that matches your goals. See [Learning Tracks & Paths](#-learning-tracks--paths) above.
+
+**Q: Can I skip foundation projects?**  
+A: Not recommended. Projects 01-10 teach essential concepts used throughout all subsequent projects.
+
+**Q: How long does each project take?**  
+A: 2-15 hours depending on difficulty. See [Prerequisites Matrix](#prerequisites-matrix) in PROJECT_MANAGEMENT.md for detailed estimates.
+
+**Q: Where do I find solutions?**  
+A: Each project has a `solution/` folder with fully documented implementations. Study them even if you solve it yourself!
+
+**Q: What if I'm stuck?**  
+A: 1) Read the project README thoroughly, 2) Check the solution file for hints, 3) Review [LEARNING_GUIDE.md](./LEARNING_GUIDE.md) for concepts
+
+**Q: Can I use this code in production?**  
+A: These are educational projects. Always audit production code professionally and follow security best practices.
+
+**Q: Which projects are most important?**  
+A: Projects 01-10 (foundations) are essential. After that, choose based on your goals (tokens, NFTs, vaults, security).
+
+**Q: Do I need prior blockchain knowledge?**  
+A: No! Start with Project 01. Basic programming knowledge (any language) is helpful but not required.
 
 ---
 
