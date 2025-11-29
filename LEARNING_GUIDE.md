@@ -571,7 +571,7 @@ contract ControlFlow {
         }
     }
 
-    // FOR LOOP (? Gas warning: avoid unbounded loops)
+    // FOR LOOP (? Gas warning: avoid unbounded loops)
     function sumArray(uint[] memory arr) public pure returns (uint) {
         uint sum = 0;
         for (uint i = 0; i < arr.length; i++) {
