@@ -43,6 +43,31 @@ Use this document to track your progress through the **50 projects**.
 
 > **Note**: This section shows a sample of projects. See the [Complete Project Curriculum](../README.md#-complete-50-project-curriculum) in README.md for all 50 projects.
 
+## 📈 Visual Progress Tracker (Fill As You Go)
+
+```
+Foundations   (01-10): [####################] 10/10
+Intermediate  (11-20): [####################] 10/10
+Tokens/NFTs   (21-30): [####################] 10/10
+Security Labs (31-40): [####################] 10/10
+Advanced DeFi (41-50): [####################] 10/10
+
+Total Progress:        [##################################################] 50/50
+```
+
+Replace `#` counts with your own progress (e.g., `[####............] 4/20`).
+
+## 🗂️ Personal Progress Log (gitignored)
+
+- Create a local `PROGRESS.md` (add to `.gitignore`) to record dates, time spent, and notes per project.
+- Format example:
+  ```
+  # My Learning Progress
+  - [x] 01 Datatypes & Storage (2024-05-01) — packing vs calldata notes
+  - [ ] 02 Functions & Payable
+  ```
+- Optional automation: add a small script to read `forge test` results and mark completed projects automatically.
+
 ## 🎯 Learning Objectives by Project
 
 ### Beginner Track (Projects 1-3)
@@ -183,6 +208,28 @@ You've built a comprehensive foundation in Solidity and smart contract developme
 This guide helps you navigate the 50 projects and choose the best learning path for your experience level.
 
 > Quick pick: If you're unsure where to go next, stick to numeric order. Jumping ahead is fine, but ensure prerequisites in the matrix are covered to avoid test surprises.
+
+## 🔗 Project Dependency Graph (ASCII)
+
+```
+01 Datatypes
+├─ 02 Functions
+│  ├─ 04 Modifiers
+│  └─ 11 Reentrancy
+│       ├─ 12 Safe ETH Transfer
+│       └─ 31 Reentrancy Lab
+├─ 03 Events
+│   └─ 21-30 Token Standards
+├─ 05 Errors
+└─ 06 Mappings/Arrays/Gas
+
+20 Deposit/Withdraw
+└─ 41 ERC4626 Base
+    ├─ 42 Precision
+    │   ├─ 43 Yield
+    │   └─ 44 Inflation Attack
+    └─ 45-50 Advanced Vaults
+```
 
 ## Table of Contents
 
@@ -327,6 +374,23 @@ This guide helps you navigate the 50 projects and choose the best learning path 
 ---
 
 ## Quick Start Paths
+
+### 🗺️ Learning Path Visualizer (ASCII)
+
+```
+BEGINNER
+01 → 02 → 03 → 04 → 05 → 06 → 07 → 08 → 09 → 10
+                              |
+                              v
+SECURITY BRANCH
+11 → 12 → 31 → 32 → 33 → 34 → 35 → 36 → 37 → 38 → 39 → 40
+
+DEFI VAULT BRANCH
+20 → 41 → 42 → 43 → 44 → 45 → 46 → 47 → 48 → 49 → 50
+
+TOKENS/NFTs
+21 → 22 → 23 → 24 → 25 → 26 → 27 → 28 → 29 → 30
+```
 
 ### Path A: "I Want to Build a Token"
 

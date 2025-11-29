@@ -16,7 +16,6 @@ import "../src/DatatypesStorage.sol";
  *      - Gas measurements
  *
  * FOUNDRY TESTING BASICS:
- * PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
  * - Test functions must start with "test"
  * - Use setUp() for initialization (runs before each test)
  * - Use assertEq, assertTrue, assertFalse for checks

@@ -69,6 +69,57 @@ This guide covers **12 major DeFi attack vectors** and **ERC-4626 vault mathemat
 - **[LEARNING_GUIDE.md](../LEARNING_GUIDE.md)** - Solidity syntax and Foundry guide
 - **[PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md)** - Learning paths and dependencies
 
+## 🚨 Attack Severity Matrix
+
+| Attack Vector | Severity | Frequency | Mitigation Difficulty | Related Projects |
+|--------------|----------|-----------|-----------------------|------------------|
+| Reentrancy | 🔴 Critical | Very High | Medium | 11, 31 |
+| Flashloan | 🔴 Critical | High | Medium | 34 |
+| Oracle Manipulation | 🔴 Critical | Medium | Hard | 34, 47 |
+| Front-running/MEV | 🟠 High | Very High | Hard | 33 |
+| Governance Attack | 🔴 Critical | Low | Medium | 39 |
+| Signature Replay | 🟡 Medium | Medium | Easy | 38 |
+| Integer Overflow | 🟡 Medium | Low* | Easy* | 32 |
+| Access Control | 🔴 Critical | Medium | Easy | 36 |
+| Gas DoS | 🟠 High | Medium | Medium | 37 |
+| Vault Inflation | 🔴 Critical | Low | Hard | 44 |
+
+*Low frequency after Solidity 0.8.0 (built-in checks)
+
+## ⚡ Quick Reference: Attack Patterns
+
+### Reentrancy Protection
+```solidity
+// Checks-Effects-Interactions keeps state updates before external calls
+function withdraw() external {
+    uint256 amount = balances[msg.sender];
+    balances[msg.sender] = 0;
+    (bool ok, ) = msg.sender.call{value: amount}("");
+    require(ok, "transfer failed");
+}
+```
+
+### Oracle Hygiene
+```solidity
+require(price > 0, "invalid price");
+require(block.timestamp - lastUpdate < MAX_STALENESS, "stale oracle");
+require(price >= minPrice && price <= maxPrice, "out of bounds");
+```
+
+### Minimal ERC-4626 Flow (ASCII)
+```
+User Deposit -> Vault Receives Assets
+                | 
+                v
+          Shares Minted
+                |
+                v
+         Accounting Updates
+                |
+                v
+           Events Emitted
+```
+
 ---
 
 # DeFi Attacks Reference Guide

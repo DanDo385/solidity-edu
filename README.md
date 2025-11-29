@@ -146,6 +146,8 @@ Each project is a standalone Foundry workspace with:
 | 09 | [Inheritance & Interfaces](./09-inheritance-interfaces/) | virtual/override, diamond inheritance | 📝 Ready |
 | 10 | [Foundry Basics](./10-foundry-basics/) | Fuzzing, cheatcodes, invariant testing | 📝 Ready |
 
+> Reference: Storage + data locations → [LEARNING_GUIDE.md](./LEARNING_GUIDE.md#data-locations); Function visibility/payable → [LEARNING_GUIDE.md](./LEARNING_GUIDE.md#functions); Event patterns → [LEARNING_GUIDE.md](./LEARNING_GUIDE.md#important-patterns).
+
 ---
 
 ### 🎓 INTERMEDIATE LEVEL (Projects 11-20)
@@ -623,6 +625,14 @@ cast 4byte-decode <CALLDATA>
 # Get storage slot
 cast storage <CONTRACT_ADDRESS> <SLOT>
 ```
+
+### Standardization & Tooling Roadmap
+
+- **Scripts & Makefile**: Add `scripts/setup.sh`, `scripts/test-all.sh`, and a root `Makefile` so newcomers can run `make setup && make test`.
+- **Templates**: Create `docs/TEMPLATE_README.md` plus a `PROJECT_TEMPLATE/` folder to keep structure consistent across all 50 projects.
+- **Progress Tracking**: Ship a gitignored `PROGRESS.md` generator to log completions locally without polluting the repo.
+- **Validation**: Add `scripts/validate-structure.sh` and naming checks to keep contracts/tests/scripts aligned (`PascalCase`, `DeployPascalCase.s.sol`, etc.).
+- **Gas + Coverage**: Include `scripts/gas-benchmark.sh` and coverage targets in a future CI matrix.
 
 ---
 

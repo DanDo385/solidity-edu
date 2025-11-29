@@ -73,6 +73,21 @@
 - **[DEFI_REFERENCE.md](../DEFI_REFERENCE.md)** - DeFi attacks and ERC-4626 vault mathematics
 - **[PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md)** - Learning paths and project dependencies
 
+## 📝 Code Examples Index
+
+Jump straight to worked snippets without scrolling:
+- **Data Types**: [Value Types](#value-types-stored-directly-in-variables), [Reference Types](#reference-types-store-reference-to-data), [Storage Packing](#storage-packing)
+- **Functions**: [Visibility](#visibility--mutability), [Payable Functions](#payable-functions), [Modifiers](#modifiers)
+- **Foundry**: [Testing Commands](#forge-commands), [Deployment Scripts](#foundry-scripts-for-deployment), [Fuzzing/Invariant Patterns](#advanced-testing-patterns)
+- **Gas Optimization**: [Storage](#storage-optimization), [Loops](#loop-optimization), [Advanced Techniques](#advanced-techniques)
+- **Security**: [Reentrancy](#reentrancy--state-management), [Access Control](#access-control--authorization), [Deployment Security](#network--deployment-security)
+
+## 🔗 Related Projects for Practice
+
+- **Project 01**: Datatypes & Storage — apply the value/reference and data location sections.
+- **Project 06**: Mappings, Arrays & Gas — measure the storage hashing and loop tips here.
+- **Project 11**: Reentrancy & Security — put the security checklist into practice.
+
 ---
 
 # Solidity Basics - Quick Reference Guide
