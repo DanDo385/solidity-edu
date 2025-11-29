@@ -23,6 +23,7 @@ contract DatatypesStorage {
 
     // TODO: Declare a public uint256 variable called 'number'
 
+
     // TODO: Declare a public address variable called 'owner'
 
     // TODO: Declare a public bool variable called 'isActive'

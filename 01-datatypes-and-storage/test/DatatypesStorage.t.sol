@@ -51,9 +51,7 @@ contract DatatypesStorageTest is Test {
         vm.label(user2, "User2");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // CONSTRUCTOR TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_Constructor_SetsOwner() public {
         assertEq(datatypes.owner(), owner, "Owner should be set to deployer");
@@ -63,9 +61,7 @@ contract DatatypesStorageTest is Test {
         assertTrue(datatypes.isActive(), "Contract should be active on deployment");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // VALUE TYPE TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_SetNumber() public {
         uint256 newNumber = 42;
@@ -111,9 +107,7 @@ contract DatatypesStorageTest is Test {
         datatypes.incrementNumber();
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // MAPPING TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_SetBalance() public {
         uint256 balance = 1000;
@@ -150,9 +144,7 @@ contract DatatypesStorageTest is Test {
         assertFalse(datatypes.hasBalance(user1), "Should return false for zero balance");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // ARRAY TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_AddNumber_IncreasesLength() public {
         assertEq(datatypes.getNumbersLength(), 0, "Initial length should be 0");
@@ -187,9 +179,7 @@ contract DatatypesStorageTest is Test {
         assertEq(datatypes.getNumbersLength(), 5, "Length should be 5 after adding 5 elements");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // STRUCT TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_RegisterUser() public {
         uint256 initialBalance = 500;
@@ -227,9 +217,7 @@ contract DatatypesStorageTest is Test {
         assertFalse(isRegistered, "Should not be registered");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // DATA LOCATION TESTS
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_SumMemoryArray() public {
         uint256[] memory arr = new uint256[](4);
@@ -274,9 +262,7 @@ contract DatatypesStorageTest is Test {
         datatypes.getFirstElement(arr);
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // ADVANCED: STRUCT PACKING DEMO
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_SetMessage() public {
         string memory newMessage = "Hello World";
@@ -313,9 +299,7 @@ contract DatatypesStorageTest is Test {
         datatypes.removeNumber(1);
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // FUZZ TESTS (Foundry automatically generates random inputs)
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     /**
      * @notice Fuzz test for setNumber
@@ -348,9 +332,7 @@ contract DatatypesStorageTest is Test {
         assertEq(datatypes.getNumber(), _start + 1, "Should increment by 1");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // GAS BENCHMARKING
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     /**
      * @notice Benchmark gas cost of setting a number (first time - cold storage)
@@ -421,9 +403,7 @@ contract DatatypesStorageTest is Test {
         );
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // EDGE CASES
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function test_EdgeCase_MaxUint256() public {
         datatypes.setNumber(type(uint256).max);
@@ -443,9 +423,7 @@ contract DatatypesStorageTest is Test {
         assertEq(datatypes.getNumbersLength(), 10, "Should handle multiple additions");
     }
 
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
     // INVARIANT TESTS (Properties that should always hold)
-    // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
     function invariant_OwnerNeverChanges() public {
         assertEq(datatypes.owner(), owner, "Owner should never change");
@@ -460,9 +438,7 @@ contract DatatypesStorageTest is Test {
 }
 
 /**
- * TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPW
- * Q                        TESTING BEST PRACTICES                             Q
- * ZPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP]
+ *                        TESTING BEST PRACTICES                             
  *
  * 1. TEST NAMING CONVENTION
  *      test_FunctionName_Scenario
@@ -492,11 +468,9 @@ contract DatatypesStorageTest is Test {
  *      Use --gas-report flag for automated reports
  *      Benchmark critical operations
  *
- * TPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPW
- * Q                            RUN TESTS                                      Q
- * ZPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP]
+ *                            RUN TESTS                                      
  *
- * forge test                    # Run all tests
+ * forge test                   # Run all tests
  * forge test -vvv              # Run with verbose output
  * forge test --gas-report      # Run with gas reporting
  * forge test --match-test test_SetNumber  # Run specific test
