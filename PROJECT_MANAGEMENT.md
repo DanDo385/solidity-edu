@@ -4,6 +4,12 @@
 
 This guide consolidates project management documentation for navigating and tracking progress through the 50 projects.
 
+**How to use this file**
+- Mark completion in the status table as you finish tests.
+- Skim the track summaries to choose the next project.
+- Use naming standards to keep new files consistent with the template.
+- Pair this with `PROJECT_ENHANCEMENTS.md` for roadmap-level changes.
+
 ## Table of Contents
 
 1. [Project Summary & Learning Tracker](#project-summary--learning-tracker)
@@ -175,6 +181,8 @@ You've built a comprehensive foundation in Solidity and smart contract developme
 > **Learning paths and project dependencies for the Solidity Education curriculum**
 
 This guide helps you navigate the 50 projects and choose the best learning path for your experience level.
+
+> Quick pick: If you're unsure where to go next, stick to numeric order. Jumping ahead is fine, but ensure prerequisites in the matrix are covered to avoid test surprises.
 
 ## Table of Contents
 

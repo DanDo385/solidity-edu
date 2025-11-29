@@ -11,6 +11,10 @@ pragma solidity ^0.8.20;
  * 2. Emit events for state changes
  * 3. Understand gas costs of events vs storage
  * 4. Design event schemas for off-chain indexing
+ *
+ * FUN FACT: The EVM stores logs separately from contract storage and builds
+ * bloom filters so nodes can scan topics quickly. That design choice is why
+ * explorers and rollups can cheaply filter events without touching full state.
  */
 contract EventsLogging {
     // ============================================================
@@ -29,11 +33,14 @@ contract EventsLogging {
     //       - indexed sender (address)
     //       - indexed recipient (address)
     //       - amount (uint256)
+    // Tip: Mirroring ERC20's Transfer schema makes block explorers and The Graph
+    // integrations trivial. Indexed addresses act like filterable columns.
 
     // TODO: Declare event 'Approval' with:
     //       - indexed owner (address)
     //       - indexed spender (address)
     //       - amount (uint256)
+    // Layer 2 angle: lean topic sets reduce calldata in rollup proofs.
 
     // TODO: Declare event 'Deposit' with:
     //       - indexed user (address)
@@ -44,6 +51,8 @@ contract EventsLogging {
     //       - indexed user (address)
     //       - oldStatus (string)
     //       - newStatus (string)
+    // Strings live in event data (cheaper than storage writes) and are great for
+    // human-readable dashboards, though not indexable.
 
     // ============================================================
     // CONSTRUCTOR
@@ -62,6 +71,9 @@ contract EventsLogging {
         // 1. Check balance sufficient
         // 2. Update balances
         // 3. Emit Transfer event
+        // Events here are your public receipts; they are cheaper than storing a
+        // full transfer history and keep chain state slim (good for long-term
+        // ETH issuance pressure).
     }
 
     function approve(address _spender, uint256 _amount) public {

@@ -4,6 +4,13 @@
 
 This document outlines actionable enhancements to improve the overall project quality, developer experience, and learning outcomes.
 
+## 🚀 Quick Wins (Do These First)
+
+- Ship a `scripts/setup.sh` + `Makefile` pair so newcomers can run `make setup && make test` without reading docs.
+- Add a `docs/TEMPLATE_README.md` and retrofit Projects 01-05 to prove the template works.
+- Drop in a lightweight `PROGRESS.md` generator (gitignored) so learners can track completions locally.
+- Standardize deploy script comments (aligned in Projects 01-05) to show the split between student `src/` work and reference `script/` deploys.
+
 ---
 
 ## 📊 Current State Analysis
@@ -390,6 +397,14 @@ Define minimum test coverage requirements:
 - [ ] Create coverage checker script
 - [ ] Add coverage badges to READMEs
 - [ ] Generate coverage reports
+
+### 5. Execution Order (One Sprint View)
+
+1. Standardize READMEs for Projects 01-05 using the template.
+2. Add root Makefile + setup/test-all scripts.
+3. Wire a simple `progress` generator (gitignored) to prove tracking UX.
+4. Add gas benchmark script and a single diagram (Mermaid) to one advanced project as a pattern.
+5. Backfill difficulty/prereqs table into `PROJECT_MANAGEMENT.md` once the template stabilizes.
 
 #### B. Gas Benchmark Standards
 **Priority: Medium**

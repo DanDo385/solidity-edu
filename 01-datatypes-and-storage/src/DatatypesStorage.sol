@@ -11,6 +11,10 @@ pragma solidity ^0.8.20;
  * 2. Master storage, memory, and calldata locations
  * 3. Analyze gas costs of different data structures
  * 4. Implement efficient struct packing
+ *
+ * FUN FACT: The EVM is a 256-bit stack machine. Solc packs your variables into
+ * 32-byte storage slots; tight packing can save thousands of gas on mainnet and
+ * even more on rollups where calldata/state bytes get reposted to L1.
  */
 contract DatatypesStorage {
     // ============================================================
@@ -48,7 +52,9 @@ contract DatatypesStorage {
     // CONSTRUCTOR
     // ============================================================
 
-    // TODO: Implement constructor that sets owner to msg.sender
+    constructor() {
+        owner = msg.sender;
+    }
 
     // ============================================================
     // VALUE TYPE FUNCTIONS
@@ -88,6 +94,9 @@ contract DatatypesStorage {
      */
     function setBalance(address _address, uint256 _balance) public {
         // TODO: Implement using the balances mapping
+        // Warm vs cold SSTORE costs: first touch in a tx is pricier. On rollups,
+        // these storage writes get posted to L1 calldata, so keeping state lean
+        // indirectly helps the entire network (and ETH issuance).
     }
 
     /**
@@ -199,7 +208,8 @@ contract DatatypesStorage {
     // It should set the 'owner' to the address that deployed the contract (msg.sender).
     // It should also set 'isActive' to true.
     constructor() {
-        // TODO: Implement
+        owner = msg.sender;
+        isActive = true;
     }
 
     // ============================================================
@@ -429,6 +439,7 @@ contract DatatypesStorage {
         // TODO: Implement
         // Loop through _arr and sum all elements
         // Note: This is a MEMORY array, changes don't persist
+        // Memory here is like a whiteboard: cheap, wiped clean after the call.
     }
 
     /**
@@ -440,6 +451,8 @@ contract DatatypesStorage {
         // TODO: Implement
         // Return the first element if array is not empty
         // Note: calldata is read-only and gas-efficient
+        // Calldata lives off the EVM stack and avoids copies—great for rollups
+        // where every byte of input is posted to L1.
     }
 
     // ============================================================

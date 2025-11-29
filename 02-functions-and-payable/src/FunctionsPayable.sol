@@ -11,6 +11,11 @@ pragma solidity ^0.8.20;
  * 2. Understand the payable modifier
  * 3. Implement receive() and fallback() functions
  * 4. Learn safe ETH transfer patterns
+ * 
+ * FUN FACT: Solidity compiles to Yul and then to bytecode. Marking helpers
+ * internal often lets the optimizer inline them, shaving jumps and saving gas.
+ * On rollups, trimming calldata and storage writes matters even more because
+ * those bytes ultimately get posted to L1 during dispute windows.
  */
 contract FunctionsPayable {
     // ============================================================
@@ -52,6 +57,10 @@ contract FunctionsPayable {
     // TODO: Implement fallback() function that:
     //       1. Is external payable
     //       2. Emits FallbackCalled event with msg.data
+    // These two functions are like the mailroom of your contract: receive()
+    // handles plain envelopes (empty calldata) while fallback() routes unknown
+    // parcels. Istanbul and later forks repriced gas, so avoid hardcoded limits
+    // like transfer/send and stick to call with proper checks.
 
     // ============================================================
     // DEPOSIT FUNCTIONS
@@ -99,6 +108,9 @@ contract FunctionsPayable {
         //   4. Send ETH using .call{value: _amount}("")
         //   5. Require the call succeeded
         //   6. Emit Withdrawn event
+        // Think of this as settling a tab: close your books before handing out cash
+        // so a reentrant caller cannot ask twice. Rollups replay these calls in
+        // fraud proofs, so deterministic ordering keeps disputes simple.
     }
 
     /**

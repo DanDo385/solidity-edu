@@ -23,9 +23,13 @@ By completing this project, you will:
 - **Gas predictability**: Type sizes determine computational costs
 - **Security**: Type confusion can lead to vulnerabilities
 
-This is similar to Rust (safety through types) and Go (explicit types), but stricter than both because blockchain state must be deterministically reproducible.
+Think of storage like a *global shipping warehouse*: every package must have the exact same dimensions and aisle number on every forklift (node) so deliveries are reproducible worldwide.
+
+This is similar to Rust (safety through types) and Go (explicit types), but stricter than both because blockchain state must be deterministically reproducible. Solidity was co-designed by Gavin Wood and Christian Reitwiessner; they favored explicit types so compilers (Solc) could map human code to tight EVM bytecode without ambiguity.
 
 ## Background: The EVM Storage Model
+
+**Fun fact**: Solc first lowers Solidity to an intermediate language called *Yul* before emitting bytecode. That lets the compiler aggressively reorder storage writes for gas gains while keeping the slot math deterministic.
 
 ### Storage Slots (256-bit)
 
@@ -44,7 +48,9 @@ Slot 2: [32 bytes]
 - Write (zero ? non-zero): 20,000 gas
 - Write (non-zero ? non-zero): 5,000 gas
 
-**Compare to memory**: 3 gas per 32-byte word
+**Compare to memory**: ~3 gas per 32-byte word
+
+On rollups (Layer 2s), calldata is cheaper but storage writes are still pricey because the data ultimately posts to Ethereum mainnet. Choosing smaller types reduces calldata footprint, which is why calldata packing matters even more on L2.
 
 ### Why Data Locations Matter
 
@@ -213,7 +219,7 @@ struct GoodPacking {
 }
 ```
 
-**Rule**: Variables in a struct pack if their combined size <= 32 bytes.
+**Rule**: Variables in a struct pack if their combined size <= 32 bytes. Storage packing is the EVM equivalent of fitting carry-ons into an overhead bin; wasted space costs gas every time.
 
 ## Language Comparisons
 
@@ -253,13 +259,21 @@ let arr: Vec<u32> = vec![1, 2, 3];  // Typed arrays
 ```solidity
 // Static typing, NO inference, explicit sizes
 uint256 x = 42;
-// x = "hello";  // Compile error 
+// x = "hello";  // Compile error
 uint256[] memory arr = new uint256[](3);  // Must specify type AND location
 ```
 
 **Solidity is strictest because blockchain state must be deterministic across all nodes.**
 
-## =? Further Reading
+## Real-World Anchors and Fun Facts
+
+- **Elevator vs stairs**: Reading storage is like waiting for an elevator (slow but reaches every floor), while memory is taking the stairs for quick trips that do not persist.
+- **DAO fork**: After the 2016 DAO exploit, Ethereum and Ethereum Classic split. That fork reinforced the need for explicit storage rules because replaying history on two chains demanded byte-for-byte determinism.
+- **ETH inflation risk**: Large unbounded mappings/arrays increase state size. More state means more chain bloat; if block sizes grow, validators need more resources, which can indirectly pressure issuance to pay for security.
+- **Compiler trivia**: The Solidity team ships frequent optimizer improvements; a packed struct can compile down to fewer `SSTORE` opcodes, saving thousands of gas. Run `solc --optimize` to see the difference in bytecode size.
+- **Layer 2 tie-in**: Rollups charge mainly for calldata. Returning `bytes32` instead of `string` trims calldata bytes, which can cut fees by 30–60% on optimistic rollups.
+
+## Further Reading
 
 - [Solidity Docs: Types](https://docs.soliditylang.org/en/latest/types.html)
 - [Solidity Docs: Data Location](https://docs.soliditylang.org/en/latest/types.html#data-location)
@@ -293,4 +307,4 @@ Once comfortable with datatypes and storage:
 
 ---
 
-**Ready to code?** Open `src/DatatypesStorage.sol` and start implementing! =?
+**Ready to code?** Open `src/DatatypesStorage.sol` and start implementing!

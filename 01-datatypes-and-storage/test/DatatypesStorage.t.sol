@@ -28,7 +28,7 @@ import "../src/DatatypesStorage.sol";
  * Run with gas report: forge test --gas-report
  */
 contract DatatypesStorageTest is Test {
-    DatatypesStorageSolution public datatypes;
+    DatatypesStorage public datatypes;
 
     address public owner;
     address public user1;
@@ -44,7 +44,7 @@ contract DatatypesStorageTest is Test {
         user1 = address(0x1);
         user2 = address(0x2);
 
-        datatypes = new DatatypesStorageSolution();
+        datatypes = new DatatypesStorage();
 
         // Label addresses for better trace output
         vm.label(owner, "Owner");
@@ -78,8 +78,8 @@ contract DatatypesStorageTest is Test {
         uint256 newNumber = 100;
 
         // Expect NumberUpdated event with parameters
-        vm.expectEmit(true, true, false, false);
-        emit DatatypesStorageSolution.NumberUpdated(0, newNumber);
+        vm.expectEmit(false, false, false, true);
+        emit NumberUpdated(0, newNumber);
 
         datatypes.setNumber(newNumber);
     }
@@ -207,7 +207,7 @@ contract DatatypesStorageTest is Test {
         uint256 balance = 1000;
 
         vm.expectEmit(true, false, false, true);
-        emit DatatypesStorageSolution.UserRegistered(user1, balance);
+        emit UserRegistered(user1, balance);
 
         datatypes.registerUser(user1, balance);
     }
@@ -279,15 +279,39 @@ contract DatatypesStorageTest is Test {
     // ADVANCED: STRUCT PACKING DEMO
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
 
-    function test_GetPackedDataExample() public {
-        (uint128 n1, uint128 n2, uint64 ts, address user, bool flag) =
-            datatypes.getPackedDataExample();
+    function test_SetMessage() public {
+        string memory newMessage = "Hello World";
+        datatypes.setMessage(newMessage);
+        assertEq(datatypes.message(), newMessage, "Message should be updated");
+    }
 
-        assertEq(n1, 100, "smallNumber1 should be 100");
-        assertEq(n2, 200, "smallNumber2 should be 200");
-        assertGt(ts, 0, "timestamp should be greater than 0");
-        assertEq(user, address(0x1234567890123456789012345678901234567890), "user should match");
-        assertTrue(flag, "flag should be true");
+    function test_Deposit_IncreasesBalance() public {
+        uint256 amount = 1 ether;
+        vm.deal(user1, amount);
+        vm.prank(user1);
+        datatypes.deposit{value: amount}();
+        assertEq(datatypes.getBalance(user1), amount, "Balance should be updated");
+    }
+
+    function test_Deposit_RevertsOnZeroAmount() public {
+        vm.prank(user1);
+        vm.expectRevert();
+        datatypes.deposit{value: 0}();
+    }
+
+    function test_RemoveNumber() public {
+        datatypes.addNumber(10);
+        datatypes.addNumber(20);
+        datatypes.addNumber(30);
+        datatypes.removeNumber(1);
+        assertEq(datatypes.getNumbersLength(), 2, "Array length should be 2");
+        assertEq(datatypes.getNumberAt(1), 30, "Last element should be moved");
+    }
+
+    function test_RemoveNumber_RevertsOnOutOfBounds() public {
+        datatypes.addNumber(10);
+        vm.expectRevert();
+        datatypes.removeNumber(1);
     }
 
     // PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

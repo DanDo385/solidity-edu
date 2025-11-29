@@ -8,34 +8,40 @@ import "../src/solution/DatatypesStorageSolution.sol";
 /**
  * @title DeployDatatypesStorage
  * @notice Deployment script for DatatypesStorage contract
- * @dev Usage:
- *      Local deployment:
- *        forge script script/DeployDatatypesStorage.s.sol --broadcast --rpc-url http://localhost:8545
+ * @dev Steps:
+ *      - Reads PRIVATE_KEY from env, falls back to Anvil default for local use.
+ *      - Starts a broadcast so every call is sent as a transaction.
+ *      - Deploys the *solution* contract (students write src/; scripts demo deployment).
+ *      - Logs the address so you can plug it into tests or frontends.
  *
- *      Testnet deployment (e.g., Sepolia):
- *        forge script script/DeployDatatypesStorage.s.sol --broadcast --rpc-url $SEPOLIA_RPC_URL \
- *          --private-key $PRIVATE_KEY --verify
+ * Quick commands:
+ *   # Local (Anvil)
+ *   forge script script/DeployDatatypesStorage.s.sol --broadcast --rpc-url http://localhost:8545
  *
- *      Dry run (simulation):
- *        forge script script/DeployDatatypesStorage.s.sol
+ *   # Testnet (Sepolia)
+ *   forge script script/DeployDatatypesStorage.s.sol --broadcast --rpc-url $SEPOLIA_RPC_URL \\
+ *     --private-key $PRIVATE_KEY --verify
+ *
+ *   # Dry run (no tx sent)
+ *   forge script script/DeployDatatypesStorage.s.sol
  */
 contract DeployDatatypesStorage is Script {
     function run() external {
-        // Read deployer private key from environment or use default for local testing
+        // Pull a deployer key from env; default is Foundry's first Anvil account for quick demos
         uint256 deployerPrivateKey = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
 
-        // Start broadcasting transactions
+        // Begin sending real transactions
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy the contract
+        // Deploy the fully implemented solution (students compare against this)
         DatatypesStorageSolution datatypes = new DatatypesStorageSolution();
 
-        // Log deployment address
+        // Useful logs for quick wiring into frontends/scripts
         console.log("DatatypesStorage deployed at:", address(datatypes));
         console.log("Owner:", datatypes.owner());
         console.log("Is Active:", datatypes.isActive());
 
-        // Stop broadcasting
+        // Close the broadcast session
         vm.stopBroadcast();
     }
 }

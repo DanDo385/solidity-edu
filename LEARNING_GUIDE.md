@@ -344,12 +344,10 @@ fallback() external payable {
 **Decision Tree: When is each called?**
 ```
 Send ETH to contract
-    ?
+    |
 msg.data empty?
-       Yes ? receive() exists?
-                  Yes ? receive()
-                  No ? fallback()
-       No ? fallback()
+    |-- Yes -> receive() exists? -> Yes: receive() / No: fallback()
+    |-- No  -> fallback()
 ```
 
 ---
