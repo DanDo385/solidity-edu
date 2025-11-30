@@ -43,26 +43,71 @@ Slot 2: [32 bytes]
 ...
 ```
 
-**Reading/writing storage is expensive**:
-- Cold read: 2,100 gas
-- Warm read: 100 gas
-- Write (zero → non-zero): 20,000 gas
-- Write (non-zero → non-zero): 5,000 gas
+**Understanding Storage Costs (Gas)**:
 
-**Compare to memory**: ~3 gas per 32-byte word
+Think of your smart contract's storage like a giant filing cabinet that exists forever on the blockchain. Every time you want to read or write to this cabinet, you pay a cost called "gas". Here's why different operations cost different amounts:
+
+**Reading from Storage**:
+- **First-time read (2,100 gas)**: Imagine walking into a cold storage warehouse for the first time in a transaction. The lights are off, you need to find the right aisle, turn on the lights, and locate the file. This "first access" within a transaction is expensive because the EVM (Ethereum Virtual Machine) needs to load this data from the blockchain state into its working memory. We call this a "cold read" - like accessing cold storage.
+
+- **Subsequent reads (100 gas)**: Once you've already accessed that storage location in the same transaction, it's like the lights are already on and you know exactly where the file is. The EVM has already loaded it, so reading it again is much cheaper - about 21x cheaper! We call this a "warm read" - the data is already warmed up and ready to access.
+
+**Writing to Storage**:
+- **Writing a new value (zero → non-zero): 20,000 gas**: This is like adding a brand new file to an empty filing cabinet slot. You're creating something from nothing, which requires the blockchain to allocate new state space. This is the most expensive operation because every single node on the Ethereum network must record this new piece of information forever.
+
+- **Updating an existing value (non-zero → non-zero): 5,000 gas**: This is like replacing a file that's already in the cabinet. The slot already exists, you're just changing what's in it. It's still expensive (because all nodes must update their records), but cheaper than creating something new.
+
+**Compare to Memory (~3 gas per 32-byte word)**:
+Memory is like a whiteboard in your office. It's super cheap to use because it's temporary - everything gets erased when the transaction ends. You can scribble notes, do calculations, and organize data without worrying about cost. But the moment the transaction finishes, *poof* - it's all gone. That's why memory costs about 700x less than cold storage writes!
+
+**Real-World Example**:
+Imagine you're building a game. Player scores stored in `storage` persist forever (expensive, ~20k gas to create). But calculating a temporary leaderboard during gameplay? Use `memory` (cheap, ~3 gas). You wouldn't want to pay $50 (at current gas prices) to store a calculation that only matters for 2 seconds!
 
 On rollups (Layer 2s), calldata is cheaper but storage writes are still pricey because the data ultimately posts to Ethereum mainnet. Choosing smaller types reduces calldata footprint, which is why calldata packing matters even more on L2.
 
 ### Why Data Locations Matter
 
+In Solidity, **where** your data lives is just as important as **what** type it is. There are three main locations:
+
+1. **Storage** (Permanent, Expensive)
+   - Like a bank vault: secure, permanent, but costly to access
+   - Persists between function calls and transactions forever
+   - Every change is recorded on the blockchain
+   - Costs ~20,000 gas for new data, ~5,000 gas for updates
+
+2. **Memory** (Temporary, Cheap)
+   - Like RAM in your computer: fast, temporary, erased when done
+   - Only exists during function execution
+   - Perfect for calculations and temporary data
+   - Costs ~3 gas per 32-byte word (incredibly cheap!)
+
+3. **Calldata** (Read-Only, Cheapest)
+   - Like a read-only USB drive: can't modify it, but super cheap to read
+   - Used for function parameters from external calls
+   - Data comes from the transaction itself
+   - Most gas-efficient for passing large arrays/strings to functions
+
 ```solidity
 uint256 public storageVar;  // Lives forever, expensive (~20k gas to write)
+                            // Think: permanent record in a government database
 
 function temp(uint256[] memory arr) public {
     // 'arr' is temporary, erased after function exits
+    // Think: scratch paper you throw away after solving a math problem
     // Costs ~3 gas per word to allocate
 }
+
+function readOnly(uint256[] calldata arr) external {
+    // 'arr' is read-only from the transaction data
+    // Think: reading from a book - you can't change the text, just read it
+    // Cheapest option because no copying happens!
+}
 ```
+
+**When to use each**:
+- `storage`: Player balances, game state, ownership records - anything that must persist
+- `memory`: Temporary calculations, sorting arrays, building return values
+- `calldata`: Function parameters for external calls, especially large arrays
 
 ## What You'll Build
 
@@ -125,13 +170,69 @@ Compare your implementations with the solution files:
 - Understand the broadcast pattern
 - Learn best practices for logging deployment info
 
-### Task 4: Run Tests
+### Task 4: Compile and Analyze Bytecode
+
+**Compiling Contracts:**
 
 ```bash
 # Navigate to this project
 cd 01-datatypes-and-storage
 
-# Run tests
+# Compile all contracts (creates bytecode artifacts in out/)
+forge build
+
+# Force recompilation (useful after making changes)
+forge build --force
+
+# Show compilation details
+forge build -vv
+
+# Check contract sizes (important for deployment limits)
+forge build --sizes
+```
+
+**Understanding Compiled Artifacts:**
+
+After compilation, Foundry saves artifacts in `out/DatatypesStorage.sol/DatatypesStorage.json`:
+- **bytecode.object**: Full deployment bytecode (constructor + contract code)
+- **deployedBytecode.object**: Runtime bytecode (what's stored on-chain)
+- **abi**: Application Binary Interface (function signatures, events, errors)
+- **metadata**: Compiler version, settings, source mappings
+
+**Extracting Bytecode for Analysis:**
+
+```bash
+# Extract deployment bytecode to a file
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' > deployment-bytecode.txt
+
+# Extract runtime bytecode (what's actually deployed on-chain)
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.deployedBytecode.object' > runtime-bytecode.txt
+
+# Extract ABI for frontend integration
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq '.abi' > abi.json
+
+# View bytecode length (deployment bytecode is larger due to constructor)
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' | wc -c
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.deployedBytecode.object' | wc -c
+```
+
+**Why Analyze Bytecode?**
+- **Security**: Verify what's actually deployed matches your source code
+- **Size Optimization**: Ensure contracts stay under 24KB deployment limit
+- **Gas Analysis**: Understand opcode-level gas costs
+- **Verification**: Compare on-chain bytecode with compiled bytecode for Etherscan verification
+- **Learning**: Understand how Solidity compiles to EVM bytecode
+
+**Bytecode Analysis Tools:**
+- **evm.codes**: Interactive EVM opcode reference - paste bytecode to see opcodes
+- **Etherscan**: View verified bytecode on-chain after deployment
+- **Cast**: Foundry's CLI tool - `cast code <ADDRESS>` to get on-chain bytecode
+- **Panoramix**: Decompiler that converts bytecode back to readable Solidity-like code
+
+### Task 5: Run Tests
+
+```bash
+# Run tests (Foundry compiles automatically if needed)
 forge test
 
 # Run with verbose output
@@ -141,33 +242,56 @@ forge test -vvv
 forge test --gas-report
 ```
 
+**Note**: `forge test` automatically compiles contracts before running tests, but explicit compilation with `forge build` is useful for:
+- Checking for compilation errors without running tests
+- Analyzing bytecode before deployment
+- Extracting ABIs for frontend integration
+- Verifying contract sizes
+
 All tests in `test/DatatypesStorage.t.sol` should pass.
 
-### Task 5: Test Your Deployment Script
+### Task 6: Test Your Deployment Script
+
+**⚠️ IMPORTANT: This project runs on LOCAL ANVIL ONLY**
 
 ```bash
-# Start a local Anvil node (in a separate terminal)
+# Terminal 1: Start Anvil (keep this running)
 anvil
+
+# Terminal 2: Set up environment and deploy
+cd 01-datatypes-and-storage
+
+# Load environment variables (use default Anvil keys)
+source ../.env  # Or manually: export PRIVATE_KEY=0xac0974...
 
 # Run the deployment script (dry run - no transactions sent)
 forge script script/DeployDatatypesStorage.s.sol
 
 # Deploy to local Anvil (with transactions)
-forge script script/DeployDatatypesStorage.s.sol --broadcast --rpc-url http://localhost:8545
+forge script script/DeployDatatypesStorage.s.sol \
+  --broadcast \
+  --rpc-url http://localhost:8545
 
-# Deploy to testnet (Sepolia)
-forge script script/DeployDatatypesStorage.s.sol --broadcast \
-  --rpc-url $SEPOLIA_RPC_URL \
-  --private-key $PRIVATE_KEY \
-  --verify
+# The script reads PRIVATE_KEY from .env automatically
+# Use PRIVATE_KEY_1 through PRIVATE_KEY_9 for multi-address testing
+```
+
+**Environment Setup:**
+
+Create `.env` in the project root with Anvil's default accounts:
+```bash
+PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+PRIVATE_KEY_1=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+PRIVATE_KEY_2=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+# ... (see root .env.example for all 10 accounts)
 ```
 
 **What happens in each mode?**
 - **Dry run** (`forge script` without `--broadcast`): Simulates the script, shows what would happen, but doesn't send transactions
-- **Broadcast** (`--broadcast`): Actually sends transactions to the network
-- **Verify** (`--verify`): Automatically verifies the contract on Etherscan after deployment
+- **Broadcast** (`--broadcast`): Actually sends transactions to the local Anvil network
+- **Anvil accounts**: All 10 accounts are pre-funded with 10,000 ETH each
 
-### Task 6: Experiment
+### Task 7: Experiment
 
 Try these experiments to deepen understanding:
 
@@ -201,24 +325,49 @@ The test suite covers:
 
 ### Value Types (Copied When Assigned)
 
+**What are Value Types?**
+Value types work like photocopying a document. When you assign a value type to a new variable, you get a completely independent copy. Changing one doesn't affect the other.
+
 ```solidity
 uint256 a = 10;
 uint256 b = a;  // 'b' is a COPY, not a reference
+                // Think: You photocopied document 'a' to create document 'b'
 b = 20;         // 'a' is still 10
+                // Changing the photocopy doesn't change the original!
 ```
 
 **Examples**: `uint`, `int`, `bool`, `address`, `bytes32`, `enum`
 
+**Why?** Value types are typically small (32 bytes or less) and fit in a single EVM stack slot. It's cheaper and simpler to just copy them rather than manage pointers.
+
+**Real-World Analogy**: Value types are like cash. If you give someone a $10 bill, they have their own $10 and you can't change it. If they turn it into two $5 bills, your original $10 doesn't change.
+
 ### Reference Types (Assigned by Reference)
 
+**What are Reference Types?**
+Reference types work like sharing a Google Doc link. Multiple variables can point to the same underlying data. Changing it through one "link" affects everyone who has access to that data.
+
 ```solidity
-uint[] storage arr1 = myArray;  // 'arr1' points to myArray
-uint[] memory arr2 = arr1;      // 'arr2' is a COPY in memory
-arr1.push(5);                   // Changes storage
-arr2.push(5);                   // Only changes memory copy
+uint[] storage arr1 = myArray;  // 'arr1' points to myArray in permanent storage
+                                // Think: arr1 is a link to a shared Google Doc
+
+uint[] memory arr2 = arr1;      // 'arr2' is a COPY in temporary memory
+                                // Think: You downloaded a copy of the Google Doc to your computer
+
+arr1.push(5);                   // Changes the permanent storage (the original Google Doc)
+arr2.push(5);                   // Only changes your local copy (your downloaded file)
 ```
 
 **Examples**: `array`, `struct`, `mapping` (storage only)
+
+**Why?** Reference types can be huge (arrays with millions of elements!). Copying them every time would waste insane amounts of gas. Instead, we use "references" (pointers) that tell the EVM where to find the data.
+
+**Critical Rule**: The data location (`storage`, `memory`, `calldata`) determines whether you're working with the original or a copy!
+- `storage` → `storage`: Reference (same Google Doc)
+- `storage` → `memory`: Copy (download the Doc)
+- `memory` → `memory`: Reference (same temporary copy)
+
+**Real-World Analogy**: Reference types are like a house address. Multiple people can have "123 Main St" written down, but there's only one actual house. If someone renovates the house, everyone who visits that address sees the changes.
 
 ### Data Location Rules
 
@@ -287,23 +436,78 @@ function goodUpdate(uint index) public {
 
 ### Pitfall 3: Inefficient Struct Packing
 
-```solidity
-// ❌ BAD: Uses 3 storage slots (96 bytes)
-struct BadPacking {
-    uint256 a;  // Slot 0 (32 bytes)
-    uint8 b;    // Slot 1 (1 byte, wastes 31 bytes)
-    uint256 c;  // Slot 2 (32 bytes)
-}
+**Understanding Struct Packing**:
+The EVM stores data in "slots" of exactly 32 bytes (256 bits). Think of each slot like a shelf in a warehouse - it's always the same size, whether you fill it completely or waste space.
 
-// ✅ GOOD: Uses 2 storage slots (64 bytes)
+**Why Packing Matters**:
+Every storage slot you use costs gas to read and write. If you can fit multiple variables into one slot instead of using multiple slots, you save money! But there's a catch: the EVM can only pack variables that appear next to each other in your struct definition.
+
+**Bad Packing Example**:
+```solidity
+// ❌ BAD: Uses 3 storage slots (96 bytes total)
+struct BadPacking {
+    uint256 a;  // Slot 0: [aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] (32 bytes - FULL)
+    uint8 b;    // Slot 1: [b_______________________________] (1 byte used, 31 WASTED!)
+    uint256 c;  // Slot 2: [ccccccccccccccccccccccccccccccc] (32 bytes - FULL)
+}
+// Reading this struct: 3 SLOAD operations = 6,300 gas (if warm)
+// Writing this struct: 3 SSTORE operations = 15,000+ gas
+```
+
+Think of it like packing suitcases. You put a large item (uint256) in suitcase 1. Then you put a tiny item (uint8 - like a single sock) in suitcase 2, wasting all that space. Then you put another large item (uint256) in suitcase 3. You just paid airline fees for 3 suitcases when you could've paid for 2!
+
+**Good Packing Example**:
+```solidity
+// ✅ GOOD: Uses 2 storage slots (64 bytes total)
 struct GoodPacking {
-    uint256 a;  // Slot 0 (32 bytes)
-    uint256 c;  // Slot 1 (32 bytes)
-    uint8 b;    // Slot 1 (packs with 'c')
+    uint256 a;  // Slot 0: [aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] (32 bytes - FULL)
+    uint256 c;  // Slot 1: [ccccccccccccccccccccccccccccccc] (32 bytes - FULL)
+    uint8 b;    // Slot 1: [ccccccccccccccccccccccccccccccb] (packs with 'c'!)
+}
+// Reading this struct: 2 SLOAD operations = 4,200 gas (33% cheaper!)
+// Writing this struct: 2 SSTORE operations = 10,000+ gas (33% cheaper!)
+```
+
+Wait, how did `b` fit into Slot 1 with `c`? Because `uint256` takes 32 bytes, but `uint8` only takes 1 byte. The EVM is smart: it sees that slot 1 has `c` using 32 bytes, but wait - if we re-arrange, we can put `c` in 31 bytes and squeeze `b` into the remaining 1 byte... Actually no, `uint256` always takes the full 32 bytes. Let me correct this:
+
+Actually, the better packing is:
+```solidity
+// ✅ BEST: Uses 2 storage slots (64 bytes total)
+struct BestPacking {
+    uint256 a;  // Slot 0: [aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa] (32 bytes - FULL)
+    uint8 b;    // Slot 1: [b_______________________________] (1 byte)
+    // Since slot 1 has 31 bytes free, we could pack more small types here!
+    // But uint256 c won't fit because it needs a full 32 bytes
+    uint256 c;  // Slot 2: [ccccccccccccccccccccccccccccccc] (32 bytes - FULL)
 }
 ```
 
-**Rule**: Variables in a struct pack if their combined size <= 32 bytes. Storage packing is the EVM equivalent of fitting carry-ons into an overhead bin; wasted space costs gas every time.
+Actually, the REAL optimal packing would be:
+```solidity
+// ✅ OPTIMAL: Uses 2 storage slots if we're clever!
+struct OptimalPacking {
+    uint128 a;  // Slot 0: [aaaaaaaaaaaaaaaaa________________] (16 bytes)
+    uint128 c;  // Slot 0: [aaaaaaaaaaaaaaaaaaccccccccccccccc] (16 bytes - FITS!)
+    uint8 b;    // Slot 1: [b_______________________________] (1 byte)
+}
+// Or even better, pack everything possible:
+struct UltraOptimal {
+    uint128 a;  // Slot 0: [aaaaaaaaaaaaaaaaa________________] (16 bytes)
+    uint64 d;   // Slot 0: [aaaaaaaaaaaaaaaaadddddddd________] (8 bytes)
+    uint32 e;   // Slot 0: [aaaaaaaaaaaaaaaaaddddddddeee_____] (4 bytes)
+    uint8 b;    // Slot 0: [aaaaaaaaaaaaaaaaaddddddddeeeb____] (1 byte)
+    // Still 3 bytes free in this slot!
+}
+// Only 1 storage slot used! Reading/writing is 66% cheaper than bad packing!
+```
+
+**The Packing Rule**:
+The Solidity compiler packs variables into the same slot if:
+1. They're sequential in the struct (next to each other)
+2. Their combined size ≤ 32 bytes
+3. Each individual variable fits within a single slot
+
+**Real-World Analogy**: Struct packing is like Tetris. You want to arrange your blocks (variables) so they fit together tightly, with no wasted space. Every empty gap in a slot is wasted gas!
 
 ### Pitfall 4: Forgetting to Broadcast
 
@@ -327,9 +531,11 @@ function run() external {
 // ❌ WRONG: Never hardcode private keys!
 uint256 key = 0x123...;  // Security risk!
 
-// ✅ CORRECT: Read from environment
-uint256 key = vm.envOr("PRIVATE_KEY", uint256(0xac09...));  // Safe fallback for local dev
+// ✅ CORRECT: Read from environment (uses Anvil default for local dev)
+uint256 key = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
 ```
+
+**Note**: The fallback value is Anvil's default Account #0 private key, safe for local development only.
 
 ## Language Comparisons
 
@@ -388,55 +594,57 @@ uint256[] memory arr = new uint256[](3);  // Must specify type AND location
 
 ### Local Development (Anvil)
 
+**⚠️ IMPORTANT: This project runs on LOCAL ANVIL ONLY**
+
 ```bash
-# Terminal 1: Start Anvil
+# Terminal 1: Start Anvil (keep running)
 anvil
 
-# Terminal 2: Deploy to local network
+# Terminal 2: Set up environment and deploy
+cd 01-datatypes-and-storage
+
+# Load environment variables
+source ../.env  # Contains default Anvil private keys
+
+# Deploy to local Anvil
 forge script script/DeployDatatypesStorage.s.sol \
   --broadcast \
   --rpc-url http://localhost:8545
+
+# The script automatically uses PRIVATE_KEY from .env
 ```
 
-### Testnet Deployment (Sepolia)
+### Environment Variables
+
+Create `.env` in the project root with Anvil's default accounts:
 
 ```bash
-# Set environment variables
-export SEPOLIA_RPC_URL="https://sepolia.infura.io/v3/YOUR_KEY"
-export PRIVATE_KEY="0xYOUR_PRIVATE_KEY"
+# Main deployer (Account #0)
+PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
-# Deploy and verify
-forge script script/DeployDatatypesStorage.s.sol \
-  --broadcast \
-  --rpc-url $SEPOLIA_RPC_URL \
-  --private-key $PRIVATE_KEY \
-  --verify \
-  --etherscan-api-key $ETHERSCAN_API_KEY
+# Additional accounts for multi-address testing
+PRIVATE_KEY_1=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+PRIVATE_KEY_2=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+PRIVATE_KEY_3=0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+PRIVATE_KEY_4=0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+PRIVATE_KEY_5=0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+PRIVATE_KEY_6=0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+PRIVATE_KEY_7=0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+PRIVATE_KEY_8=0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+PRIVATE_KEY_9=0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
 ```
 
-### Mainnet Deployment
+**Account Details:**
+- **PRIVATE_KEY**: Account #0 (`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266`) - Main deployer
+- **PRIVATE_KEY_1-9**: Accounts #1-9 for multi-address interactions
+- All accounts are pre-funded with 10,000 ETH when Anvil starts
 
-**⚠️ WARNING**: Only deploy to mainnet after thorough testing!
-
-```bash
-# Set mainnet RPC URL
-export MAINNET_RPC_URL="https://mainnet.infura.io/v3/YOUR_KEY"
-
-# Deploy (double-check everything first!)
-forge script script/DeployDatatypesStorage.s.sol \
-  --broadcast \
-  --rpc-url $MAINNET_RPC_URL \
-  --private-key $PRIVATE_KEY \
-  --verify \
-  --etherscan-api-key $ETHERSCAN_API_KEY
-```
-
-**Best Practices**:
-1. Always test locally first
-2. Deploy to testnet before mainnet
-3. Use a hardware wallet or secure key management for mainnet
-4. Verify contracts on Etherscan
-5. Keep deployment logs for records
+**Best Practices:**
+1. Always use Anvil for local development
+2. Use `PRIVATE_KEY` for main deployer operations
+3. Use `PRIVATE_KEY_1` through `PRIVATE_KEY_9` for multi-address testing
+4. Never commit `.env` file to git (it's in `.gitignore`)
+5. Keep Anvil running in a separate terminal while developing
 
 ## Further Reading
 

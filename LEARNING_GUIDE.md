@@ -3929,6 +3929,12 @@ forge install openzeppelin/openzeppelin-contracts --no-commit
 
 **IMPORTANT: Always compile before deploying!**
 
+**Note**: Foundry automatically compiles contracts when you run `forge test` or `forge script`, but explicit compilation is useful for:
+- Checking for compilation errors without running tests
+- Analyzing bytecode before deployment
+- Extracting ABIs for frontend integration
+- Verifying contract sizes
+
 Compilation checks for:
 - Syntax errors
 - Type errors
@@ -3938,6 +3944,24 @@ Compilation checks for:
 ```bash
 # From the project root
 forge build
+
+# Force recompilation (ignore cache)
+forge build --force
+
+# Verbose output (see compilation details)
+forge build -vv
+
+# Show contract sizes (critical for 24KB limit)
+forge build --sizes
+
+# Compile specific contract
+forge build --contracts src/MyContract.sol
+
+# Custom optimizer runs
+forge build --optimizer-runs 200
+
+# Specific EVM version
+forge build --evm-version paris
 ```
 
 **Expected Output:**
@@ -3948,12 +3972,64 @@ forge build
 Compiler run successful!
 ```
 
+**Understanding Compiled Artifacts:**
+
+After compilation, Foundry saves artifacts in `out/` directory:
+```
+out/
+├── DatatypesStorage.sol/
+│   └── DatatypesStorage.json    # Contains bytecode, ABI, metadata
+└── ...
+```
+
+**Each JSON artifact contains:**
+- `bytecode.object`: Deployment bytecode (constructor + contract code)
+- `deployedBytecode.object`: Runtime bytecode (what's stored on-chain)
+- `abi`: Application Binary Interface (function signatures, events, errors)
+- `metadata`: Compiler version, settings, source mappings
+
+**Extracting and Analyzing Bytecode:**
+
+```bash
+# Extract deployment bytecode
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' > deployment-bytecode.txt
+
+# Extract runtime bytecode (what's actually deployed)
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.deployedBytecode.object' > runtime-bytecode.txt
+
+# Extract ABI for frontend integration
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq '.abi' > abi.json
+
+# View bytecode length
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' | wc -c
+
+# Compare with on-chain bytecode (after deployment)
+cast code <DEPLOYED_ADDRESS> > onchain-bytecode.txt
+diff runtime-bytecode.txt onchain-bytecode.txt
+```
+
+**Why Bytecode Analysis Matters:**
+- **Security**: Verify deployed bytecode matches source code
+- **Size Limits**: Contracts must be < 24KB (check with `forge build --sizes`)
+- **Gas Optimization**: Understand opcode-level costs
+- **Verification**: Compare compiled vs on-chain bytecode for Etherscan
+- **Learning**: Understand Solidity → EVM compilation process
+
+**Bytecode Analysis Tools:**
+- **evm.codes**: Interactive EVM opcode reference and disassembler
+- **Etherscan**: View verified bytecode on-chain
+- **Cast**: `cast code <ADDRESS>` to get on-chain bytecode
+- **Panoramix**: Decompiler for EVM bytecode
+- **Mythril**: Security analysis of bytecode
+
 ### Starting Anvil
+
+**⚠️ IMPORTANT: This project is designed for LOCAL DEVELOPMENT ONLY using Anvil**
 
 Anvil is Foundry's local Ethereum node. Think of it as a private blockchain running on your computer - like a test server for your contracts.
 
 ```bash
-# Start Anvil in a terminal window
+# Start Anvil in a terminal window (keep it running)
 anvil
 ```
 
@@ -3965,6 +4041,11 @@ Available Accounts
 ACCOUNT #0: 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 (10000 ETH)
 Private Key: 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
 
+ACCOUNT #1: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8 (10000 ETH)
+Private Key: 0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+
+... (8 more accounts)
+
 Listening on 127.0.0.1:8545
 ```
 
@@ -3973,12 +4054,40 @@ Listening on 127.0.0.1:8545
 - **Chain ID**: `31337` (default)
 - **10 accounts** pre-funded with 10,000 ETH each
 - **Instant mining** (no waiting for blocks)
+- **Local only** - never deploy to testnets or mainnet
+
+**Environment Variables:**
+
+Create `.env` in the project root with Anvil's default accounts:
+```bash
+PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+PRIVATE_KEY_1=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+PRIVATE_KEY_2=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+PRIVATE_KEY_3=0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+PRIVATE_KEY_4=0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+PRIVATE_KEY_5=0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+PRIVATE_KEY_6=0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+PRIVATE_KEY_7=0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+PRIVATE_KEY_8=0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+PRIVATE_KEY_9=0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+```
+
+- Use `PRIVATE_KEY` for main deployer (Account #0)
+- Use `PRIVATE_KEY_1` through `PRIVATE_KEY_9` for multi-address interactions
 
 ### Deploying to Anvil
 
+**⚠️ This project runs on LOCAL ANVIL ONLY - never deploy to testnets or mainnet**
+
 ```bash
-# Navigate to a project
+# Terminal 1: Start Anvil (keep running)
+anvil
+
+# Terminal 2: Navigate to a project
 cd 01-datatypes-and-storage
+
+# Load environment variables
+source ../.env  # Or export PRIVATE_KEY=0xac0974...
 
 # ALWAYS compile before deploying
 forge build
@@ -3987,13 +4096,17 @@ forge build
 forge script script/DeployDatatypesStorage.s.sol \
   --broadcast \
   --rpc-url http://localhost:8545
+
+# The script automatically reads PRIVATE_KEY from .env
 ```
 
 **Command Breakdown:**
 - `forge script`: Run a deployment script
 - `script/DeployDatatypesStorage.s.sol`: Path to script
 - `--broadcast`: Actually send transactions (without this, it's a dry run)
-- `--rpc-url http://localhost:8545`: Connect to Anvil
+- `--rpc-url http://localhost:8545`: Connect to Anvil (local only)
+- Script reads `PRIVATE_KEY` from `.env` automatically
+- Use `PRIVATE_KEY_1` through `PRIVATE_KEY_9` for multi-address testing
 
 ### Quick Start Summary
 

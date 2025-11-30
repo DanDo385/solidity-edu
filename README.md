@@ -78,6 +78,11 @@ Every pattern includes:
 
 ## 🚀 Quick Start
 
+> **⚠️ IMPORTANT: This project is designed for LOCAL DEVELOPMENT ONLY using Anvil**
+> 
+> All projects run on a local Anvil blockchain. Do not deploy to testnets or mainnet.
+> Use the default Anvil accounts provided below for all interactions.
+
 ### Prerequisites
 
 1. **Install Foundry** (Forge, Cast, Anvil):
@@ -102,6 +107,15 @@ cd solidity-edu
 # Install dependencies (OpenZeppelin contracts)
 forge install openzeppelin/openzeppelin-contracts --no-commit
 
+# Set up environment variables (use default Anvil accounts)
+cp .env.example .env  # Or create .env with the keys below
+
+# Start Anvil in a separate terminal (keep it running)
+anvil
+
+# Compile all contracts (creates bytecode artifacts)
+forge build
+
 # Run all tests
 forge test
 
@@ -117,6 +131,92 @@ forge test --gas-report
 # Generate gas snapshots
 forge snapshot
 ```
+
+### Environment Variables (.env)
+
+**This project uses the default Anvil accounts for local development:**
+
+Create a `.env` file in the root directory with:
+
+```bash
+# Default Anvil Account #0 (Main deployer - 10,000 ETH)
+PRIVATE_KEY=0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+
+# Additional Anvil Accounts (for multi-address interactions)
+PRIVATE_KEY_1=0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d
+PRIVATE_KEY_2=0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
+PRIVATE_KEY_3=0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6
+PRIVATE_KEY_4=0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a
+PRIVATE_KEY_5=0x8b3a350cf5c34c9194ca85829a2df0ec3153be0318b5e2d3348e872092edffba
+PRIVATE_KEY_6=0x92db14e403b83dfe3df233f83dfa3a0d7096f21ca9b0d6d6b8d88b2b4ec1564e
+PRIVATE_KEY_7=0x4bbbf85ce3377467afe5d46f804f221813b2bb87f24d81f60f1fcdbf7cbf4356
+PRIVATE_KEY_8=0xdbda1821b80551c9d65939329250298aa3472ba22feea921c0cf5d620ea67b97
+PRIVATE_KEY_9=0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
+```
+
+**Account Details:**
+- **PRIVATE_KEY**: Account #0 - `0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266` (Main deployer)
+- **PRIVATE_KEY_1**: Account #1 - `0x70997970C51812dc3A010C7d01b50e0d17dc79C8`
+- **PRIVATE_KEY_2**: Account #2 - `0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC`
+- **PRIVATE_KEY_3-9**: Accounts #3-9 (use for multi-address testing)
+
+All accounts are pre-funded with 10,000 ETH when Anvil starts.
+
+### Compiling Contracts
+
+**Foundry automatically compiles contracts when you run `forge test` or `forge script`, but you can also compile explicitly:**
+
+```bash
+# Compile all contracts
+forge build
+
+# Force recompilation (ignore cache)
+forge build --force
+
+# Compile with verbose output (see compilation details)
+forge build -vv
+
+# Compile specific contract
+forge build --contracts src/DatatypesStorage.sol
+
+# Show contract sizes after compilation
+forge build --sizes
+
+# Compile with specific optimizer settings
+forge build --optimizer-runs 200
+
+# Compile with specific EVM version
+forge build --evm-version paris
+```
+
+**Compiled artifacts are saved in `out/` directory:**
+- `out/DatatypesStorage.sol/DatatypesStorage.json` - Contains bytecode, ABI, and metadata
+- Bytecode is stored in the `bytecode` field (deployment bytecode)
+- Runtime bytecode (what's stored on-chain) is in `deployedBytecode`
+- ABI is in the `abi` field
+
+### Analyzing Bytecode
+
+**View compiled bytecode:**
+```bash
+# Extract bytecode from compiled artifact
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object'
+
+# Extract runtime bytecode
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.deployedBytecode.object'
+
+# Save bytecode to a file for analysis
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' > bytecode.txt
+
+# View contract size (important for deployment limits)
+forge build --sizes
+```
+
+**Bytecode Analysis Tools:**
+- **Etherscan**: Verify and view bytecode on-chain
+- **evm.codes**: Interactive EVM opcode reference
+- **Mythril**: Security analysis of bytecode
+- **Slither**: Static analysis (works on source, but can analyze bytecode patterns)
 
 ---
 
@@ -570,6 +670,77 @@ After completing all 50 projects, you should be able to:
 
 ## 🔧 Development Workflow
 
+### Compiling Contracts
+
+**Explicit Compilation:**
+
+While Foundry automatically compiles when running tests or scripts, you can compile explicitly:
+
+```bash
+# Compile all contracts
+forge build
+
+# Force recompilation (useful after dependency changes)
+forge build --force
+
+# Verbose compilation output
+forge build -vv
+
+# Show contract sizes (important for 24KB limit)
+forge build --sizes
+
+# Compile specific contract
+forge build --contracts src/MyContract.sol
+```
+
+**Understanding Compiled Artifacts:**
+
+After compilation, artifacts are saved in `out/` directory:
+```
+out/
+├── DatatypesStorage.sol/
+│   └── DatatypesStorage.json    # Contains bytecode, ABI, metadata
+├── MyContract.sol/
+│   └── MyContract.json
+└── ...
+```
+
+**Each JSON file contains:**
+- `bytecode.object`: Deployment bytecode (constructor + contract code)
+- `deployedBytecode.object`: Runtime bytecode (what's stored on-chain)
+- `abi`: Application Binary Interface (function signatures, events)
+- `metadata`: Compiler version, settings, source mappings
+
+**Extracting and Analyzing Bytecode:**
+
+```bash
+# Extract deployment bytecode
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.bytecode.object' > deployment-bytecode.txt
+
+# Extract runtime bytecode (what's actually deployed)
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq -r '.deployedBytecode.object' > runtime-bytecode.txt
+
+# Extract ABI
+cat out/DatatypesStorage.sol/DatatypesStorage.json | jq '.abi' > abi.json
+
+# View contract size (critical - contracts must be < 24KB)
+forge build --sizes
+```
+
+**Why Bytecode Analysis Matters:**
+- **Security**: Analyze deployed bytecode for vulnerabilities
+- **Verification**: Compare on-chain bytecode with compiled bytecode
+- **Optimization**: Understand gas costs at the opcode level
+- **Size Limits**: Ensure contracts don't exceed 24KB deployment limit
+- **Upgradeability**: Compare bytecode versions for proxy patterns
+
+**Bytecode Analysis Tools:**
+- **evm.codes**: Interactive EVM opcode reference and disassembler
+- **Etherscan**: View verified bytecode on-chain
+- **Mythril**: Security analysis of bytecode
+- **Panoramix**: Decompiler for EVM bytecode
+- **Cast**: Foundry's CLI tool for bytecode operations
+
 ### Running Tests
 
 ```bash
@@ -595,19 +766,34 @@ forge test --fuzz-runs 10000
 forge test --match-test invariant
 ```
 
-### Local Deployment
+### Local Deployment (Anvil Only)
+
+**⚠️ This project is designed for LOCAL DEVELOPMENT ONLY on Anvil**
 
 ```bash
-# Start local Ethereum node
+# Terminal 1: Start Anvil (keep running)
 anvil
 
-# Deploy contract (in another terminal)
+# Terminal 2: Deploy contract to local Anvil
 cd 01-datatypes-and-storage
-forge script script/Deploy.s.sol --broadcast --rpc-url http://localhost:8545
 
-# Deploy with verification
-forge script script/Deploy.s.sol --broadcast --verify
+# Load environment variables
+source ../.env  # Or export PRIVATE_KEY=0xac0974...
+
+# Deploy to Anvil
+forge script script/DeployDatatypesStorage.s.sol \
+  --broadcast \
+  --rpc-url http://localhost:8545
+
+# The script will use PRIVATE_KEY from .env automatically
+# All 10 Anvil accounts are available via PRIVATE_KEY, PRIVATE_KEY_1-9
 ```
+
+**Important Notes:**
+- **Never deploy to testnets or mainnet** - this is a learning project
+- All deployments use the local Anvil chain (`http://localhost:8545`)
+- Use `PRIVATE_KEY` for main deployer, `PRIVATE_KEY_1` through `PRIVATE_KEY_9` for multi-address interactions
+- Anvil accounts are pre-funded with 10,000 ETH each
 
 ### Interacting with Contracts
 

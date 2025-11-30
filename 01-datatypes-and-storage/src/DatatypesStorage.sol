@@ -22,25 +22,26 @@ contract DatatypesStorage {
     // ============================================================
 
     // TODO: Declare a public uint256 variable called 'number'
-
+    uint256 public number;
 
     // TODO: Declare a public address variable called 'owner'
-
+    address public owner;
     // TODO: Declare a public bool variable called 'isActive'
-
+    bool public isActive;
     // TODO: Declare a public bytes32 variable called 'data'
-
+    bytes32 public data;
     // TODO: Declare a mapping from address to uint256 called 'balances'
+    mapping(address => uint256) public balances;
 
     // TODO: Declare a dynamic array of uint256 called 'numbers'
-
+    uint256[] public numbers;
     // TODO: Define a struct called 'User' with:
     //       - address wallet
     //       - uint256 balance
     //       - bool isRegistered
 
     // TODO: Declare a mapping from address to User called 'users'
-
+    
     // TODO: Define a struct called 'PackedData' with optimal packing:
     //       - uint128 smallNumber1
     //       - uint128 smallNumber2
