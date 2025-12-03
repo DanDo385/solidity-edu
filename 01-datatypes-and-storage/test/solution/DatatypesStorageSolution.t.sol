@@ -15,7 +15,7 @@ contract DatatypesStorageSolutionTest is Test {
     DatatypesStorageSolution public datatypes;
 
     // Event declarations for testing (must match contract events)
-    event NumberUpdated(uint256 oldNumber, uint256 newNumber);
+    event NumberUpdated(uint256 indexed oldValue, uint256 indexed newValue);
     event UserRegistered(address indexed wallet, uint256 balance);
 
     address public owner;
@@ -55,7 +55,7 @@ contract DatatypesStorageSolutionTest is Test {
     function test_SetNumber_EmitsEvent() public {
         uint256 newNumber = 100;
 
-        vm.expectEmit(false, false, false, true);
+        vm.expectEmit(true, true, false, true); // Both params are indexed
         emit NumberUpdated(0, newNumber);
 
         datatypes.setNumber(newNumber);

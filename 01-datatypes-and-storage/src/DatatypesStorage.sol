@@ -4,138 +4,6 @@ pragma solidity ^0.8.20;
 /**
  * @title DatatypesStorage
  * @notice Skeleton contract for learning Solidity datatypes and storage
- * @dev Complete the TODOs to implement all functionality
- *
- * LEARNING GOALS:
- * 1. Understand value types vs reference types
- * 2. Master storage, memory, and calldata locations
- * 3. Analyze gas costs of different data structures
- * 4. Implement efficient struct packing
- *
- * FUN FACT: The EVM is a 256-bit stack machine. Solc packs your variables into
- * 32-byte storage slots; tight packing can save thousands of gas on mainnet and
- * even more on rollups where calldata/state bytes get reposted to L1.
- */
-contract DatatypesStorage {
-    // ============================================================
-    // STATE VARIABLES (Storage)
-    // ============================================================
-
-    // TODO: Declare a public uint256 variable called 'number'
-    uint256 public number;
-
-    // TODO: Declare a public address variable called 'owner'
-    address public owner;
-    // TODO: Declare a public bool variable called 'isActive'
-    bool public isActive;
-    // TODO: Declare a public bytes32 variable called 'data'
-    bytes32 public data;
-    // TODO: Declare a mapping from address to uint256 called 'balances'
-    mapping(address => uint256) public balances;
-
-    // TODO: Declare a dynamic array of uint256 called 'numbers'
-    uint256[] public numbers;
-    // TODO: Define a struct called 'User' with:
-    //       - address wallet
-    //       - uint256 balance
-    //       - bool isRegistered
-
-    // TODO: Declare a mapping from address to User called 'users'
-    
-    // TODO: Define a struct called 'PackedData' with optimal packing:
-    //       - uint128 smallNumber1
-    //       - uint128 smallNumber2
-    //       - uint64 timestamp
-    //       - address user (20 bytes)
-    //       - bool flag
-    //       Hint: Order matters for gas efficiency!
-
-    // ============================================================
-    // CONSTRUCTOR
-    // ============================================================
-
-    constructor() {
-        owner = msg.sender;
-    }
-
-    // ============================================================
-    // VALUE TYPE FUNCTIONS
-    // ============================================================
-
-    /**
-     * @notice Set the number value
-     * @param _number The new number value
-     */
-    function setNumber(uint256 _number) public {
-        // TODO: Implement
-    }
-
-    /**
-     * @notice Get the number value
-     * @return The current number value
-     */
-    function getNumber() public view returns (uint256) {
-        // TODO: Implement
-    }
-
-    /**
-     * @notice Increment the number by 1
-     */
-    function incrementNumber() public {
-        // TODO: Implement
-    }
-
-    // ============================================================
-    // MAPPING FUNCTIONS
-    // ============================================================
-
-    /**
-     * @notice Set balance for an address
-     * @param _address The address to set balance for
-     * @param _balance The balance amount
-     */
-    function setBalance(address _address, uint256 _balance) public {
-        // TODO: Implement using the balances mapping
-        // Warm vs cold SSTORE costs: first touch in a tx is pricier. On rollups,
-        // these storage writes get posted to L1 calldata, so keeping state lean
-        // indirectly helps the entire network (and ETH issuance).
-    }
-
-    /**
-     * @notice Get balance for an address
-     * @param _address The address to query
-     * @return The balance amount
-     */
-    function getBalance(address _address) public view returns (uint256) {
-        // TODO: Implement
-    }
-
-    // ============================================================
-    // ARRAY FUNCTIONS
-    // ============================================================
-
-    /**
-     * @notice Add a number to the numbers array
-     * @param _number The number to add
-     */
-    function addNumber(uint256 _number) public {
-        // TODO: Implement using push
-    }
-
-    /**
-     * @notice Get the length of the numbers array
-     * @return The array length
-     */
-    function getNumbersLength() public view returns (uint256) {
-        // TODO: Implement
-    }
-
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-/**
- * @title DatatypesStorage
- * @notice Skeleton contract for learning Solidity datatypes and storage
  * @dev Complete the TODOs to implement all functionality.
  *      Think about the "why" behind each task.
  *
@@ -148,6 +16,61 @@ pragma solidity ^0.8.20;
  */
 contract DatatypesStorage {
     // ============================================================
+    // STATE VARIABLES (Storage)
+    // ============================================================
+
+    // TODO: Declare a public uint256 variable called 'number'.
+    // Why is uint256 the most common integer type in Solidity? What are the alternatives?
+    uint256 public number;
+
+    // TODO: Declare a public address variable called 'owner'.
+    // What is the difference between an address and an address payable?
+    address public owner;
+
+    // TODO: Declare a public bool variable called 'isActive'.
+    // What is the default value for a bool in storage?
+    bool public isActive;
+
+    // TODO: Declare a public bytes32 variable called 'data'.
+    // When would you use bytes32 vs. string or bytes?
+    bytes32 public data;
+
+    // TODO: Declare a public string variable called 'message'.
+    // Why are strings generally more expensive to use than bytes32?
+    string public message;
+
+    // TODO: Declare a public mapping from address to uint256 called 'balances'.
+    // What happens if you try to access a key that doesn't exist in a mapping?
+    mapping(address => uint256) public balances;
+
+    // TODO: Declare a dynamic array of uint256 called 'numbers'.
+    // What are the gas implications of using a dynamic array?
+    uint256[] public numbers;
+
+    // TODO: Define a struct called 'User' with:
+    //       - address wallet
+    //       - uint256 balance
+    //       - bool isRegistered
+    // Structs are reference types. How does their storage layout work in a mapping?
+    struct User {
+        address wallet;
+        uint256 balance;
+        bool isRegistered;
+    }
+
+    // TODO: Declare a public mapping from address to User called 'users'.
+    mapping(address => User) public users;
+
+    // TODO: Define a struct called 'PackedData' with optimal packing.
+    // Research "struct packing" in Solidity. How should you order these fields?
+    //       - uint128 smallNumber1
+    //       - address user (20 bytes)
+    //       - uint64 timestamp
+    //       - bool flag
+    //       - uint128 smallNumber2
+    // How many storage slots does your packed struct use vs. an unpacked one?
+
+    // ============================================================
     // EVENTS
     // ============================================================
 
@@ -159,48 +82,6 @@ contract DatatypesStorage {
     // TODO: Declare an event 'FundsDeposited' that logs the depositor and the amount.
 
     event MessageUpdated(string oldMessage, string newMessage);
-
-    // ============================================================
-    // STATE VARIABLES (Storage)
-    // ============================================================
-
-    // TODO: Declare a public uint256 variable called 'number'.
-    // Why is uint256 the most common integer type in Solidity? What are the alternatives?
-
-    // TODO: Declare a public address variable called 'owner'.
-    // What is the difference between an address and an address payable?
-
-    // TODO: Declare a public bool variable called 'isActive'.
-    // What is the default value for a bool in storage?
-
-    // TODO: Declare a public bytes32 variable called 'data'.
-    // When would you use bytes32 vs. string or bytes?
-
-    // TODO: Declare a public string variable called 'message'.
-    // Why are strings generally more expensive to use than bytes32?
-
-    // TODO: Declare a public mapping from address to uint256 called 'balances'.
-    // What happens if you try to access a key that doesn't exist in a mapping?
-
-    // TODO: Declare a dynamic array of uint256 called 'numbers'.
-    // What are the gas implications of using a dynamic array?
-
-    // TODO: Define a struct called 'User' with:
-    //       - address wallet
-    //       - uint256 balance
-    //       - bool isRegistered
-    // Structs are reference types. How does their storage layout work in a mapping?
-
-    // TODO: Declare a public mapping from address to User called 'users'.
-
-    // TODO: Define a struct called 'PackedData' with optimal packing.
-    // Research "struct packing" in Solidity. How should you order these fields?
-    //       - uint128 smallNumber1
-    //       - address user (20 bytes)
-    //       - uint64 timestamp
-    //       - bool flag
-    //       - uint128 smallNumber2
-    // How many storage slots does your packed struct use vs. an unpacked one?
 
     // ============================================================
     // CONSTRUCTOR
@@ -399,74 +280,5 @@ contract DatatypesStorage {
      */
     function hasBalance(address _addr) public view returns (bool) {
         // TODO: Implement this helper function.
-    }
-}
-    // ============================================================
-
-    /**
-     * @notice Register a user
-     * @param _wallet The user's wallet address
-     * @param _balance The initial balance
-     */
-    function registerUser(address _wallet, uint256 _balance) public {
-        // TODO: Create a User struct and store in users mapping
-        // Set isRegistered to true
-    }
-
-    /**
-     * @notice Get user information
-     * @param _wallet The user's wallet address
-     * @return wallet address
-     * @return balance amount
-     * @return isRegistered status
-     */
-    function getUser(address _wallet)
-        public
-        view
-        returns (address wallet, uint256 balance, bool isRegistered)
-    {
-        // TODO: Implement - return user data from mapping
-    }
-
-    // ============================================================
-    // DATA LOCATION DEMONSTRATION
-    // ============================================================
-
-    /**
-     * @notice Demonstrates memory usage - modifies a copy
-     * @param _arr Array to process (in memory)
-     * @return The sum of array elements
-     */
-    function sumMemoryArray(uint256[] memory _arr) public pure returns (uint256) {
-        // TODO: Implement
-        // Loop through _arr and sum all elements
-        // Note: This is a MEMORY array, changes don't persist
-        // Memory here is like a whiteboard: cheap, wiped clean after the call.
-    }
-
-    /**
-     * @notice Demonstrates calldata usage - read-only
-     * @param _arr Array to process (in calldata)
-     * @return The first element
-     */
-    function getFirstElement(uint256[] calldata _arr) public pure returns (uint256) {
-        // TODO: Implement
-        // Return the first element if array is not empty
-        // Note: calldata is read-only and gas-efficient
-        // Calldata lives off the EVM stack and avoids copies—great for rollups
-        // where every byte of input is posted to L1.
-    }
-
-    // ============================================================
-    // HELPER FUNCTIONS
-    // ============================================================
-
-    /**
-     * @notice Check if an address has a non-zero balance
-     * @param _address The address to check
-     * @return true if balance > 0
-     */
-    function hasBalance(address _address) public view returns (bool) {
-        // TODO: Implement
     }
 }

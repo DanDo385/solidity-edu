@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
-import "../src/DatatypesStorage.sol";
+import "../src/solution/DatatypesStorageSolution.sol";
 
 /**
  * @title DatatypesStorageTest
@@ -86,7 +86,7 @@ import "../src/DatatypesStorage.sol";
  *
  */
 contract DatatypesStorageTest is Test {
-    DatatypesStorage public datatypes;
+    DatatypesStorageSolution public datatypes;
 
     address public owner;
     address public user1;
@@ -113,7 +113,7 @@ contract DatatypesStorageTest is Test {
      *
      * WHAT HAPPENS HERE:
      * 1. We create test addresses (owner, user1, user2)
-     * 2. We deploy a FRESH instance of DatatypesStorage
+     * 2. We deploy a FRESH instance of DatatypesStorageSolution
      * 3. We label addresses for better debugging output
      *
      * IMPORTANT: Even if Test A sets number = 100, when Test B runs,
@@ -126,7 +126,7 @@ contract DatatypesStorageTest is Test {
     function setUp() public {
         // TODO: Set owner to address(this) - the test contract is the deployer
         // TODO: Create user1 and user2 addresses (use address(0x1) and address(0x2))
-        // TODO: Deploy a new DatatypesStorage contract instance
+        // TODO: Deploy a new DatatypesStorageSolution contract instance
         // TODO: Use vm.label() to label addresses for better debugging output
         //       Example: vm.label(owner, "Owner");
     }
