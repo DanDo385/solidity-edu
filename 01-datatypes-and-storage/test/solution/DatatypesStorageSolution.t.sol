@@ -36,11 +36,11 @@ contract DatatypesStorageSolutionTest is Test {
 
     // CONSTRUCTOR TESTS
 
-    function test_Constructor_SetsOwner() public {
+    function test_Constructor_SetsOwner() public view {
         assertEq(datatypes.owner(), owner, "Owner should be set to deployer");
     }
 
-    function test_Constructor_SetsIsActive() public {
+    function test_Constructor_SetsIsActive() public view {
         assertTrue(datatypes.isActive(), "Contract should be active on deployment");
     }
 
@@ -95,7 +95,7 @@ contract DatatypesStorageSolutionTest is Test {
         assertEq(datatypes.getBalance(user1), balance, "Balance should be set correctly");
     }
 
-    function test_GetBalance_ReturnsZeroForNewAddress() public {
+    function test_GetBalance_ReturnsZeroForNewAddress() public view {
         assertEq(
             datatypes.getBalance(user1), 0, "New address should have zero balance by default"
         );
@@ -120,7 +120,7 @@ contract DatatypesStorageSolutionTest is Test {
         assertTrue(datatypes.hasBalance(user1), "Should return true for non-zero balance");
     }
 
-    function test_HasBalance_ReturnsFalseForZero() public {
+    function test_HasBalance_ReturnsFalseForZero() public view {
         assertFalse(datatypes.hasBalance(user1), "Should return false for zero balance");
     }
 
@@ -188,7 +188,7 @@ contract DatatypesStorageSolutionTest is Test {
         assertEq(balance, 200, "Balance should be updated to new value");
     }
 
-    function test_GetUser_ReturnsDefaultForNonExistent() public {
+    function test_GetUser_ReturnsDefaultForNonExistent() public view {
         (address wallet, uint256 balance, bool isRegistered) = datatypes.getUser(user1);
 
         assertEq(wallet, address(0), "Wallet should be zero address");
@@ -198,7 +198,7 @@ contract DatatypesStorageSolutionTest is Test {
 
     // DATA LOCATION TESTS
 
-    function test_SumMemoryArray() public {
+    function test_SumMemoryArray() public view {
         uint256[] memory arr = new uint256[](4);
         arr[0] = 10;
         arr[1] = 20;
@@ -209,13 +209,13 @@ contract DatatypesStorageSolutionTest is Test {
         assertEq(sum, 100, "Sum should be 100");
     }
 
-    function test_SumMemoryArray_EmptyArray() public {
+    function test_SumMemoryArray_EmptyArray() public view {
         uint256[] memory arr = new uint256[](0);
         uint256 sum = datatypes.sumMemoryArray(arr);
         assertEq(sum, 0, "Sum of empty array should be 0");
     }
 
-    function test_SumMemoryArray_SingleElement() public {
+    function test_SumMemoryArray_SingleElement() public view {
         uint256[] memory arr = new uint256[](1);
         arr[0] = 42;
 
@@ -223,7 +223,7 @@ contract DatatypesStorageSolutionTest is Test {
         assertEq(sum, 42, "Sum should be 42");
     }
 
-    function test_GetFirstElement() public {
+    function test_GetFirstElement() public view {
         uint256[] memory arr = new uint256[](3);
         arr[0] = 100;
         arr[1] = 200;
@@ -375,11 +375,11 @@ contract DatatypesStorageSolutionTest is Test {
 
     // INVARIANT TESTS
 
-    function invariant_OwnerNeverChanges() public {
+    function invariant_OwnerNeverChanges() public view {
         assertEq(datatypes.owner(), owner, "Owner should never change");
     }
 
-    function invariant_ArrayLengthConsistent() public {
+    function invariant_ArrayLengthConsistent() public view {
         uint256 length = datatypes.getNumbersLength();
         assertTrue(length >= 0, "Length should never be negative");
     }
