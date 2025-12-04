@@ -263,7 +263,7 @@ forge script script/DeployProject48.s.sol:DeployProject48 --rpc-url sepolia --br
 ```bash
 # IMPORTANT: Audit code before mainnet deployment!
 # Use same process as testnet but with mainnet RPC
-export MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
+export MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/INFURA_RPC_URL
 
 forge script script/DeployProject48.s.sol:DeployProject48 \
     --rpc-url $MAINNET_RPC_URL \

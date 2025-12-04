@@ -76,13 +76,15 @@ contract DatatypesStorage {
 
     // TODO: Declare an event 'NumberUpdated' that logs the old and new number.
     // Why are events useful for off-chain applications?
-
+    event NumberUpdated(uint256 oldNumber, uint256 newNumber);
     // TODO: Declare an event 'UserRegistered' that logs the user's wallet and balance.
-
+    event UserRegistered(address wallet, uint256 balance);
     // TODO: Declare an event 'FundsDeposited' that logs the depositor and the amount.
-
+    event FundsDeposited(address depositor, uint256 amount);
+    // TODO: Declare an event 'MessageUpdated' that logs the old and new message.
     event MessageUpdated(string oldMessage, string newMessage);
-
+    // TODO: Declare an event 'BalanceUpdated' that logs the address and the balance.
+    event BalanceUpdated(address addr, uint256 balance);
     // ============================================================
     // CONSTRUCTOR
     // ============================================================
@@ -108,6 +110,9 @@ contract DatatypesStorage {
         // 1. Check if msg.value is greater than 0.
         // 2. Add the sent ETH (msg.value) to the sender's balance in the 'balances' mapping.
         // 3. Emit a 'FundsDeposited' event.
+        require(msg.value > 0, "Amount must be greater than 0");
+        balances[msg.sender] += msg.value;
+        emit FundsDeposited(msg.sender, msg.value);
     }
 
     // ============================================================
@@ -123,6 +128,9 @@ contract DatatypesStorage {
         // 1. Store the old number in a temporary variable.
         // 2. Update the 'number' state variable to _number.
         // 3. Emit the 'NumberUpdated' event with the old and new values.
+        uint256 oldNumber = number;
+        number = _number;
+        emit NumberUpdated(oldNumber, _number);
     }
 
     /**
@@ -139,6 +147,7 @@ contract DatatypesStorage {
      */
     function incrementNumber() public {
         // TODO: Implement to increment 'number'.
+        number += 1;
     }
 
     /**
@@ -147,6 +156,9 @@ contract DatatypesStorage {
      */
     function setMessage(string memory _message) public {
         // TODO: Implement to update the 'message' state variable.
+        string memory oldMessage = message;
+        message = _message;
+        emit MessageUpdated(oldMessage, _message);
     }
 
     // ============================================================
@@ -160,6 +172,8 @@ contract DatatypesStorage {
      */
     function setBalance(address _addr, uint256 _balance) public {
         // TODO: Implement using the 'balances' mapping.
+        balances[_addr] = _balance;
+        emit BalanceUpdated(_addr, _balance);
     }
 
     /**
@@ -169,6 +183,7 @@ contract DatatypesStorage {
      */
     function getBalance(address _addr) public view returns (uint256) {
         // TODO: Implement to return the balance from the 'balances' mapping.
+        return balances[_addr];
     }
 
     // ============================================================
@@ -181,6 +196,7 @@ contract DatatypesStorage {
      */
     function addNumber(uint256 _number) public {
         // TODO: Implement using array's 'push' method.
+        numbers.push(_number);
     }
 
     /**
@@ -189,6 +205,7 @@ contract DatatypesStorage {
      */
     function getNumbersLength() public view returns (uint256) {
         // TODO: Implement to return the array's length.
+        return numbers.length;
     }
 
     /**
@@ -199,6 +216,8 @@ contract DatatypesStorage {
     function getNumberAt(uint256 _index) public view returns (uint256) {
         // TODO: Implement with a bounds check to prevent errors.
         // Use a require() statement.
+        require(_index < numbers.length, "Index out of bounds");
+        return numbers[_index];
     }
 
     /**
@@ -212,6 +231,10 @@ contract DatatypesStorage {
         // 1. Check if the index is valid.
         // 2. Move the last element to the place of the one to be removed.
         // 3. Remove the last element of the array.
+        require(_index < numbers.length, "Index out of bounds");
+        uint256 lastIndex = numbers.length - 1;
+        numbers[lastIndex] = numbers[_index];
+        numbers.pop();
     }
 
     // ============================================================
@@ -227,6 +250,7 @@ contract DatatypesStorage {
         // TODO: Create a User struct in the 'users' mapping.
         // Set 'isRegistered' to true.
         // Emit the 'UserRegistered' event.
+
     }
 
     /**
@@ -243,6 +267,7 @@ contract DatatypesStorage {
     {
         // TODO: Implement to return data from the 'users' mapping.
         // What does this function return for a non-existent user?
+        return users[_wallet].wallet, users[_wallet].balance, users[_wallet].isRegistered;
     }
 
     // ============================================================
@@ -256,6 +281,11 @@ contract DatatypesStorage {
      */
     function sumMemoryArray(uint256[] memory _arr) public pure returns (uint256) {
         // TODO: Implement the sum of the array.
+        uint256 sum = 0;
+        for (uint256 i = 0; i < _arr.length; i++) {
+            sum += _arr[i];
+        }
+        return sum;
         // Why is this function 'pure'? What's the difference between 'view' and 'pure'?
     }
 
@@ -266,6 +296,7 @@ contract DatatypesStorage {
      */
     function getFirstElement(uint256[] calldata _arr) public pure returns (uint256) {
         // TODO: Implement to return the first element.
+        return _arr[0];
         // Why can this function be 'pure'? Why is 'calldata' cheaper than 'memory'?
     }
 
@@ -280,5 +311,6 @@ contract DatatypesStorage {
      */
     function hasBalance(address _addr) public view returns (bool) {
         // TODO: Implement this helper function.
+        return balances[_addr] > 0;
     }
 }

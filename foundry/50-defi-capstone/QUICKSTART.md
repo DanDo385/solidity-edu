@@ -219,8 +219,8 @@ Create a `.env` file:
 
 ```bash
 # RPC URLs
-SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
-MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
+SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/INFURA_RPC_URL
+MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/INFURA_RPC_URL
 
 # Private Keys (NEVER commit these!)
 PRIVATE_KEY=0x...
@@ -234,7 +234,7 @@ SIGNER_4=0x...
 SIGNER_5=0x...
 
 # Etherscan
-ETHERSCAN_API_KEY=YOUR_KEY
+ETHERSCAN_API_KEY=INFURA_RPC_URL
 
 # Oracle Feeds (Chainlink)
 PRICE_FEED_ADDRESS=0x...

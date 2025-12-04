@@ -280,7 +280,7 @@ contract DeployMerkleAllowlist is Script {
  * 2. Set Environment Variables:
  *    $ export MERKLE_ROOT=0x1234...
  *    $ export PRIVATE_KEY=0xabcd...
- *    $ export RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
+ *    $ export RPC_URL=https://eth-sepolia.g.alchemy.com/v2/INFURA_RPC_URL
  *
  * 3. Deploy Contract:
  *    $ forge script script/DeployMerkleAllowlist.s.sol \

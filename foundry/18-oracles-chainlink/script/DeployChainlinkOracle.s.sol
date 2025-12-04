@@ -312,8 +312,8 @@ contract MockAggregatorV3 {
  * ---------------------------
  * Create .env file with:
  *   PRIVATE_KEY=your_private_key
- *   MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
- *   SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
+ *   MAINNET_RPC_URL=https://eth-mainnet.g.alchemy.com/v2/INFURA_RPC_URL
+ *   SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/INFURA_RPC_URL
  *   ETHERSCAN_API_KEY=your_etherscan_key
  *
  * STEP 2: LOCAL TESTING

@@ -290,7 +290,7 @@ cast call <CONTRACT_ADDRESS> "getLastUpdateTime()(uint256)"
 
 ```bash
 # Fork Ethereum mainnet
-anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY
+anvil --fork-url https://eth-mainnet.g.alchemy.com/v2/INFURA_RPC_URL
 
 # Deploy against real Chainlink feeds
 forge script script/DeployProject18.s.sol --broadcast \
