@@ -18,7 +18,7 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	contractHex := flag.String("contract", "", "contract address")
@@ -30,6 +30,12 @@ func main() {
 	if *contractHex == "" {
 		log.Fatal("usage: -contract <addr> -slot <n> [-mapkey addr]")
 	}
+
+	// EDUCATIONAL NOTES:
+	// - Storage slots = numbered lockers (32 bytes each). Simple vars live at declared slots.
+	// - Mappings: slot = keccak(key, slot). Dynamic arrays: base = keccak(slot) + index.
+	// - Ties to Solidity storage layout (module 01) and proofs (module 12).
+	// - CPU analogy: fixed memory addresses; mapping hash is like computing an offset via hash.
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()

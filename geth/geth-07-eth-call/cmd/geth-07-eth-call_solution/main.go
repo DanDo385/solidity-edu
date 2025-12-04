@@ -20,7 +20,7 @@ import (
 func main() {
     defaultRPC := os.Getenv("INFURA_RPC_URL")
     if defaultRPC == "" {
-        defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URLPC_URL"
+        defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
     }
     rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
     contractHex := flag.String("contract", "", "contract address (e.g., ERC20)")
@@ -93,9 +93,10 @@ func main() {
         fmt.Printf("raw hex: %s\n", hex.EncodeToString(raw))
     }
 
-    // Commentary:
-    // - eth_call is read-only; no gas spent on-chain, but node executes the EVM.
+    // Commentary / nerdy bits:
+    // - eth_call is read-only; no gas spent on-chain, but the node simulates the EVM.
     // - Manual ABI packing mirrors ethers.js contract.populateTransaction().
-    // - Reverts surface as errors; inspect returned data for revert reasons when available.
-    // Analogy: asking the contract clerk to read a value without recording anything in the ledger.
+    // - Reverts surface as errors; revert data may contain an error string—inspect raw bytes when needed.
+    // - CPU analogy: read-only syscall that inspects memory/state without committing writes.
+    // - Analogy: asking the contract clerk to read a value without recording anything in the ledger.
 }

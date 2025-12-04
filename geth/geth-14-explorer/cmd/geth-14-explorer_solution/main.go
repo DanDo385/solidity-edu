@@ -15,11 +15,16 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	blockNum := flag.Int64("block", -1, "block number (-1 = latest)")
 	flag.Parse()
+
+	// EDUCATIONAL NOTES:
+	// - Mini explorer: prints header + tx summaries (to/value/gasPrice).
+	// - Extend with receipts/logs (module 15) or traces (module 13) for deeper inspection.
+	// - Analogy: flipping to a specific ledger page and reading every line item.
 
 	ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 	defer cancel()

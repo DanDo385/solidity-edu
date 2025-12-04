@@ -92,10 +92,10 @@ func cmdEvents(ctx context.Context, c *ethclient.Client, addr common.Address, fr
 }
 
 func main() {
-	defaultRPC := os.Getenv("INFURA_RPC_URL")
-	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
-	}
+defaultRPC := os.Getenv("INFURA_RPC_URL")
+if defaultRPC == "" {
+    defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
+}
 	rpcFlag := flag.String("rpc", defaultRPC, "RPC URL")
 	timeout := flag.Duration("timeout", 10*time.Second, "timeout")
 	flag.Parse()

@@ -23,7 +23,7 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URLPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	timeout := flag.Duration("timeout", 8*time.Second, "timeout")

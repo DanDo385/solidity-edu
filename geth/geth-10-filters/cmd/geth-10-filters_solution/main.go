@@ -71,5 +71,7 @@ func main() {
 
     // Reorg hint: if stored parentHash doesn’t match previously seen hash, a reorg happened.
     // Analogy: watching the tape of new ledger pages; if a page references a different prev page, the story changed.
-    _ = ethereum.FilterQuery{} // placeholder to show filters exist for logs too
+
+    // Filters for logs (not used here): ethereum.FilterQuery with Topics/Addresses.
+    _ = ethereum.FilterQuery{}
 }

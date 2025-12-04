@@ -15,7 +15,7 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	flag.Parse()
@@ -50,5 +50,6 @@ func main() {
 	// - Receipt status 1 = success, 0 = revert.
 	// - CumulativeGasUsed is across block execution order.
 	// - Logs live here; tie to module 09 for decoding.
-	// Analogy: delivery receipt with success stamp and list of emitted events.
+	// - CPU analogy: receipt is the syscall return struct (status + emitted events).
+	// - Analogy: delivery receipt with success stamp and list of emitted events.
 }

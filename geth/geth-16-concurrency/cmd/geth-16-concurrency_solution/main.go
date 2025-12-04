@@ -16,7 +16,7 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	start := flag.Int64("start", 0, "start block")
@@ -24,6 +24,10 @@ func main() {
 	workers := flag.Int("workers", 3, "concurrent workers")
 	flag.Parse()
 
+	// EDUCATIONAL NOTES:
+	// - Worker pools help fan-out requests; add rate limiting/backoff to respect provider limits.
+	// - Context cancellation stops workers on timeout.
+	// - Analogy: multiple clerks fetching ledger pages in parallel to speed up research.
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 

@@ -17,11 +17,16 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
+// EDUCATIONAL NOTES:
+// - EIP-1559 splits fees: baseFee (protocol burn) + priority tip. You cap with maxFee/maxPriority.
+// - Legacy gasPrice still works, but dynamic fees are standard post-London.
+// - Effective gas price = min(maxFeeCap, baseFee+tip); excess refunded.
+// - Analogy: bus fare (baseFee) plus a tip for faster boarding; maxFee is your budget cap.
 func main() {
 	// Flags for RPC, keys, recipient, and fee caps.
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URLPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint (uses INFURA_RPC_URL if set)")
 	toHex := flag.String("to", "", "recipient address")
@@ -100,9 +105,9 @@ func main() {
 	fmt.Printf("Submitted EIP-1559 tx %s\n  from=%s nonce=%d to=%s\n  value=%s wei maxFee=%s maxPriority=%s\n",
 		signed.Hash(), from.Hex(), nonce, to.Hex(), valueWei.String(), maxFee.String(), maxPriority.String())
 
-	// Commentary:
-	// - baseFee is set by protocol; actual effectiveGasPrice = min(maxFee, baseFee+tip).
-	// - Using ChainID avoids cross-chain replay (EIP-155).
-	// - For production, use precise wei math and consider gas estimation with CallMsg.
-	// Analogy: maxFee is your total budget; tip is your extra incentive for inclusion; baseFee is toll everyone pays.
+	// Commentary / nerdy bits:
+	// - baseFee is set by protocol; effectiveGasPrice = min(maxFeeCap, baseFee+tip). Excess is refunded.
+	// - ChainID prevents cross-chain replay (EIP-155); London signer handles dynamic-fee fields.
+	// - For production: use precise wei math (no float), estimate gas limit with CallMsg, and consider dynamic tips.
+	// - CPU analogy: baseFee = constant bus fare, tip = priority boarding fee, maxFee = your total budget cap.
 }

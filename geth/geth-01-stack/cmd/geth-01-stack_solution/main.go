@@ -15,7 +15,7 @@ func main() {
 	// Flags keep this CLI flexible: swap endpoints without recompiling.
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL" // fallback if env not set
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY" // fallback if env not set
 	}
 	rpcURL := flag.String("rpc", defaultRPC, "RPC endpoint (HTTP/WS). Uses INFURA_RPC_URL if set.")
 	timeout := flag.Duration("timeout", 5*time.Second, "RPC call timeout")

@@ -22,10 +22,10 @@ import (
 const erc20ABI = `[{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"value","type":"uint256"}],"name":"Transfer","type":"event"}]`
 
 func main() {
-	defaultRPC := os.Getenv("INFURA_RPC_URL")
-	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
-	}
+defaultRPC := os.Getenv("INFURA_RPC_URL")
+if defaultRPC == "" {
+    defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
+}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint")
 	tokenHex := flag.String("token", "", "ERC20 token address")
 	from := flag.Int64("from", 0, "start block")

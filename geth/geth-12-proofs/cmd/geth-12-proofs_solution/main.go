@@ -16,7 +16,7 @@ import (
 func main() {
 	defaultRPC := os.Getenv("INFURA_RPC_URL")
 	if defaultRPC == "" {
-		defaultRPC = "https://mainnet.infura.io/v3/INFURA_RPC_URL"
+		defaultRPC = "https://mainnet.infura.io/v3/YOUR_KEY"
 	}
 	rpc := flag.String("rpc", defaultRPC, "RPC endpoint (needs eth_getProof support)")
 	accountHex := flag.String("account", "", "account to prove")
@@ -28,6 +28,11 @@ func main() {
 	if *accountHex == "" {
 		log.Fatal("usage: -account <addr> [-slot N] [-block num]")
 	}
+
+	// EDUCATIONAL NOTES:
+	// - eth_getProof returns Merkle Patricia trie proofs (account + storage). Think tamper-evident receipts.
+	// - Light clients/bridges verify these without full state; ties to storage layout (module 11).
+	// - Analogy: notarized receipt stapled to the ledger page proving your entry existed at that block.
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
