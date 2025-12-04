@@ -1,0 +1,18 @@
+{
+  "solidity.remappings": [
+    "forge-std/=lib/forge-std/src/"
+  ],
+  "solidity.includePath": [
+    "lib",
+    "src",
+    "script",
+    "test"
+  ],
+  "files.associations": {
+    "*.sol": "solidity"
+  },
+  "[solidity]": {
+    "editor.defaultFormatter": "NomicFoundation.hardhat-solidity",
+    "editor.formatOnSave": true
+  }
+}

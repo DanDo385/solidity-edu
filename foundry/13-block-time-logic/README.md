@@ -1,0 +1,402 @@
+# Project 13: Block Properties & Time Logic ⏰
+
+> **Master blockchain time and block properties safely**
+
+## 🎯 Learning Objectives
+
+By completing this project, you will:
+
+1. **Understand `block.timestamp` vs `block.number`** and when to use each
+2. **Learn about miner manipulation** possibilities and risks
+3. **Implement rate limiting patterns** to prevent spam
+4. **Create cooldown mechanisms** for two-step processes
+5. **Recognize time-based exploits** and avoid them
+6. **Use Foundry's time manipulation** (`vm.warp()`, `vm.roll()`, `skip()`)
+7. **Implement vesting schedules** and time-locked vaults
+8. **Create Foundry deployment scripts** for time-based contracts
+9. **Write comprehensive test suites** with time manipulation
+
+## Block Properties Deep Dive
+
+### block.timestamp
+
+**What it is:** The Unix timestamp (seconds since January 1, 1970) when the block was mined.
+
+**Key characteristics:**
+- Measured in seconds
+- Set by the block miner
+- Subject to ~15 second drift allowance
+- Can be manipulated within limits by miners
+- More human-readable for time periods
+
+**Example:**
+```solidity
+// Current timestamp
+uint256 currentTime = block.timestamp;
+
+// Check if 1 day has passed
+require(block.timestamp >= lastAction + 1 days, "Too soon");
+```
+
+### block.number
+
+**What it is:** The sequential number of the current block in the blockchain.
+
+**Key characteristics:**
+- Increments by 1 for each block
+- Cannot be manipulated (other than by controlling block production)
+- More predictable than timestamp
+- Average block time: ~12 seconds on Ethereum mainnet
+- Block time varies by network (e.g., 2s on Polygon)
+
+**Example:**
+```solidity
+// Current block number
+uint256 currentBlock = block.number;
+
+// Check if 100 blocks have passed (~20 minutes on Ethereum)
+require(block.number >= lastBlock + 100, "Too soon");
+```
+
+## Miner Manipulation
+
+### The 15-Second Drift Rule
+
+Ethereum protocol allows miners to set `block.timestamp` with these constraints:
+- Must be greater than the parent block's timestamp
+- Must be within ~15 seconds of the actual time
+- Other nodes will reject blocks that violate these rules
+
+**What this means:**
+- Miners can manipulate timestamp by ±15 seconds
+- For short time periods (<15 seconds), timestamp is unreliable
+- For longer periods (hours/days), manipulation is negligible
+
+### Attack Scenarios
+
+**Vulnerable code:**
+```solidity
+// DANGEROUS: Can be manipulated
+function claimReward() external {
+    require(block.timestamp % 10 == 0, "Only on even 10s");
+    // Miner can manipulate to hit this condition
+}
+```
+
+**Safer code:**
+```solidity
+// BETTER: Long time periods are safer
+function claimReward() external {
+    require(block.timestamp >= lastClaim + 1 days, "24h cooldown");
+    // 15 second manipulation is negligible over 1 day
+}
+```
+
+## When to Use Each Approach
+
+### Use block.timestamp when:
+- Time periods are measured in hours, days, weeks, or longer
+- Human-readable time matters (e.g., "7 day voting period")
+- Exact timing isn't critical for security
+- You need to work with specific dates/times
+
+**Good use cases:**
+- Vesting schedules
+- Lock-up periods
+- Voting durations
+- Auction end times
+- Cooldown periods (>1 hour)
+
+### Use block.number when:
+- You need more predictable intervals
+- Security depends on precise ordering
+- Working with short time periods
+- You want network-agnostic logic
+
+**Good use cases:**
+- Snapshot mechanisms
+- Oracle price updates
+- Rate limiting (very short periods)
+- Governance checkpoints
+
+### Avoid time-based logic when:
+- Security depends on exact second precision
+- Time periods are < 15 seconds
+- Randomness is involved (never use block properties for randomness!)
+
+## Common Patterns
+
+### 1. Rate Limiting
+
+Restrict how often an action can be performed.
+
+```solidity
+mapping(address => uint256) public lastActionTime;
+uint256 public constant RATE_LIMIT = 1 hours;
+
+function rateLimitedAction() external {
+    require(
+        block.timestamp >= lastActionTime[msg.sender] + RATE_LIMIT,
+        "Rate limit active"
+    );
+
+    lastActionTime[msg.sender] = block.timestamp;
+    // Perform action...
+}
+```
+
+### 2. Cooldown Period
+
+Enforce waiting time between state changes.
+
+```solidity
+mapping(address => uint256) public cooldownStart;
+uint256 public constant COOLDOWN_PERIOD = 7 days;
+
+function initiateCooldown() external {
+    cooldownStart[msg.sender] = block.timestamp;
+}
+
+function executeAfterCooldown() external {
+    require(
+        cooldownStart[msg.sender] != 0,
+        "Cooldown not initiated"
+    );
+    require(
+        block.timestamp >= cooldownStart[msg.sender] + COOLDOWN_PERIOD,
+        "Cooldown not finished"
+    );
+
+    cooldownStart[msg.sender] = 0;
+    // Execute action...
+}
+```
+
+### 3. Time-Locked Vault
+
+Lock funds until a specific time.
+
+```solidity
+uint256 public unlockTime;
+
+constructor(uint256 _lockDuration) {
+    unlockTime = block.timestamp + _lockDuration;
+}
+
+function withdraw() external {
+    require(block.timestamp >= unlockTime, "Still locked");
+    // Withdraw logic...
+}
+```
+
+### 4. Deadline Enforcement
+
+Ensure actions happen before a deadline.
+
+```solidity
+uint256 public deadline;
+
+function submitProposal() external {
+    require(block.timestamp <= deadline, "Deadline passed");
+    // Submit logic...
+}
+```
+
+## Testing Time-Based Logic
+
+Foundry provides powerful time manipulation tools:
+
+### vm.warp(timestamp)
+
+Sets `block.timestamp` to a specific value.
+
+```solidity
+function testCooldown() public {
+    // Set to a known time
+    vm.warp(1000);
+
+    contract.initiateCooldown();
+
+    // Fast forward 7 days
+    vm.warp(1000 + 7 days);
+
+    contract.executeAfterCooldown();
+}
+```
+
+### vm.roll(blockNumber)
+
+Sets `block.number` to a specific value.
+
+```solidity
+function testBlockBased() public {
+    vm.roll(100);
+
+    contract.doSomething();
+
+    // Advance 100 blocks
+    vm.roll(200);
+
+    contract.doSomethingElse();
+}
+```
+
+### skip(duration)
+
+Advances `block.timestamp` by a duration.
+
+```solidity
+function testRateLimit() public {
+    contract.action();
+
+    // Try too soon
+    vm.expectRevert("Rate limit active");
+    contract.action();
+
+    // Skip forward
+    skip(1 hours);
+
+    // Should work now
+    contract.action();
+}
+```
+
+## Common Pitfalls & Exploits
+
+### 1. Short Time Windows
+
+**Problem:**
+```solidity
+// VULNERABLE
+require(block.timestamp % 60 < 10, "Only in first 10 seconds of each minute");
+```
+
+**Why:** Miner can manipulate within 15 seconds to hit this window.
+
+### 2. Timestamp as Randomness
+
+**Problem:**
+```solidity
+// NEVER DO THIS
+uint256 random = uint256(keccak256(abi.encodePacked(block.timestamp))) % 100;
+```
+
+**Why:** Miners can manipulate timestamp AND see the value before mining.
+
+### 3. Comparison with block.timestamp Equality
+
+**Problem:**
+```solidity
+// FRAGILE
+require(block.timestamp == unlockTime, "Not exact time");
+```
+
+**Why:** Very unlikely to execute at exact second. Use `>=` instead.
+
+**Fix:**
+```solidity
+// CORRECT
+require(block.timestamp >= unlockTime, "Not yet unlocked");
+```
+
+### 4. Overflow with Arithmetic
+
+**Problem (pre-0.8.0):**
+```solidity
+// Could overflow
+uint256 deadline = block.timestamp + 100 days;
+```
+
+**Why:** In Solidity <0.8.0, this could overflow. Always use SafeMath or 0.8.0+.
+
+### 5. Network-Specific Assumptions
+
+**Problem:**
+```solidity
+// Assumes Ethereum block time
+uint256 blocksPerDay = 7200; // 12 second blocks
+```
+
+**Why:** Different networks have different block times (Polygon ~2s, BSC ~3s).
+
+## Real-World Examples
+
+### DeFi Vesting
+```solidity
+// Vesting contract releases tokens over time
+function calculateVested() public view returns (uint256) {
+    if (block.timestamp < startTime) return 0;
+    if (block.timestamp >= startTime + duration) return totalAmount;
+
+    uint256 elapsed = block.timestamp - startTime;
+    return (totalAmount * elapsed) / duration;
+}
+```
+
+### Governance Voting
+```solidity
+// Voting period with clear start/end times
+require(block.timestamp >= proposalStart, "Not started");
+require(block.timestamp <= proposalEnd, "Voting ended");
+```
+
+### Flash Loan Protection
+```solidity
+// Prevent flash loan attacks with cooldown
+require(
+    lastDepositBlock[msg.sender] < block.number,
+    "No same-block withdraw"
+);
+```
+
+## Security Best Practices
+
+1. **Use timestamp for long periods (>1 hour):** Manipulation is negligible.
+2. **Use block.number for short periods:** More predictable.
+3. **Never use for randomness:** Use Chainlink VRF or similar.
+4. **Use >= not ==:** Time won't hit exact seconds.
+5. **Document assumptions:** Note block time assumptions.
+6. **Test edge cases:** Use vm.warp() and vm.roll() extensively.
+7. **Consider MEV:** Miners/validators can see pending transactions.
+
+## Project Tasks
+
+In this project, you will implement:
+
+1. **TimeLockedVault:** Lock ETH until a specific timestamp
+2. **RateLimiter:** Allow actions only after a cooldown period
+3. **BlockBasedLottery:** Use block numbers for fair lottery mechanics
+4. **VestingWallet:** Release tokens linearly over time
+
+Each implementation will include security considerations and proper testing.
+
+## Resources
+
+- [Solidity Documentation - Block and Transaction Properties](https://docs.soliditylang.org/en/latest/units-and-global-variables.html#block-and-transaction-properties)
+- [Consensys Best Practices - Timestamp Dependence](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/timestamp-dependence/)
+- [SWC-116: Block values as a proxy for time](https://swcregistry.io/docs/SWC-116)
+- [Foundry Cheatcodes - Time](https://book.getfoundry.sh/cheatcodes/warp)
+
+## Running the Project
+
+```bash
+# Run tests
+forge test --match-path test/BlockTimeLogic.t.sol -vvv
+
+# Run specific test
+forge test --match-test testRateLimit -vvv
+
+# Deploy
+forge script script/DeployBlockTimeLogic.s.sol --rpc-url <your-rpc> --broadcast
+
+# Test with gas report
+forge test --match-path test/BlockTimeLogic.t.sol --gas-report
+```
+
+## Success Criteria
+
+- All tests pass
+- Understand timestamp vs block number tradeoffs
+- Can identify vulnerable time-based code
+- Know when each approach is appropriate
+- Can use vm.warp() and vm.roll() for testing
