@@ -36,7 +36,7 @@
 
 ---
 
-## 🚀 Quick Navigation
+## đ Quick Navigation
 
 **Need to find something fast?**
 - [Data Types](#data-types) - All Solidity types explained
@@ -53,27 +53,27 @@
 - [Part 4: Gas Optimization](#part-4-gas-optimization)
 - [Part 5: Security Checklist](#part-5-security-checklist)
 
-## 📖 When to Use This Guide
+## đ When to Use This Guide
 
 **Use LEARNING_GUIDE.md when:**
-- ✅ Learning Solidity syntax for the first time
-- ✅ Comparing Solidity to other languages you know
-- ✅ Looking up Foundry commands and patterns
-- ✅ Optimizing gas costs
-- ✅ Reviewing security best practices
-- ✅ Quick reference while coding
+- â Learning Solidity syntax for the first time
+- â Comparing Solidity to other languages you know
+- â Looking up Foundry commands and patterns
+- â Optimizing gas costs
+- â Reviewing security best practices
+- â Quick reference while coding
 
 **Don't use this guide for:**
-- ❌ Project-specific implementation details (see project READMEs in [main repository](../README.md))
-- ❌ DeFi attack vectors (see [DEFI_REFERENCE.md](../DEFI_REFERENCE.md))
-- ❌ Project navigation (see [PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md))
+- â Project-specific implementation details (see project READMEs in [main repository](../README.md))
+- â DeFi attack vectors (see [DEFI_REFERENCE.md](../DEFI_REFERENCE.md))
+- â Project navigation (see [PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md))
 
 **Related Documentation:**
 - **[README.md](../README.md)** - Main entry point, project overview
 - **[DEFI_REFERENCE.md](../DEFI_REFERENCE.md)** - DeFi attacks and ERC-4626 vault mathematics
 - **[PROJECT_MANAGEMENT.md](../PROJECT_MANAGEMENT.md)** - Learning paths and project dependencies
 
-## 📝 Code Examples Index
+## đ Code Examples Index
 
 Jump straight to worked snippets without scrolling:
 - **Data Types**: [Value Types](#value-types-stored-directly-in-variables), [Reference Types](#reference-types-store-reference-to-data), [Storage Packing](#storage-packing)
@@ -82,11 +82,11 @@ Jump straight to worked snippets without scrolling:
 - **Gas Optimization**: [Storage](#storage-optimization), [Loops](#loop-optimization), [Advanced Techniques](#advanced-techniques)
 - **Security**: [Reentrancy](#reentrancy--state-management), [Access Control](#access-control--authorization), [Deployment Security](#network--deployment-security)
 
-## 🔗 Related Projects for Practice
+## đ Related Projects for Practice
 
-- **Project 01**: Datatypes & Storage — apply the value/reference and data location sections.
-- **Project 06**: Mappings, Arrays & Gas — measure the storage hashing and loop tips here.
-- **Project 11**: Reentrancy & Security — put the security checklist into practice.
+- **Project 01**: Datatypes & Storage â apply the value/reference and data location sections.
+- **Project 06**: Mappings, Arrays & Gas â measure the storage hashing and loop tips here.
+- **Project 11**: Reentrancy & Security â put the security checklist into practice.
 
 ---
 
@@ -621,10 +621,10 @@ contract EventExample {
 ```
 
 **Why Events?**
-- ✅ Cheaper than storage (~2k gas vs ~20k gas)
-- ✅ Enable off-chain indexing (The Graph, Etherscan)
-- ✅ Frontend can listen for real-time updates
-- ❌ Cannot be read by contracts
+- â Cheaper than storage (~2k gas vs ~20k gas)
+- â Enable off-chain indexing (The Graph, Etherscan)
+- â Frontend can listen for real-time updates
+- â Cannot be read by contracts
 
 **Real-World Analogy**: Events are like receipts from a store - they prove what happened (transaction occurred), but you can't change them, and they're cheaper than storing the full transaction details. Like receipts, they're useful for record-keeping and auditing, but the store (contract) can't read its own receipts.
 
@@ -836,14 +836,14 @@ function withdraw(uint256 amount) public {
 **Avoid DoS by letting users withdraw**:
 
 ```solidity
-// ❌ BAD: Push payment
+// â BAD: Push payment
 function payAll(address[] memory recipients) public {
     for (uint i = 0; i < recipients.length; i++) {
         recipients[i].call{value: 1 ether}("");  // Can fail, DoS entire function
     }
 }
 
-// ✅ GOOD: Pull payment
+// â GOOD: Pull payment
 mapping(address => uint256) public pendingWithdrawals;
 
 function withdraw() public {
@@ -857,7 +857,7 @@ function withdraw() public {
 ### Safe ETH Transfer
 
 ```solidity
-// ✅ RECOMMENDED: call (forwards all gas, returns bool)
+// â RECOMMENDED: call (forwards all gas, returns bool)
 (bool success, ) = recipient.call{value: amount}("");
 require(success, "Transfer failed");
 
@@ -954,7 +954,7 @@ address(this).balance;  // This contract's ETH balance
 **Real-World Analogy**: Struct packing is like organizing items in a moving truck - you want to fit as many items as possible in each box (32-byte storage slot) to minimize the number of boxes (gas costs).
 
 ```solidity
-// ❌ BAD: Wastes storage slots
+// â BAD: Wastes storage slots
 struct BadPacking {
     uint256 a;  // Slot 0 (32 bytes)
     uint8 b;    // Slot 1 (1 byte, wastes 31 bytes!)
@@ -962,7 +962,7 @@ struct BadPacking {
 }
 // Total: 3 slots = ~60k gas for first write
 
-// ✅ GOOD: Packs efficiently
+// â GOOD: Packs efficiently
 struct GoodPacking {
     uint256 a;  // Slot 0 (32 bytes)
     uint256 c;  // Slot 1 (32 bytes)
@@ -3724,12 +3724,12 @@ console.timeEnd("simple");
 
 | Operation | Solidity | Python | Rust | Go | TypeScript |
 |-----------|----------|--------|------|----|----|
-| **Simple Arithmetic** | 3-5 gas | μs | ns | ns | μs |
-| **Array Push** | 20,000+ gas | μs | ns | ns | ns |
+| **Simple Arithmetic** | 3-5 gas | Îźs | ns | ns | Îźs |
+| **Array Push** | 20,000+ gas | Îźs | ns | ns | ns |
 | **Storage Write** | 20,000 gas | N/A | N/A | N/A | N/A |
-| **Loop (10K iter)** | 30,000+ gas | ms | μs | μs | ms |
-| **Memory Allocation** | N/A | μs | ns | ns | μs |
-| **Concurrency** | None | ms/thread | ns | μs/goroutine | μs/promise |
+| **Loop (10K iter)** | 30,000+ gas | ms | Îźs | Îźs | ms |
+| **Memory Allocation** | N/A | Îźs | ns | ns | Îźs |
+| **Concurrency** | None | ms/thread | ns | Îźs/goroutine | Îźs/promise |
 
 ---
 
@@ -3885,20 +3885,20 @@ anvil 0.2.0 (abc123 2024-01-01T00:00:00.000000000Z)
 
 ```
 my-project/
-├── foundry.toml              # Foundry configuration
-├── src/                      # Smart contracts
-│   ├── Counter.sol
-│   └── solution/
-│       └── CounterSolution.sol
-├── test/                     # Test files
-│   └── Counter.t.sol
-├── script/                   # Deployment and interaction scripts
-│   └── Deploy.s.sol
-├── lib/                      # Dependencies (OpenZeppelin, etc.)
-│   └── openzeppelin-contracts/
-└── out/                      # Compiled artifacts (generated)
-    ├── Counter.sol/
-    └── Counter.json
+âââ foundry.toml              # Foundry configuration
+âââ src/                      # Smart contracts
+â   âââ Counter.sol
+â   âââ solution/
+â       âââ CounterSolution.sol
+âââ test/                     # Test files
+â   âââ Counter.t.sol
+âââ script/                   # Deployment and interaction scripts
+â   âââ Deploy.s.sol
+âââ lib/                      # Dependencies (OpenZeppelin, etc.)
+â   âââ openzeppelin-contracts/
+âââ out/                      # Compiled artifacts (generated)
+    âââ Counter.sol/
+    âââ Counter.json
 ```
 
 ### Project Setup
@@ -3966,9 +3966,9 @@ forge build --evm-version paris
 
 **Expected Output:**
 ```
-[⠊] Compiling...
-[⠊] Compiling 50 files with 0.8.20
-[⠊] Solc 0.8.20 finished in 2.34s
+[â ] Compiling...
+[â ] Compiling 50 files with 0.8.20
+[â ] Solc 0.8.20 finished in 2.34s
 Compiler run successful!
 ```
 
@@ -3977,9 +3977,9 @@ Compiler run successful!
 After compilation, Foundry saves artifacts in `out/` directory:
 ```
 out/
-├── DatatypesStorage.sol/
-│   └── DatatypesStorage.json    # Contains bytecode, ABI, metadata
-└── ...
+âââ DatatypesStorage.sol/
+â   âââ DatatypesStorage.json    # Contains bytecode, ABI, metadata
+âââ ...
 ```
 
 **Each JSON artifact contains:**
@@ -4013,7 +4013,7 @@ diff runtime-bytecode.txt onchain-bytecode.txt
 - **Size Limits**: Contracts must be < 24KB (check with `forge build --sizes`)
 - **Gas Optimization**: Understand opcode-level costs
 - **Verification**: Compare compiled vs on-chain bytecode for Etherscan
-- **Learning**: Understand Solidity → EVM compilation process
+- **Learning**: Understand Solidity â EVM compilation process
 
 **Bytecode Analysis Tools:**
 - **evm.codes**: Interactive EVM opcode reference and disassembler
@@ -4024,7 +4024,7 @@ diff runtime-bytecode.txt onchain-bytecode.txt
 
 ### Starting Anvil
 
-**⚠️ IMPORTANT: This project is designed for LOCAL DEVELOPMENT ONLY using Anvil**
+**â ď¸ IMPORTANT: This project is designed for LOCAL DEVELOPMENT ONLY using Anvil**
 
 Anvil is Foundry's local Ethereum node. Think of it as a private blockchain running on your computer - like a test server for your contracts.
 
@@ -4077,7 +4077,7 @@ PRIVATE_KEY_9=0x2a871d0798f97d79848a013d4936a73bf4cc922c825d33c1cf7073dff6d409c6
 
 ### Deploying to Anvil
 
-**⚠️ This project runs on LOCAL ANVIL ONLY - never deploy to testnets or mainnet**
+**â ď¸ This project runs on LOCAL ANVIL ONLY - never deploy to testnets or mainnet**
 
 ```bash
 # Terminal 1: Start Anvil (keep running)
@@ -4178,7 +4178,7 @@ forge snapshot
 Running 5 tests for test/Counter.t.sol:CounterTest
 [PASS] test_Increment() (gas: 28328)
 [PASS] test_SetNumber() (gas: 31041)
-[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 31089, ~: 31089)
+[PASS] testFuzz_SetNumber(uint256) (runs: 256, Îź: 31089, ~: 31089)
 [PASS] invariant_AlwaysPositive()
 Tests: 4 passed, 0 failed, 0 skipped; finished in 0.003s
 ```
@@ -4982,13 +4982,13 @@ forge test --gas-report > gas_report.txt
 **Sample Gas Report Output**:
 
 ```
-╭────────────────────────────────┬─────────────┬────────┬────────┬────────╮
-│ src/Counter.sol:Counter        ┆ Size (B)    ┆ Times  ┆ Min    ┆ Max    │
-├────────────────────────────────┼─────────────┼────────┼────────┼────────┤
-│ increment()                    ┆             ┆ 2      ┆ 22315  ┆ 22363  │
-│ setNumber(uint256)             ┆             ┆ 3      ┆ 22393  ┆ 22441  │
-│ Deployment Cost                ┆ 59115       ┆        ┆        ┆        │
-╰────────────────────────────────┴─────────────┴────────┴────────┴────────╯
+â­âââââââââââââââââââââââââââââââââŹââââââââââââââŹâââââââââŹâââââââââŹâââââââââŽ
+â src/Counter.sol:Counter        â Size (B)    â Times  â Min    â Max    â
+ââââââââââââââââââââââââââââââââââźââââââââââââââźâââââââââźâââââââââźâââââââââ¤
+â increment()                    â             â 2      â 22315  â 22363  â
+â setNumber(uint256)             â             â 3      â 22393  â 22441  â
+â Deployment Cost                â 59115       â        â        â        â
+â°âââââââââââââââââââââââââââââââââ´ââââââââââââââ´âââââââââ´âââââââââ´âââââââââŻ
 ```
 
 ### Gas Snapshots with `snapshot`
@@ -6453,7 +6453,7 @@ contract GoodString {
 |-----------|----------|--------|---------|
 | Read 10 uint256 | ~30 gas | ~600 gas | 95% |
 | Pass string | 0 gas | ~variable | variable |
-| Modify array | ❌ Cannot | ✅ Yes | N/A |
+| Modify array | â Cannot | â Yes | N/A |
 
 ---
 
