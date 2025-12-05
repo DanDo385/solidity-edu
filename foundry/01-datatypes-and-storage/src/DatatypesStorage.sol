@@ -74,13 +74,13 @@ contract DatatypesStorage {
     // EVENTS
     // ============================================================
 
-    // TODO: Declare an event 'NumberUpdated' that logs the old and new number.
+    // TODO: Declare an event 'NumberUpdated' that logs the old and new number value.
     // Why are events useful for off-chain applications?
-    event NumberUpdated(uint256 oldNumber, uint256 newNumber);
+    event NumberUpdated(uint256 indexed oldValue, uint256 newValue);
     // TODO: Declare an event 'UserRegistered' that logs the user's wallet and balance.
-    event UserRegistered(address wallet, uint256 balance);
+    event UserRegistered(address indexed wallet, uint256 balance);
     // TODO: Declare an event 'FundsDeposited' that logs the depositor and the amount.
-    event FundsDeposited(address depositor, uint256 amount);
+    event FundsDeposited(address indexed depositor, uint256 amount);
     // TODO: Declare an event 'MessageUpdated' that logs the old and new message.
     event MessageUpdated(string oldMessage, string newMessage);
     // TODO: Declare an event 'BalanceUpdated' that logs the address and the balance.
@@ -128,9 +128,9 @@ contract DatatypesStorage {
         // 1. Store the old number in a temporary variable.
         // 2. Update the 'number' state variable to _number.
         // 3. Emit the 'NumberUpdated' event with the old and new values.
-        uint256 oldNumber = number;
+        uint256 oldValue = number;
         number = _number;
-        emit NumberUpdated(oldNumber, _number);
+        emit NumberUpdated(oldValue, _number);
     }
 
     /**
@@ -139,6 +139,7 @@ contract DatatypesStorage {
      */
     function getNumber() public view returns (uint256) {
         // TODO: Implement to return the 'number' state variable.
+        return number;
     }
 
     /**
@@ -250,6 +251,7 @@ contract DatatypesStorage {
         // TODO: Create a User struct in the 'users' mapping.
         // Set 'isRegistered' to true.
         // Emit the 'UserRegistered' event.
+        
 
     }
 

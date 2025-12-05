@@ -351,7 +351,7 @@ function test_SetNumber_EmitsEvent() public {
     // Set up expected event
     vm.expectEmit(false, false, false, true);
     // Parameters: checkTopic1, checkTopic2, checkTopic3, checkData
-    emit NumberUpdated(0, 100);  // oldNumber, newNumber
+    emit NumberUpdated(0, 100);  // oldValue, newNumber
     
     // Perform action that should emit event
     datatypes.setNumber(100);

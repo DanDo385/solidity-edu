@@ -5,6 +5,58 @@
 - Starter CLI (TODOs).
 - Commented solution with rich explanations, tips, and gotchas.
 
+## Quick Start
+
+### Prerequisites
+- Go 1.22 or later
+- An Ethereum RPC endpoint (Infura, Alchemy, or your own node)
+
+### Setup
+
+1. **Configure RPC endpoint** (choose one):
+   ```bash
+   # Option 1: Set environment variable
+   export INFURA_RPC_URL=https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID
+   
+   # Option 2: Copy .env.example to .env and edit
+   cp .env.example .env
+   # Then edit .env with your RPC URL
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   make tidy
+   # or manually:
+   go mod tidy
+   ```
+
+3. **Run a module**:
+   ```bash
+   # Using Makefile (recommended)
+   make run-01  # Run geth-01-stack solution
+   
+   # Or manually
+   go run geth-01-stack/cmd/geth-01-stack_solution/main.go
+   
+   # Or work on the starter version
+   go run geth-01-stack/cmd/geth-01-stack/main.go
+   ```
+
+### Available Make Targets
+
+- `make tidy` - Update Go dependencies
+- `make build` - Build all module binaries
+- `make clean` - Remove build artifacts and databases
+- `make run-01` through `make run-25` - Run specific module solutions
+- `make help` - Show all available targets
+
+### Project Structure
+
+Each module (`geth-XX-name/`) contains:
+- `README.md` - Learning objectives and explanations
+- `cmd/geth-XX-name/main.go` - Starter code with TODOs
+- `cmd/geth-XX-name_solution/main.go` - Complete solution with comments
+
 ## Module Map
 
 1) Stack basics: execution vs consensus, ping chain/head.  

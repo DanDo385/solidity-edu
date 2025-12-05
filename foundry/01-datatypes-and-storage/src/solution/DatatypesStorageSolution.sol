@@ -373,6 +373,12 @@ contract DatatypesStorageSolution {
      */
     event MessageUpdated(string oldMessage, string newMessage);
 
+    /**
+     * @notice Emitted when balance is updated
+     * @dev Both parameters are non-indexed
+     */
+    event BalanceUpdated(address addr, uint256 balance);
+
     // ════════════════════════════════════════════════════════════════════════
     // CONSTRUCTOR
     // ════════════════════════════════════════════════════════════════════════
@@ -555,7 +561,7 @@ contract DatatypesStorageSolution {
      *      - Event emission: ~2,000 gas
      *      TOTAL: ~45,000 gas (first call), ~28,000 gas (subsequent)
      *
-     * GAS OPTIMIZATION: Why cache oldNumber?
+     * GAS OPTIMIZATION: Why cache oldValue?
      * - Reading number: 1 SLOAD = 100 gas (warm)
      * - We use it for the event
      * - If we read it twice: 2 SLOADs = 200 gas
@@ -598,7 +604,7 @@ contract DatatypesStorageSolution {
         //        → Reads number twice = 2 × SLOAD = 200 gas
         //   Good: Cache first, then update = 1 × SLOAD = 100 gas
         //        Savings: 100 gas per call!
-        uint256 oldNumber = number; // SLOAD: ~100 gas (warm read from slot 0)
+        uint256 oldValue = number; // SLOAD: ~100 gas (warm read from slot 0)
         
         // 💾 WRITE OPERATION: Update the state variable
         // This is where the real cost happens - storage writes are expensive!
@@ -610,7 +616,7 @@ contract DatatypesStorageSolution {
         // Events are like receipts - they prove something happened!
         // Off-chain systems (like frontends) listen to these events
         // to update UIs in real-time. Much cheaper than storage!
-        emit NumberUpdated(oldNumber, _number); // ~2,000 gas (event emission)
+        emit NumberUpdated(oldValue, _number); // ~2,000 gas (event emission)
     }
 
     /**
@@ -834,6 +840,7 @@ contract DatatypesStorageSolution {
     function setBalance(address _address, uint256 _balance) public {
         // Direct assignment - no need to read first if we're overwriting
         balances[_address] = _balance; // SSTORE to calculated slot
+        emit BalanceUpdated(_address, _balance);
     }
 
     /**
@@ -1637,7 +1644,7 @@ contract DatatypesStorageSolution {
      *      It's the most gas-efficient option and makes your intent clear.
      *      Only use memory if you need to modify the data.
      */
-    function getFirstElement(uint256[] calldata _arr) external pure returns (uint256) {
+    function getFirstElement(uint256[] calldata _arr) public pure returns (uint256) {
         // 🛡️  VALIDATION: Check array is not empty
         // This prevents reading from an empty array (would revert anyway, but clearer error)
         require(_arr.length > 0, "Array is empty");

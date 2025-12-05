@@ -95,7 +95,7 @@ contract DatatypesStorageTest is Test {
     // Event declarations for testing (must match contract events)
     // TODO: Declare events that match the contract's events
     // Hint: Check the contract for event declarations like:
-    //       event NumberUpdated(uint256 oldNumber, uint256 newNumber);
+    //       event NumberUpdated(uint256 oldValue, uint256 newNumber);
     //       event UserRegistered(address indexed wallet, uint256 balance);
 
     /**
