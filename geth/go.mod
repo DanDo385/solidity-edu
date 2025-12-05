@@ -3,7 +3,7 @@ module geth-edu
 go 1.24.0
 
 require (
-	github.com/ethereum/go-ethereum v1.13.14
+	github.com/ethereum/go-ethereum v1.13.15
 	modernc.org/sqlite v1.40.1
 )
 
