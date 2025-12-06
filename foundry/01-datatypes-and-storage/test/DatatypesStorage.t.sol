@@ -125,10 +125,18 @@ contract DatatypesStorageTest is Test {
      */
     function setUp() public {
         // TODO: Set owner to address(this) - the test contract is the deployer
+        owner = address(this);
         // TODO: Create user1 and user2 addresses (use address(0x1) and address(0x2))
+        user1 = address(0x1);
+        user2 = address(0x2);
+
         // TODO: Deploy a new DatatypesStorageSolution contract instance
+        datatypes = new DatatypesStorageSolution();
         // TODO: Use vm.label() to label addresses for better debugging output
         //       Example: vm.label(owner, "Owner");
+        vm.label(owner, "Owner");
+        vm.label(user1, "User1");
+        vm.label(user2, "User2");
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -152,6 +160,7 @@ contract DatatypesStorageTest is Test {
     function test_Constructor_SetsOwner() public {
         // TODO: Assert that datatypes.owner() equals owner
         // Hint: assertEq(datatypes.owner(), owner, "Owner should be set to deployer");
+        assertEq(datatypes.owner(), owner, "Owner should be set to deployer");
     }
 
     /**
@@ -161,6 +170,7 @@ contract DatatypesStorageTest is Test {
     function test_Constructor_SetsIsActive() public {
         // TODO: Assert that datatypes.isActive() is true
         // Hint: assertTrue(datatypes.isActive(), "Contract should be active on deployment");
+        assertTrue(datatypes.isActive(), "Contract should be active on deployment");
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -184,10 +194,11 @@ contract DatatypesStorageTest is Test {
      */
     function test_SetNumber() public {
         // TODO: Set a number (e.g., 42) using datatypes.setNumber()
+        uint256 newNumber = 42;
+        datatypes.setNumber(newNumber);
         // TODO: Assert that datatypes.getNumber() returns the value you set
-        // Hint: uint256 newNumber = 42;
-        //       datatypes.setNumber(newNumber);
-        //       assertEq(datatypes.getNumber(), newNumber, "Number should be updated");
+        assertEq(datatypes.getNumber(), newNumber, "Number should be updated");
+       
     }
 
     /**
@@ -198,9 +209,14 @@ contract DatatypesStorageTest is Test {
      */
     function test_SetNumber_EmitsEvent() public {
         // TODO: Set up vm.expectEmit(false, false, false, true)
+        vm.expectEmit(false, false, false, true);
         // TODO: Emit the expected NumberUpdated event (check contract for event signature)
+        vm.expectEmit(false, false, false, true);
+        emit NumberUpdated(oldNumber, newNumber);
         // TODO: Call datatypes.setNumber() with a value
         // Hint: You'll need to know the old value (0 initially) and new value
+        datatypes.setNumber(newNumber);
+        assertEq(datatypes.getNumber(), newNumber, "Number should be updated");
     }
 
     /**
@@ -219,8 +235,12 @@ contract DatatypesStorageTest is Test {
      */
     function test_IncrementNumber() public {
         // TODO: Set number to 5
+        uint256 newNumber = 5;
+        datatypes.setNumber(newNumber);
         // TODO: Call incrementNumber()
+        datatypes.incrementNumber();
         // TODO: Assert that number is now 6
+        assertEq(datatypes.getNumber(), 6, "Number should be incremented by 1");
     }
 
     /**
@@ -229,8 +249,12 @@ contract DatatypesStorageTest is Test {
      */
     function test_IncrementNumber_FromZero() public {
         // TODO: Assert initial number is 0
+        uint256 newNumber = 0;
+        datatypes.setNumber(newNumber); 
         // TODO: Call incrementNumber()
+        datatypes.incrementNumber();
         // TODO: Assert number is now 1
+        assertEq(datatypes.getNumber(), 1, "Number should be incremented by 1");
     }
 
     /**
@@ -240,8 +264,12 @@ contract DatatypesStorageTest is Test {
      */
     function test_IncrementNumber_RevertsOnOverflow() public {
         // TODO: Set number to type(uint256).max
+        uint256 newNumber = type(uint256).max;
+        datatypes.setNumber(newNumber);
         // TODO: Use vm.expectRevert() to expect a revert
+        vm.expectRevert();
         // TODO: Call incrementNumber() - this should revert
+        datatypes.incrementNumber();
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -266,6 +294,8 @@ contract DatatypesStorageTest is Test {
      */
     function test_SetBalance() public {
         // TODO: Set balance for user1 to 1000
+        uint256 newBalance = 1000;
+        datatypes.setBalance(user1, newBalance);
         // TODO: Assert that getBalance(user1) returns 1000
     }
 

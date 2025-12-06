@@ -38,6 +38,13 @@ contract DatatypesStorage {
     //       - bool flag
     //       - uint128 smallNumber2
     // How many storage slots does your packed struct use vs. an unpacked one?
+    struct PackedData {
+        uint128 smallNumber1;
+        uint128 smallNumber2;
+        address user;
+        uint64 timestamp;
+        bool flag;
+    }
 
     // ============================================================
     // STATE VARIABLES (Storage)
@@ -255,8 +262,12 @@ contract DatatypesStorage {
         // TODO: Create a User struct in the 'users' mapping.
         // Set 'isRegistered' to true.
         // Emit the 'UserRegistered' event.
-        
-
+        users[_wallet] = User({
+            wallet: _wallet,
+            balance: _balance,
+            isRegistered: true
+        });
+        emit UserRegistered(_wallet, _balance);
     }
 
     /**
@@ -273,7 +284,7 @@ contract DatatypesStorage {
     {
         // TODO: Implement to return data from the 'users' mapping.
         // What does this function return for a non-existent user?
-        return users[_wallet].wallet, users[_wallet].balance, users[_wallet].isRegistered;
+        return (users[_wallet].wallet, users[_wallet].balance, users[_wallet].isRegistered);
     }
 
     // ============================================================

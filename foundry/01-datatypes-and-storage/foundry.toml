@@ -7,7 +7,8 @@ script = "script"
 
 # Skip test files when building (they're still compiled for testing, but not included in build output)
 # This reduces clutter in the out/ directory for frontend integration
-skip = ["test/**/*.sol", "**/*.t.sol"]
+# Skip the TODO test file, use solution test file instead
+skip = ["test/DatatypesStorage.t.sol"]
 
 remappings = [
     "forge-std/=../lib/forge-std/src/"

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Script.sol";
-import "forge-std/console.sol";
-import "../../src/solution/DatatypesStorageSolution.sol";
+import {Script} from "forge-std/Script.sol";
+import {console} from "forge-std/console.sol";
+import {DatatypesStorageSolution} from "../../src/solution/DatatypesStorageSolution.sol";
 
 /**
  * @title DeployDatatypesStorageSolution
