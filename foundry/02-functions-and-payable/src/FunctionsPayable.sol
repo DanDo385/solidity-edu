@@ -23,21 +23,21 @@ contract FunctionsPayable {
     // ============================================================
 
     // TODO: Declare a public address variable called 'owner'
-
+    address public owner;
     // TODO: Declare a mapping from address to uint256 called 'balances'
-
+    mapping(address => uint256) public balances;
     // ============================================================
     // EVENTS
     // ============================================================
 
     // TODO: Define an event 'Deposited' with indexed sender (address) and amount (uint256)
-
+    event Deposited(address indexed sender, uint256 amount);
     // TODO: Define an event 'Withdrawn' with indexed recipient (address) and amount (uint256)
-
+    event Withdrawn(address indexed recipient, uint256 amount);
     // TODO: Define an event 'Received' with indexed sender (address) and amount (uint256)
-
+    event Received(address indexed sender, uint256 amount);
     // TODO: Define an event 'FallbackCalled' with indexed sender (address), amount (uint256), and data (bytes)
-
+    event FallbackCalled(address indexed sender, uint256 amount, bytes data);
     // ============================================================
     // CONSTRUCTOR
     // ============================================================
@@ -45,7 +45,9 @@ contract FunctionsPayable {
     // TODO: Implement a payable constructor that:
     //       1. Sets owner to msg.sender
     //       2. Accepts ETH during deployment
-
+    constructor() payable {
+        owner = msg.sender;
+    }
     // ============================================================
     // RECEIVE AND FALLBACK
     // ============================================================
@@ -53,7 +55,16 @@ contract FunctionsPayable {
     // TODO: Implement receive() function that:
     //       1. Is external payable
     //       2. Emits Received event
-
+    receive() external payable {
+        // TODO: Implement
+        // 1. Emit Received event with msg.sender and msg.value
+        emit Received(msg.sender, msg.value);
+    }
+    fallback() external payable {
+        // TODO: Implement
+        // 1. Emit FallbackCalled event with msg.sender, msg.value, and msg.data
+        emit FallbackCalled(msg.sender, msg.value, msg.data);
+    }
     // TODO: Implement fallback() function that:
     //       1. Is external payable
     //       2. Emits FallbackCalled event with msg.data
@@ -72,6 +83,7 @@ contract FunctionsPayable {
      */
     function externalFunction() external pure returns (string memory) {
         // TODO: Return "This is external"
+        return "This is external";
     }
 
     // ============================================================
@@ -87,6 +99,9 @@ contract FunctionsPayable {
         // 1. Require msg.value > 0
         // 2. Increase balances[msg.sender] by msg.value
         // 3. Emit Deposited event
+        require(msg.value > 0, "Amount must be greater than 0");
+        balances[msg.sender] += msg.value;
+        emit Deposited(msg.sender, msg.value);
     }
 
     /**
@@ -99,6 +114,10 @@ contract FunctionsPayable {
         // 2. Require _recipient is not zero address
         // 3. Increase balances[_recipient] by msg.value
         // 4. Emit Deposited event for _recipient
+        require(msg.value > 0, "Amount must be greater than 0");
+        require(_recipient != address(0), "Recipient must not be the zero address");
+        balances[_recipient] += msg.value;
+        emit Deposited(_recipient, msg.value);
     }
 
     /**
@@ -107,6 +126,7 @@ contract FunctionsPayable {
      */
     function withdraw(uint256 _amount) public {
         // TODO: Implement using checks-effects-interactions pattern
+        
         // CHECKS:
         //   1. Require _amount > 0
         //   2. Require balances[msg.sender] >= _amount
@@ -119,6 +139,12 @@ contract FunctionsPayable {
         // Think of this as settling a tab: close your books before handing out cash
         // so a reentrant caller cannot ask twice. Rollups replay these calls in
         // fraud proofs, so deterministic ordering keeps disputes simple.
+        require(_amount > 0, "Amount must be greater than 0");
+        require(balances[msg.sender] >= _amount, "Insufficient balance");
+        balances[msg.sender] -= _amount;
+        payable(msg.sender).call{value: _amount}("");
+        require(success, "Withdrawal failed");
+        emit Withdrawn(msg.sender, _amount);
     }
 
     /**
@@ -127,6 +153,7 @@ contract FunctionsPayable {
     function withdrawAll() public {
         // TODO: Implement
         // Use the same pattern as withdraw()
+        
     }
 
     /**
