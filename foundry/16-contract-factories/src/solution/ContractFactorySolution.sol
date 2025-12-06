@@ -49,16 +49,27 @@ contract SimpleContract {
  * @dev Complete implementation with address prediction and deployment tracking
  */
 contract ContractFactory {
-    // Events
-    event ContractDeployed(address indexed deployedAddress, bytes32 indexed salt, address indexed deployer);
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
 
     // State - track deployments by salt
     mapping(bytes32 => address) public deployments;
     address[] public allDeployments;
 
+    // ============================================================
+    // CUSTOM ERRORS
+    // ============================================================
+
     // Custom errors for better gas efficiency
     error AlreadyDeployed(bytes32 salt, address existing);
     error DeploymentFailed();
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
+    event ContractDeployed(address indexed deployedAddress, bytes32 indexed salt, address indexed deployer);
 
     /**
      * @notice Predicts the address where a contract will be deployed

@@ -17,20 +17,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * 5. Optimize gas costs for on-chain storage
  */
 contract Project30 is ERC721, Ownable {
-    // =============================================================
-    //                           STORAGE
-    // =============================================================
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    // Constants (stored in bytecode, not storage - gas efficient!)
+    string constant SVG_HEADER = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">';
+    string constant SVG_FOOTER = '</svg>';
 
     uint256 private _nextTokenId;
     uint256 public maxSupply = 1000;
 
-    // SVG constants (stored in bytecode, not storage - gas efficient!)
-    string constant SVG_HEADER = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">';
-    string constant SVG_FOOTER = '</svg>';
-
-    // =============================================================
-    //                         CONSTRUCTOR
-    // =============================================================
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     constructor() ERC721("OnChainSVG", "OCSVG") Ownable(msg.sender) {}
 

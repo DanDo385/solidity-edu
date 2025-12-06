@@ -28,6 +28,10 @@ interface IYieldStrategy {
 contract YieldVault is ERC4626, Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     // Current active strategy
     IYieldStrategy public strategy;
 
@@ -49,7 +53,10 @@ contract YieldVault is ERC4626, Ownable, ReentrancyGuard {
     // Total fees collected (for analytics)
     uint256 public totalFeesCollected;
 
-    // Events
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
     event Harvested(uint256 yield, uint256 fee, uint256 timestamp);
     event StrategyUpdated(address indexed oldStrategy, address indexed newStrategy);
     event PerformanceFeeUpdated(uint256 oldFee, uint256 newFee);

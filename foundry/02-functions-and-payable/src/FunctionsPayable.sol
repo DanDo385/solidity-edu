@@ -63,7 +63,19 @@ contract FunctionsPayable {
     // like transfer/send and stick to call with proper checks.
 
     // ============================================================
-    // DEPOSIT FUNCTIONS
+    // EXTERNAL FUNCTIONS
+    // ============================================================
+
+    /**
+     * @notice External function - only callable from outside
+     * @return A message string
+     */
+    function externalFunction() external pure returns (string memory) {
+        // TODO: Return "This is external"
+    }
+
+    // ============================================================
+    // PUBLIC FUNCTIONS
     // ============================================================
 
     /**
@@ -88,10 +100,6 @@ contract FunctionsPayable {
         // 3. Increase balances[_recipient] by msg.value
         // 4. Emit Deposited event for _recipient
     }
-
-    // ============================================================
-    // WITHDRAWAL FUNCTIONS
-    // ============================================================
 
     /**
      * @notice Withdraw ETH from your balance
@@ -134,10 +142,6 @@ contract FunctionsPayable {
         // 5. Require success
     }
 
-    // ============================================================
-    // VIEW FUNCTIONS
-    // ============================================================
-
     /**
      * @notice Get the balance of an address
      * @param _address The address to query
@@ -156,40 +160,12 @@ contract FunctionsPayable {
         // Return address(this).balance
     }
 
-    // ============================================================
-    // FUNCTION VISIBILITY DEMONSTRATIONS
-    // ============================================================
-
     /**
      * @notice Public function - callable from anywhere
      * @return A message string
      */
     function publicFunction() public pure returns (string memory) {
         // TODO: Return "This is public"
-    }
-
-    /**
-     * @notice External function - only callable from outside
-     * @return A message string
-     */
-    function externalFunction() external pure returns (string memory) {
-        // TODO: Return "This is external"
-    }
-
-    /**
-     * @notice Internal function - callable from this contract and derived contracts
-     * @return A message string
-     */
-    function internalFunction() internal pure returns (string memory) {
-        // TODO: Return "This is internal"
-    }
-
-    /**
-     * @notice Private function - only callable from this contract
-     * @return A message string
-     */
-    function privateFunction() private pure returns (string memory) {
-        // TODO: Return "This is private"
     }
 
     /**
@@ -206,5 +182,29 @@ contract FunctionsPayable {
      */
     function callPrivateFunction() public pure returns (string memory) {
         // TODO: Call and return result from privateFunction()
+    }
+
+    // ============================================================
+    // INTERNAL FUNCTIONS
+    // ============================================================
+
+    /**
+     * @notice Internal function - callable from this contract and derived contracts
+     * @return A message string
+     */
+    function internalFunction() internal pure returns (string memory) {
+        // TODO: Return "This is internal"
+    }
+
+    // ============================================================
+    // PRIVATE FUNCTIONS
+    // ============================================================
+
+    /**
+     * @notice Private function - only callable from this contract
+     * @return A message string
+     */
+    function privateFunction() private pure returns (string memory) {
+        // TODO: Return "This is private"
     }
 }

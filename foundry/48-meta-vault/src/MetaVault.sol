@@ -35,6 +35,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
  *   → MetaVault transfers Z DAI to User
  */
 contract MetaVault is ERC4626, Ownable, ReentrancyGuard {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     // Constants
     uint256 public constant TOTAL_BPS = 10000; // 100%
     uint256 public constant MIN_REBALANCE_INTERVAL = 1 hours;
@@ -46,6 +50,10 @@ contract MetaVault is ERC4626, Ownable, ReentrancyGuard {
 
     bool public autoRebalance; // Whether to auto-rebalance on deposits
     uint256 public lastRebalance; // Timestamp of last rebalance
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     // Events
     event VaultAdded(address indexed vault, uint256 targetAllocation);

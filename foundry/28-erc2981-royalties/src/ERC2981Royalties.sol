@@ -25,13 +25,20 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Marketplace integration patterns
  */
 contract Project28 is ERC721, ERC2981, Ownable {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    // Constants
+    uint96 public constant MAX_ROYALTY_FEE = 1000;
+
     // Counter for token IDs
     uint256 private _nextTokenId;
 
-    // Maximum royalty fee (10% = 1000 basis points)
-    uint96 public constant MAX_ROYALTY_FEE = 1000;
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
-    // Events
     event DefaultRoyaltySet(address indexed receiver, uint96 feeNumerator);
     event TokenRoyaltySet(uint256 indexed tokenId, address indexed receiver, uint96 feeNumerator);
     event TokenRoyaltyReset(uint256 indexed tokenId);

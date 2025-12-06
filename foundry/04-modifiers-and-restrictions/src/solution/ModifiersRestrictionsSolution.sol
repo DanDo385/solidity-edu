@@ -56,6 +56,26 @@ contract ModifiersRestrictionsSolution {
     // ════════════════════════════════════════════════════════════════════════
 
     /**
+     * @notice Role constant for admin operations
+     * @dev Using keccak256 for deterministic role IDs
+     *      Fun fact: keccak256 role IDs are deterministic, which keeps role
+     *      management cheap on L2s and easy to replay on forks like Ethereum
+     *      Classic if governance ever needs to migrate.
+     *
+     * WHY bytes32?
+     * - Gas-efficient: Single storage slot lookup
+     * - Deterministic: Same string always produces same hash
+     * - Flexible: Can add new roles without changing contract structure
+     */
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
+    /**
+     * @notice Role constant for minting operations
+     * @dev Separate role for minting (principle of least privilege)
+     */
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    /**
      * @notice Contract owner address
      * @dev Set in constructor, used by onlyOwner modifier
      *      CONNECTION TO PROJECT 01: Simple address storage
@@ -91,26 +111,6 @@ contract ModifiersRestrictionsSolution {
      * GAS COST: ~100 gas (warm) per role check
      */
     mapping(address => mapping(bytes32 => bool)) public roles;
-
-    /**
-     * @notice Role constant for admin operations
-     * @dev Using keccak256 for deterministic role IDs
-     *      Fun fact: keccak256 role IDs are deterministic, which keeps role
-     *      management cheap on L2s and easy to replay on forks like Ethereum
-     *      Classic if governance ever needs to migrate.
-     *
-     * WHY bytes32?
-     * - Gas-efficient: Single storage slot lookup
-     * - Deterministic: Same string always produces same hash
-     * - Flexible: Can add new roles without changing contract structure
-     */
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-
-    /**
-     * @notice Role constant for minting operations
-     * @dev Separate role for minting (principle of least privilege)
-     */
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
     // ════════════════════════════════════════════════════════════════════════
     // EVENTS

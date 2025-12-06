@@ -37,12 +37,18 @@ contract SimpleContract {
  * @dev Implements deterministic deployment and address prediction
  */
 contract ContractFactory {
-    // Events
-    event ContractDeployed(address indexed deployedAddress, bytes32 indexed salt, address indexed deployer);
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
 
-    // State
     mapping(bytes32 => address) public deployments;
     address[] public allDeployments;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
+    event ContractDeployed(address indexed deployedAddress, bytes32 indexed salt, address indexed deployer);
 
     /**
      * @notice Predicts the address where a contract will be deployed

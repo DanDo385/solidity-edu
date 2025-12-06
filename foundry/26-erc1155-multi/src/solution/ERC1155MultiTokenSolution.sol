@@ -69,6 +69,18 @@ contract GameItems {
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
 
+    // Constants
+    // Fungible tokens (currencies)
+    uint256 public constant GOLD = 0;
+    uint256 public constant SILVER = 1;
+
+    // Fungible tokens (consumables)
+    uint256 public constant HEALTH_POTION = 1000;
+    uint256 public constant MANA_POTION = 1001;
+
+    // Non-fungible tokens start at 10000
+    // Each equipment piece is unique
+
     /// @dev Base URI for computing token URIs
     string private _uri;
 
@@ -88,21 +100,6 @@ contract GameItems {
 
     /// @dev Total supply per token ID
     mapping(uint256 => uint256) private _totalSupply;
-
-    /*//////////////////////////////////////////////////////////////
-                            TOKEN CONSTANTS
-    //////////////////////////////////////////////////////////////*/
-
-    // Fungible tokens (currencies)
-    uint256 public constant GOLD = 0;
-    uint256 public constant SILVER = 1;
-
-    // Fungible tokens (consumables)
-    uint256 public constant HEALTH_POTION = 1000;
-    uint256 public constant MANA_POTION = 1001;
-
-    // Non-fungible tokens start at 10000
-    // Each equipment piece is unique
 
     /*//////////////////////////////////////////////////////////////
                                 EVENTS

@@ -16,6 +16,30 @@ pragma solidity ^0.8.20;
  */
 contract DatatypesStorage {
     // ============================================================
+    // TYPE DECLARATIONS
+    // ============================================================
+
+    // TODO: Define a struct called 'User' with:
+    //       - address wallet
+    //       - uint256 balance
+    //       - bool isRegistered
+    // Structs are reference types. How does their storage layout work in a mapping?
+    struct User {
+        address wallet;
+        uint256 balance;
+        bool isRegistered;
+    }
+
+    // TODO: Define a struct called 'PackedData' with optimal packing.
+    // Research "struct packing" in Solidity. How should you order these fields?
+    //       - uint128 smallNumber1
+    //       - address user (20 bytes)
+    //       - uint64 timestamp
+    //       - bool flag
+    //       - uint128 smallNumber2
+    // How many storage slots does your packed struct use vs. an unpacked one?
+
+    // ============================================================
     // STATE VARIABLES (Storage)
     // ============================================================
 
@@ -47,28 +71,8 @@ contract DatatypesStorage {
     // What are the gas implications of using a dynamic array?
     uint256[] public numbers;
 
-    // TODO: Define a struct called 'User' with:
-    //       - address wallet
-    //       - uint256 balance
-    //       - bool isRegistered
-    // Structs are reference types. How does their storage layout work in a mapping?
-    struct User {
-        address wallet;
-        uint256 balance;
-        bool isRegistered;
-    }
-
     // TODO: Declare a public mapping from address to User called 'users'.
     mapping(address => User) public users;
-
-    // TODO: Define a struct called 'PackedData' with optimal packing.
-    // Research "struct packing" in Solidity. How should you order these fields?
-    //       - uint128 smallNumber1
-    //       - address user (20 bytes)
-    //       - uint64 timestamp
-    //       - bool flag
-    //       - uint128 smallNumber2
-    // How many storage slots does your packed struct use vs. an unpacked one?
 
     // ============================================================
     // EVENTS

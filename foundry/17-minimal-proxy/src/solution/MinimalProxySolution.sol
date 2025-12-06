@@ -38,12 +38,18 @@ import "@openzeppelin/contracts/proxy/Clones.sol";
  *   Solidity: Minimal proxy uses delegatecall for code reuse
  */
 contract SimpleWallet {
-    // State variables
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     address public owner;
     uint256 public balance;
     bool private initialized;
 
-    // Events
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
     event Initialized(address indexed owner);
     event Deposited(address indexed from, uint256 amount);
     event Withdrawn(address indexed to, uint256 amount);
@@ -163,6 +169,10 @@ contract SimpleWallet {
         return initialized;
     }
 
+    // ============================================================
+    // RECEIVE FUNCTION
+    // ============================================================
+
     // Allow contract to receive ETH
     receive() external payable {
         balance += msg.value;
@@ -200,6 +210,10 @@ contract SimpleWallet {
 contract WalletFactory {
     using Clones for address;
 
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     // The implementation contract address
     address public implementation;
 
@@ -209,7 +223,10 @@ contract WalletFactory {
     // Map user address to their wallet
     mapping(address => address) public userWallets;
 
-    // Events
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
     event WalletCreated(address indexed wallet, address indexed owner, bool deterministic);
     event ImplementationUpdated(address indexed oldImpl, address indexed newImpl);
 
@@ -371,8 +388,16 @@ contract WalletFactory {
  * - 1000 wallets: ~99% savings
  */
 contract DirectWallet {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     address public owner;
     uint256 public balance;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     event Deposited(address indexed from, uint256 amount);
     event Withdrawn(address indexed to, uint256 amount);

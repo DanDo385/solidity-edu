@@ -32,12 +32,21 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Royalty amounts calculated as percentage of sale price
  */
 contract Project28Solution is ERC721, ERC2981, Ownable {
-    // Counter for token IDs
-    uint256 private _nextTokenId;
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
 
+    // Constants
     // Maximum royalty fee (10% = 1000 basis points)
     // Prevents excessive royalties that marketplaces may reject
     uint96 public constant MAX_ROYALTY_FEE = 1000;
+
+    // Counter for token IDs
+    uint256 private _nextTokenId;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     // Events for tracking royalty changes
     event DefaultRoyaltySet(address indexed receiver, uint96 feeNumerator);

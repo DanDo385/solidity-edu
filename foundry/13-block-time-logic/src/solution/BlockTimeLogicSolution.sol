@@ -25,6 +25,10 @@ contract BlockTimeLogicSolution {
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
 
+    // Constants
+    uint256 public constant RATE_LIMIT_DURATION = 1 hours;
+    uint256 public constant COOLDOWN_DURATION = 7 days;
+
     // Owner address
     address public owner;
 
@@ -35,12 +39,10 @@ contract BlockTimeLogicSolution {
     // RateLimiter variables
     // Maps user address to timestamp of their last action
     mapping(address => uint256) public lastActionTime;
-    uint256 public constant RATE_LIMIT_DURATION = 1 hours;
 
     // Cooldown variables
     // Maps user address to timestamp when cooldown started
     mapping(address => uint256) public cooldownStart;
-    uint256 public constant COOLDOWN_DURATION = 7 days;
     mapping(address => bool) public cooldownActive;
 
     // VestingWallet variables

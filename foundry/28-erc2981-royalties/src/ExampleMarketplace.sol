@@ -28,6 +28,10 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  * 6. Transfers NFT to buyer
  */
 contract ExampleMarketplace {
+    // ============================================================
+    // TYPE DECLARATIONS
+    // ============================================================
+
     // Listing structure
     struct Listing {
         address seller;
@@ -37,11 +41,18 @@ contract ExampleMarketplace {
         bool active;
     }
 
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
     // Listings by ID
     mapping(uint256 => Listing) public listings;
     uint256 public nextListingId;
 
-    // Events
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
     event Listed(
         uint256 indexed listingId,
         address indexed seller,

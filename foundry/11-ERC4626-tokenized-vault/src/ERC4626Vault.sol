@@ -25,54 +25,70 @@ contract ERC4626Vault {
     uint256 public totalSupply;
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
+
     // TODO: Implement ERC-20 events for share token
     // TODO: Implement ERC-4626 events (Deposit, Withdraw)
-    
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
+
     constructor(address _asset, string memory _name, string memory _symbol) {
         asset = IERC20(_asset);
         name = _name;
         symbol = _symbol;
         decimals = 18;
     }
-    
+
+    // ============================================================
+    // EXTERNAL FUNCTIONS
+    // ============================================================
+
+    // ============ ERC-4626 Core Functions ============
+
+    // TODO: Implement deposit(uint256 assets, address receiver) returns (uint256 shares)
+
+    // TODO: Implement mint(uint256 shares, address receiver) returns (uint256 assets)
+
+    // TODO: Implement withdraw(uint256 assets, address receiver, address owner) returns (uint256 shares)
+
+    // TODO: Implement redeem(uint256 shares, address receiver, address owner) returns (uint256 assets)
+
+    // ============================================================
+    // PUBLIC FUNCTIONS
+    // ============================================================
+
     // ============ ERC-20 Share Token Functions ============
-    
+
     // TODO: Implement transfer
     // TODO: Implement approve
     // TODO: Implement transferFrom
-    
-    // ============ ERC-4626 Core Functions ============
-    
-    // TODO: Implement deposit(uint256 assets, address receiver) returns (uint256 shares)
-    
-    // TODO: Implement mint(uint256 shares, address receiver) returns (uint256 assets)
-    
-    // TODO: Implement withdraw(uint256 assets, address receiver, address owner) returns (uint256 shares)
-    
-    // TODO: Implement redeem(uint256 shares, address receiver, address owner) returns (uint256 assets)
-    
+
     // ============ ERC-4626 View Functions ============
-    
+
     // TODO: Implement totalAssets() returns (uint256)
-    
+
     // TODO: Implement convertToShares(uint256 assets) returns (uint256)
-    
+
     // TODO: Implement convertToAssets(uint256 shares) returns (uint256)
-    
+
     // TODO: Implement previewDeposit(uint256 assets) returns (uint256)
-    
+
     // TODO: Implement previewMint(uint256 shares) returns (uint256)
-    
+
     // TODO: Implement previewWithdraw(uint256 assets) returns (uint256)
-    
+
     // TODO: Implement previewRedeem(uint256 shares) returns (uint256)
-    
+
     // TODO: Implement maxDeposit(address) returns (uint256)
-    
+
     // TODO: Implement maxMint(address) returns (uint256)
-    
+
     // TODO: Implement maxWithdraw(address owner) returns (uint256)
-    
+
     // TODO: Implement maxRedeem(address owner) returns (uint256)
 }

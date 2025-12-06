@@ -17,27 +17,27 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Optimized gas usage through efficient string handling
  */
 contract Project30Solution is ERC721, Ownable {
-    // =============================================================
-    //                           STORAGE
-    // =============================================================
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
 
-    uint256 private _nextTokenId;
-    uint256 public maxSupply = 1000;
-
-    // SVG constants (stored in bytecode, not storage - gas efficient!)
+    // Constants (stored in bytecode, not storage - gas efficient!)
     // These are reused for every token without additional storage cost
     string constant SVG_HEADER = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">';
     string constant SVG_FOOTER = '</svg>';
 
-    // =============================================================
-    //                         CONSTRUCTOR
-    // =============================================================
+    uint256 private _nextTokenId;
+    uint256 public maxSupply = 1000;
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     constructor() ERC721("OnChainSVG", "OCSVG") Ownable(msg.sender) {}
 
-    // =============================================================
-    //                        MINTING LOGIC
-    // =============================================================
+    // ============================================================
+    // MINTING LOGIC
+    // ============================================================
 
     /**
      * @notice Mint a new on-chain SVG NFT
@@ -51,9 +51,9 @@ contract Project30Solution is ERC721, Ownable {
         _safeMint(msg.sender, tokenId);
     }
 
-    // =============================================================
-    //                      METADATA GENERATION
-    // =============================================================
+    // ============================================================
+    // METADATA GENERATION
+    // ============================================================
 
     /**
      * @notice Returns the complete token URI with on-chain metadata and SVG

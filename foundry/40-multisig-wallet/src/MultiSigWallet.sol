@@ -51,12 +51,16 @@ contract MultiSigWallet {
     // Should include: sender, amount, balance
 
     /*//////////////////////////////////////////////////////////////
-                            STATE VARIABLES
+                            TYPE DECLARATIONS
     //////////////////////////////////////////////////////////////*/
 
     // TODO: Define Transaction struct
     // Should include: to, value, data, executed
     // Hint: Use bytes for data to support any function call
+
+    /*//////////////////////////////////////////////////////////////
+                            STATE VARIABLES
+    //////////////////////////////////////////////////////////////*/
 
     // TODO: Add array of owner addresses
     // Hint: Use dynamic array to support variable owner count
@@ -107,7 +111,25 @@ contract MultiSigWallet {
     // 6. Set threshold
 
     /*//////////////////////////////////////////////////////////////
-                        TRANSACTION FUNCTIONS
+                        RECEIVE ETH
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Receive ETH
+     */
+    receive() external payable {
+        // TODO: Emit deposit event with sender, amount, and new balance
+    }
+
+    /**
+     * @notice Fallback function
+     */
+    fallback() external payable {
+        // TODO: Emit deposit event with sender, amount, and new balance
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
     /**
@@ -221,35 +243,6 @@ contract MultiSigWallet {
         // 4. Emit ThresholdChanged event
     }
 
-    /*//////////////////////////////////////////////////////////////
-                            VIEW FUNCTIONS
-    //////////////////////////////////////////////////////////////*/
-
-    /**
-     * @notice Get confirmation count for a transaction
-     * @param txId Transaction ID
-     * @return count Number of confirmations
-     */
-    function getConfirmationCount(uint256 txId) public view returns (uint256 count) {
-        // TODO: Implement confirmation counting
-        // Should:
-        // 1. Iterate through all owners
-        // 2. Count how many have confirmed this transaction
-        // 3. Return count
-    }
-
-    /**
-     * @notice Check if threshold is met for a transaction
-     * @param txId Transaction ID
-     * @return True if threshold is met
-     */
-    function isThresholdMet(uint256 txId) public view returns (bool) {
-        // TODO: Implement threshold check
-        // Should:
-        // 1. Get confirmation count
-        // 2. Return true if count >= threshold
-    }
-
     /**
      * @notice Get all owner addresses
      * @return Array of owner addresses
@@ -287,20 +280,60 @@ contract MultiSigWallet {
     }
 
     /*//////////////////////////////////////////////////////////////
-                        RECEIVE ETH
+                        PUBLIC FUNCTIONS
     //////////////////////////////////////////////////////////////*/
 
     /**
-     * @notice Receive ETH
+     * @notice Get confirmation count for a transaction
+     * @param txId Transaction ID
+     * @return count Number of confirmations
      */
-    receive() external payable {
-        // TODO: Emit deposit event with sender, amount, and new balance
+    function getConfirmationCount(uint256 txId) public view returns (uint256 count) {
+        // TODO: Implement confirmation counting
+        // Should:
+        // 1. Iterate through all owners
+        // 2. Count how many have confirmed this transaction
+        // 3. Return count
     }
 
     /**
-     * @notice Fallback function
+     * @notice Check if threshold is met for a transaction
+     * @param txId Transaction ID
+     * @return True if threshold is met
      */
-    fallback() external payable {
-        // TODO: Emit deposit event with sender, amount, and new balance
+    function isThresholdMet(uint256 txId) public view returns (bool) {
+        // TODO: Implement threshold check
+        // Should:
+        // 1. Get confirmation count
+        // 2. Return true if count >= threshold
+    }
+
+    /*//////////////////////////////////////////////////////////////
+                        PUBLIC FUNCTIONS
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Get confirmation count for a transaction
+     * @param txId Transaction ID
+     * @return count Number of confirmations
+     */
+    function getConfirmationCount(uint256 txId) public view returns (uint256 count) {
+        // TODO: Implement confirmation counting
+        // Should:
+        // 1. Iterate through all owners
+        // 2. Count how many have confirmed this transaction
+        // 3. Return count
+    }
+
+    /**
+     * @notice Check if threshold is met for a transaction
+     * @param txId Transaction ID
+     * @return True if threshold is met
+     */
+    function isThresholdMet(uint256 txId) public view returns (bool) {
+        // TODO: Implement threshold check
+        // Should:
+        // 1. Get confirmation count
+        // 2. Return true if count >= threshold
     }
 }

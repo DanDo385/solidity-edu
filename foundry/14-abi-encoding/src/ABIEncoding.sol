@@ -7,6 +7,17 @@ pragma solidity ^0.8.20;
  * @dev Complete the TODOs to understand low-level encoding in Solidity
  */
 contract ABIEncoding {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    // Storage for manual routing example
+    mapping(bytes4 => bool) public allowedSelectors;
+    uint256 public value;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     // Event to log encoding results
     event EncodingResult(bytes data, uint256 length);
@@ -76,15 +87,15 @@ contract ABIEncoding {
         // TODO: Return the encoded call data
     }
 
-    // Storage for manual routing example
-    mapping(bytes4 => bool) public allowedSelectors;
-    uint256 public value;
-
     // TODO: Implement a function to register allowed function selectors
     function registerSelector(string memory signature) public {
         // TODO: Calculate the selector from signature
         // TODO: Store it in allowedSelectors mapping as true
     }
+
+    // ============================================================
+    // FALLBACK FUNCTION
+    // ============================================================
 
     // TODO: Implement a fallback function that routes calls based on selector
     // Should only execute if the selector is in allowedSelectors

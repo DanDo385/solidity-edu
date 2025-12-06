@@ -21,8 +21,21 @@ contract SoulboundTokenSolution is ERC721, Ownable {
     using EnumerableSet for EnumerableSet.UintSet;
 
     // ============================================
+    // TYPE DECLARATIONS
+    // ============================================
+
+    /// @notice Recovery requests for tokens
+    struct RecoveryRequest {
+        address newOwner;
+        uint256 requestTime;
+    }
+
+    // ============================================
     // STATE VARIABLES
     // ============================================
+
+    // Constants
+    uint256 public constant RECOVERY_DELAY = 7 days;
 
     /// @notice Counter for token IDs
     uint256 private _nextTokenId;
@@ -30,15 +43,7 @@ contract SoulboundTokenSolution is ERC721, Ownable {
     /// @notice Track the issuer of each token (for revocation rights)
     mapping(uint256 => address) public issuer;
 
-    /// @notice Recovery requests for tokens
-    struct RecoveryRequest {
-        address newOwner;
-        uint256 requestTime;
-    }
     mapping(uint256 => RecoveryRequest) public recoveryRequests;
-
-    /// @notice Time delay for recovery to prevent abuse (7 days)
-    uint256 public constant RECOVERY_DELAY = 7 days;
 
     /// @notice Track tokens being recovered (for _update function)
     mapping(uint256 => bool) private _recovering;

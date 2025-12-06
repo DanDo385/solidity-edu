@@ -68,7 +68,7 @@ contract SafeETHTransfer {
     // YOUR CODE HERE
 
     // ============================================
-    // ERRORS
+    // CUSTOM ERRORS
     // ============================================
 
     /// @dev Thrown when trying to withdraw with no balance
@@ -79,6 +79,23 @@ contract SafeETHTransfer {
 
     /// @dev Thrown when trying to deposit 0 ETH
     error DepositZero();
+
+    // ============================================
+    // RECEIVE FUNCTION
+    // ============================================
+
+    /**
+     * @notice Receive ETH sent directly to contract
+     * @dev Automatically deposits for the sender
+     *
+     * TODO: Implement receive() function that calls deposit()
+     * Hint: receive() external payable { deposit(); }
+     */
+    // YOUR CODE HERE
+
+    // ============================================
+    // PUBLIC FUNCTIONS
+    // ============================================
 
     // ============================================
     // DEPOSIT FUNCTION
@@ -230,19 +247,6 @@ contract SafeETHTransfer {
         // TODO: Return totalWithdrawn
         return 0; // Replace this
     }
-
-    // ============================================
-    // RECEIVE FUNCTION
-    // ============================================
-
-    /**
-     * @notice Receive ETH sent directly to contract
-     * @dev Automatically deposits for the sender
-     *
-     * TODO: Implement receive() function that calls deposit()
-     * Hint: receive() external payable { deposit(); }
-     */
-    // YOUR CODE HERE
 }
 
 /**

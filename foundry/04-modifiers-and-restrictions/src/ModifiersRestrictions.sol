@@ -2,13 +2,22 @@
 pragma solidity ^0.8.20;
 
 contract ModifiersRestrictions {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    
     address public owner;
     bool public paused;
     
     mapping(address => mapping(bytes32 => bool)) public roles;
-    
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    // ============================================================
+    // MODIFIERS
+    // ============================================================
+
     // Modifiers here are the contract's front door policies. The Solidity
     // optimizer often inlines simple modifiers, so a tight require is cheaper
     // than duplicating the same check everywhere.
@@ -17,7 +26,11 @@ contract ModifiersRestrictions {
     // TODO: Implement modifier 'onlyRole(bytes32 role)' that checks roles[msg.sender][role]
     
     // TODO: Implement modifier 'whenNotPaused' that checks !paused
-    
+
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
+
     constructor() {
         owner = msg.sender;
         roles[msg.sender][ADMIN_ROLE] = true;

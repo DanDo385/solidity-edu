@@ -55,8 +55,13 @@ contract LeverageLoopingVault is Ownable, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     // ============================================
-    // State Variables
+    // STATE VARIABLES
     // ============================================
+
+    // Constants
+    uint256 public constant BASIS_POINTS = 10000;
+    uint256 public constant RATE_MODE_VARIABLE = 2;
+    uint256 public constant HEALTH_FACTOR_DECIMALS = 18;
 
     /// @notice The asset being leveraged (e.g., WETH)
     IERC20 public immutable asset;
@@ -84,14 +89,6 @@ contract LeverageLoopingVault is Ownable, ReentrancyGuard {
 
     /// @notice Emergency pause flag
     bool public paused;
-
-    // ============================================
-    // Constants
-    // ============================================
-
-    uint256 public constant BASIS_POINTS = 10000;
-    uint256 public constant RATE_MODE_VARIABLE = 2;
-    uint256 public constant HEALTH_FACTOR_DECIMALS = 18;
 
     // ============================================
     // Events

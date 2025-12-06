@@ -19,6 +19,17 @@ pragma solidity ^0.8.20;
  * 5. Gas optimization with pre-computed selectors
  */
 contract ABIEncodingSolution {
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    // Storage for manual routing demonstration
+    mapping(bytes4 => bool) public allowedSelectors;
+    uint256 public value;
+
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     // Events for demonstrating encoding behavior
     event EncodingResult(bytes data, uint256 length);
@@ -196,10 +207,6 @@ contract ABIEncodingSolution {
         return abi.encodeWithSelector(selector, to, amount);
     }
 
-    // Storage for manual routing demonstration
-    mapping(bytes4 => bool) public allowedSelectors;
-    uint256 public value;
-
     /**
      * @notice Registers a function selector as allowed
      * @dev Used with fallback function for manual routing
@@ -211,6 +218,10 @@ contract ABIEncodingSolution {
         bytes4 selector = bytes4(keccak256(bytes(signature)));
         allowedSelectors[selector] = true;
     }
+
+    // ============================================================
+    // FALLBACK FUNCTION
+    // ============================================================
 
     /**
      * @notice Manual function routing using fallback

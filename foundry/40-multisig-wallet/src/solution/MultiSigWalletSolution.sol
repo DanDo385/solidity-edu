@@ -175,6 +175,88 @@ contract MultiSigWalletSolution {
     mapping(uint256 => mapping(address => bool)) public confirmations;
 
     /*//////////////////////////////////////////////////////////////
+                                EVENTS
+    //////////////////////////////////////////////////////////////*/
+
+    /**
+     * @notice Emitted when a new transaction is submitted
+     * @param txId Unique transaction identifier
+     * @param submitter Address that submitted the transaction
+     * @param to Destination address
+     * @param value ETH value to transfer
+     * @param data Calldata to execute
+     */
+    event TransactionSubmitted(
+        uint256 indexed txId, address indexed submitter, address indexed to, uint256 value, bytes data
+    );
+
+    /**
+     * @notice Emitted when an owner confirms a transaction
+     * @param txId Transaction identifier
+     * @param owner Owner who confirmed
+     */
+    event TransactionConfirmed(uint256 indexed txId, address indexed owner);
+
+    /**
+     * @notice Emitted when an owner revokes their confirmation
+     * @param txId Transaction identifier
+     * @param owner Owner who revoked
+     */
+    event ConfirmationRevoked(uint256 indexed txId, address indexed owner);
+
+    /**
+     * @notice Emitted when a transaction is successfully executed
+     * @param txId Transaction identifier
+     * @param executor Address that triggered execution
+     */
+    event TransactionExecuted(uint256 indexed txId, address indexed executor);
+
+    /**
+     * @notice Emitted when a new owner is added
+     * @param owner New owner address
+     */
+    event OwnerAdded(address indexed owner);
+
+    /**
+     * @notice Emitted when an owner is removed
+     * @param owner Removed owner address
+     */
+    event OwnerRemoved(address indexed owner);
+
+    /**
+     * @notice Emitted when the confirmation threshold changes
+     * @param threshold New threshold value
+     */
+    event ThresholdChanged(uint256 threshold);
+
+    /**
+     * @notice Emitted when ETH is deposited into the wallet
+     * @param sender Address that sent ETH
+     * @param amount Amount of ETH received
+     * @param balance New wallet balance
+     */
+    event Deposit(address indexed sender, uint256 amount, uint256 balance);
+
+    /*//////////////////////////////////////////////////////////////
+                                ERRORS
+    //////////////////////////////////////////////////////////////*/
+
+    error NotOwner();
+    error InvalidOwner();
+    error DuplicateOwner();
+    error InvalidThreshold();
+    error NoOwners();
+    error InvalidDestination();
+    error TransactionDoesNotExist();
+    error TransactionAlreadyExecuted();
+    error AlreadyConfirmed();
+    error NotConfirmed();
+    error ThresholdNotMet();
+    error TransactionFailed();
+    error OnlyWalletCanCall();
+    error WouldBreakThreshold();
+
+    /*//////////////////////////////////////////////////////////////
                               MODIFIERS
     //////////////////////////////////////////////////////////////*/
 

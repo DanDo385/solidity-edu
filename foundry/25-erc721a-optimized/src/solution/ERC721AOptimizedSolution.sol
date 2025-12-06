@@ -54,6 +54,11 @@ contract OptimizedNFTSolution {
     //                           STORAGE
     // =============================================================
 
+    // Constants
+    uint256 public constant MAX_SUPPLY = 10000;
+    uint256 public constant MINT_PRICE = 0.01 ether;
+    uint256 public constant MAX_MINT_PER_TX = 20;
+
     string private _name;
     string private _symbol;
 
@@ -75,11 +80,6 @@ contract OptimizedNFTSolution {
 
     // The number of tokens burned
     uint256 private _burnCounter;
-
-    // Collection parameters
-    uint256 public constant MAX_SUPPLY = 10000;
-    uint256 public constant MINT_PRICE = 0.01 ether;
-    uint256 public constant MAX_MINT_PER_TX = 20;
 
     address public owner;
 

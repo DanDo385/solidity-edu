@@ -81,13 +81,16 @@ contract ERC4626VaultSolution {
     // ════════════════════════════════════════════════════════════════
     // STATE VARIABLES
     // ════════════════════════════════════════════════════════════════
+
+    // Constants
+    uint8 public constant decimals = 18;
     
+    // Immutables
     IERC20 public immutable asset;
     
     // ERC-20 share token metadata
     string public name;
     string public symbol;
-    uint8 public constant decimals = 18;
     
     // ERC-20 share token state
     uint256 public totalSupply;

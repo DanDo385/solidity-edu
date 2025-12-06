@@ -24,7 +24,13 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
  * 5. Create Merkle trees off-chain
  */
 contract Project29 is ERC721, Ownable {
-    // ============ State Variables ============
+    // ============================================================
+    // STATE VARIABLES
+    // ============================================================
+
+    // Constants
+    uint256 public constant MAX_SUPPLY = 1000;
+    uint256 public constant PUBLIC_MINT_PRICE = 0.01 ether;
 
     /// @notice The Merkle root representing the entire allowlist
     /// @dev This single 32-byte value represents potentially thousands of addresses
@@ -37,22 +43,20 @@ contract Project29 is ERC721, Ownable {
     /// @notice Counter for token IDs
     uint256 private _nextTokenId;
 
-    /// @notice Maximum supply of NFTs
-    uint256 public constant MAX_SUPPLY = 1000;
-
-    /// @notice Price for public mint (allowlist is free)
-    uint256 public constant PUBLIC_MINT_PRICE = 0.01 ether;
-
     /// @notice Whether public minting is enabled
     bool public publicMintEnabled;
 
-    // ============ Events ============
+    // ============================================================
+    // EVENTS
+    // ============================================================
 
     event MerkleRootUpdated(bytes32 indexed oldRoot, bytes32 indexed newRoot);
     event AllowlistMinted(address indexed account, uint256 indexed tokenId);
     event PublicMinted(address indexed account, uint256 indexed tokenId);
 
-    // ============ Constructor ============
+    // ============================================================
+    // CONSTRUCTOR
+    // ============================================================
 
     /**
      * @notice Initialize the NFT contract with a Merkle root

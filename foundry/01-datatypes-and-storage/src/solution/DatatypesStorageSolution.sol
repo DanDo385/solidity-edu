@@ -75,6 +75,63 @@ pragma solidity ^0.8.20;
  */
 contract DatatypesStorageSolution {
     // ????????????????????????????????????????????????????????????????????????
+    // TYPE DECLARATIONS
+    // ????????????????????????????????????????????????????????????????????????
+    //
+    // ⚠️  IMPORTANT: Struct declarations are TYPE DEFINITIONS, not state variables!
+    // They do NOT consume storage slots themselves. Storage slots are only allocated
+    // for actual state variables (declared below). Structs only consume storage when
+    // used as state variables or inside mappings/arrays.
+    //
+    // Storage slot allocation starts at slot 0 with the first state variable below.
+
+    /**
+     * @notice User struct demonstrating reference types
+     * @dev This struct is NOT packed (each field uses full slot)
+     *
+     * STORAGE LAYOUT (in mapping):
+     *   address: 20 bytes ï¿½ occupies 32 bytes (slot 0 of struct)
+     *   uint256: 32 bytes ï¿½ occupies 32 bytes (slot 1 of struct)
+     *   bool: 1 byte ï¿½ occupies 32 bytes (slot 2 of struct)
+     *
+     * TOTAL: 96 bytes (3 slots) per User
+     *
+     * GAS INEFFICIENCY: bool wastes 31 bytes
+     * See PackedData below for optimized version
+     */
+    struct User {
+        address wallet;
+        uint256 balance;
+        bool isRegistered;
+    }
+
+    /**
+     * @notice Gas-optimized struct with tight packing
+     * @dev TOTAL: 64 bytes (2 slots) instead of 128 bytes (4 slots)
+     *
+     * PACKING RULES:
+     *   1. Variables pack if total size <= 32 bytes
+     *   2. Packing ONLY works in structs, not global state variables
+     *   3. Order matters! Solidity doesn't reorder
+     *
+     * STORAGE LAYOUT:
+     *   Slot 0: [uint128 smallNumber1][uint128 smallNumber2]  (16+16=32 bytes)
+     *   Slot 1: [uint64 timestamp][address user][bool flag]    (8+20+1=29 bytes)
+     *
+     * GAS OPTIMIZATION: Why pack structs?
+     * - Unpacked version: 4 slots = 4 * 20,000 gas (cold) = 80,000 gas
+     * - Packed version: 2 slots = 2 * 20,000 gas (cold) = 40,000 gas
+     * - Savings: 50% reduction in storage costs!
+     */
+    struct PackedData {
+        uint128 smallNumber1;
+        uint128 smallNumber2;
+        address user;
+        uint64 timestamp;
+        bool flag;
+    }
+
+    // ????????????????????????????????????????????????????????????????????????
     // STATE VARIABLES (Storage)
     // ????????????????????????????????????????????????????????????????????????
 
@@ -147,7 +204,7 @@ contract DatatypesStorageSolution {
 
     /**
      * @notice Mapping from address to balance
-     * @dev Stored starting at slot 4 (conceptually)
+     * @dev Stored starting at slot 5 (conceptually)
      *      Actual storage: keccak256(abi.encodePacked(key, slot))
      *
      * WHY MAPPINGS?
@@ -158,7 +215,7 @@ contract DatatypesStorageSolution {
      *
      * STORAGE CALCULATION:
      *   For key 0x1234... the storage slot is:
-     *   keccak256(abi.encodePacked(0x1234..., 4))
+     *   keccak256(abi.encodePacked(0x1234..., 5))
      *
      * GAS: First access (cold): ~2,100 gas
      *      Subsequent (warm): ~100 gas
@@ -170,9 +227,9 @@ contract DatatypesStorageSolution {
 
     /**
      * @notice Dynamic array of unsigned integers
-     * @dev Stored starting at slot 5
-     *      Length is stored in slot 5
-     *      Elements stored at: keccak256(5) + index
+     * @dev Stored starting at slot 6
+     *      Length is stored in slot 6
+     *      Elements stored at: keccak256(6) + index
      *
      * WHY ARRAYS?
      *   - Ordered collection
@@ -187,66 +244,25 @@ contract DatatypesStorageSolution {
      * BEST PRACTICE: Limit array sizes or use off-chain indexing
      *
      * STORAGE LAYOUT:
-     *   Slot 5: array length
-     *   Slot keccak256(5) + 0: numbers[0]
-     *   Slot keccak256(5) + 1: numbers[1]
+     *   Slot 6: array length
+     *   Slot keccak256(6) + 0: numbers[0]
+     *   Slot keccak256(6) + 1: numbers[1]
      *   ...
      */
     uint256[] public numbers;
-
-    /**
-     * @notice User struct demonstrating reference types
-     * @dev This struct is NOT packed (each field uses full slot)
-     *
-     * STORAGE LAYOUT (in mapping):
-     *   address: 20 bytes ï¿½ occupies 32 bytes (slot 0 of struct)
-     *   uint256: 32 bytes ï¿½ occupies 32 bytes (slot 1 of struct)
-     *   bool: 1 byte ï¿½ occupies 32 bytes (slot 2 of struct)
-     *
-     * TOTAL: 96 bytes (3 slots) per User
-     *
-     * GAS INEFFICIENCY: bool wastes 31 bytes
-     * See PackedData below for optimized version
-     */
-    struct User {
-        address wallet;
-        uint256 balance;
-        bool isRegistered;
-    }
 
     /**
      * @notice Mapping from address to User struct
      * @dev Demonstrates nested reference types
      *
      * STORAGE CALCULATION (for address 0xABCD...):
-     *   Base slot: keccak256(abi.encodePacked(0xABCD..., 6))
+     *   Base slot: keccak256(abi.encodePacked(0xABCD..., 7))
      *   wallet: base_slot + 0
      *   balance: base_slot + 1
      *   isRegistered: base_slot + 2
      */
     mapping(address => User) public users;
-
-    /**
-     * @notice Gas-optimized struct with tight packing
-     * @dev TOTAL: 64 bytes (2 slots) instead of 128 bytes (4 slots)
-     *
-     * PACKING RULES:
-     *   1. Variables pack if total size <= 32 bytes
-     *   2. Packing ONLY works in structs, not global state variables
-     *   3. Order matters! Solidity doesn't reorder
-     *
-     * STORAGE LAYOUT:
-     *   Slot 0: [uint128 smallNumber1][uint128 smallNumber2]  (16+16=32 bytes)
-     *   Slot 1: [uint64 timestamp][address user][bool flag]    (8+20+1=29 bytes)
-     *
-     * GAS OPTIMIZATION: Why pack structs?
-     * - Unpacked version: 4 slots = 4 * 20,000 gas (cold) = 80,000 gas
-     * - Packed version: 2 slots = 2 * 20,000 gas (cold) = 40,000 gas
-     * - Savings: ~40,000 gas per struct write!
-     *
-     * GAS SAVINGS: 2 slots vs 4 slots = ~10,000 gas saved per write!
-     *
-     * TRADE-OFF:
+    /** 
      *   ✅ Saves storage gas
      *   ❌ Slightly more complex read/write operations
      *   ❌ Must access both values in slot to modify one (in some cases)
@@ -272,21 +288,12 @@ contract DatatypesStorageSolution {
      *   Rust: #[repr(packed)] does similar optimization
      *   Solidity: Packing is automatic within structs, but order matters!
      */
-    struct PackedData {
-        uint128 smallNumber1; // 16 bytes
-        uint128 smallNumber2; // 16 bytes
-        // ^^ These two pack into one 32-byte slot
-        uint64 timestamp; // 8 bytes
-        address user; // 20 bytes (address is 20 bytes, not 32!)
-        bool flag; // 1 byte
-        // ^^ These three pack into one 32-byte slot (8+20+1=29, <32)
-    }
 
     // ════════════════════════════════════════════════════════════════════════
     // EVENTS
     // ════════════════════════════════════════════════════════════════════════
 
-    /**
+     /**
      * @notice Emitted when number is updated
      * @dev EVENTS: The Bridge Between On-Chain and Off-Chain
      * ═══════════════════════════════════════════════════════════
@@ -815,8 +822,8 @@ contract DatatypesStorageSolution {
      *      - Can't get length/size
      *
      * STORAGE SLOT CALCULATION:
-     *   Slot = keccak256(abi.encodePacked(_address, 4))
-     *   where 4 is the slot of the 'balances' mapping
+     *   Slot = keccak256(abi.encodePacked(_address, 5))
+     *   where 5 is the slot of the 'balances' mapping
      *
      * GAS OPTIMIZATION: Direct assignment vs read-modify-write
      * - balances[_address] = _balance: 1 SSTORE = ~20,000 gas (cold) or ~5,000 (warm)
@@ -921,7 +928,7 @@ contract DatatypesStorageSolution {
         // 🔍 MAPPING LOOKUP: Always succeeds, never throws!
         // Even if _address was never used before, this returns 0
         // This is the "zero default" behavior we discussed above
-        return balances[_address]; // SLOAD from calculated slot: keccak256(_address, slot_4)
+        return balances[_address]; // SLOAD from calculated slot: keccak256(_address, slot_5)
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -940,11 +947,11 @@ contract DatatypesStorageSolution {
      *
      *      HOW ARRAYS ARE STORED:
      *      ┌─────────────────────────────────────────────┐
-     *      │ Slot 5: Length (how many items)            │ ← Stored separately!
+     *      │ Slot 6: Length (how many items)            │ ← Stored separately!
      *      ├─────────────────────────────────────────────┤
-     *      │ Slot keccak256(5) + 0: numbers[0]          │ ← First element
-     *      │ Slot keccak256(5) + 1: numbers[1]          │ ← Second element
-     *      │ Slot keccak256(5) + 2: numbers[2]          │ ← Third element
+     *      │ Slot keccak256(6) + 0: numbers[0]          │ ← First element
+     *      │ Slot keccak256(6) + 1: numbers[1]          │ ← Second element
+     *      │ Slot keccak256(6) + 2: numbers[2]          │ ← Third element
      *      │ ...                                         │
      *      └─────────────────────────────────────────────┘
      *
@@ -955,7 +962,7 @@ contract DatatypesStorageSolution {
      *      WHAT HAPPENS WHEN YOU PUSH:
      *      Step 1: Read current length (SLOAD: ~100 gas warm)
      *      Step 2: Write new length = old_length + 1 (SSTORE: ~5,000 gas warm)
-     *      Step 3: Calculate new element slot = keccak256(5) + new_length
+     *      Step 3: Calculate new element slot = keccak256(6) + new_length
      *      Step 4: Write element to that slot (SSTORE: ~5,000 gas warm)
      *      
      *      TOTAL: ~10,000+ gas (warm) or ~40,000+ gas (cold)
@@ -965,6 +972,7 @@ contract DatatypesStorageSolution {
      *      - Mapping: slot = keccak256(key, mapping_slot)
      *      - Array: slot = keccak256(array_slot) + index
      *      Both use keccak256, but arrays use sequential indices!
+     *      For our numbers array: slot = keccak256(6) + index
      *
      *      REAL-WORLD ANALOGY:
      *      Think of a library:
@@ -1040,7 +1048,7 @@ contract DatatypesStorageSolution {
      *
      *      HOW IT WORKS:
      *      ┌─────────────────────────────────┐
-     *      │ Slot 5: numbers.length = 3       │ ← Stored as uint256
+     *      │ Slot 6: numbers.length = 3       │ ← Stored as uint256
      *      └─────────────────────────────────┘
      *
      *      FUN FACT: In Python, len(array) calculates length by counting elements.
@@ -1052,8 +1060,8 @@ contract DatatypesStorageSolution {
      *      3. Prevents out-of-bounds errors (can check before access)
      *
      *      CONNECTION TO STORAGE MODEL:
-     *      Remember: length is stored in slot 5 (the array's base slot)
-     *      Elements are stored starting at keccak256(5) + index
+     *      Remember: length is stored in slot 6 (the array's base slot)
+     *      Elements are stored starting at keccak256(6) + index
      *      This separation allows O(1) length access!
      *
      *      REAL-WORLD ANALOGY:
@@ -1072,9 +1080,9 @@ contract DatatypesStorageSolution {
      */
     function getNumbersLength() public view returns (uint256) {
         // 📏 LENGTH READ: Just a simple storage read!
-        // This is stored in slot 5 (the array's base slot)
+        // This is stored in slot 6 (the array's base slot)
         // Much faster than counting elements like Python's len()
-        return numbers.length; // SLOAD from slot 5: O(1) operation!
+        return numbers.length; // SLOAD from slot 6: O(1) operation!
     }
 
     /**
@@ -1095,7 +1103,7 @@ contract DatatypesStorageSolution {
      *      │    ✅ Yes → Continue                      │
      *      ├─────────────────────────────────────────┤
      *      │ 2. Calculate slot:                       │
-     *      │    slot = keccak256(5) + _index          │
+     *      │    slot = keccak256(6) + _index          │
      *      ├─────────────────────────────────────────┤
      *      │ 3. Read from storage (SLOAD)             │
      *      │    Return the value                       │
@@ -1110,10 +1118,10 @@ contract DatatypesStorageSolution {
      *
      *      THE STORAGE CALCULATION:
      *      Remember: array elements are stored at keccak256(base_slot) + index
-     *      For our numbers array (slot 5):
-     *      - numbers[0] → slot = keccak256(5) + 0
-     *      - numbers[1] → slot = keccak256(5) + 1
-     *      - numbers[2] → slot = keccak256(5) + 2
+     *      For our numbers array (slot 6):
+     *      - numbers[0] → slot = keccak256(6) + 0
+     *      - numbers[1] → slot = keccak256(6) + 1
+     *      - numbers[2] → slot = keccak256(6) + 2
      *
      *      CONNECTION TO MAPPINGS:
      *      Arrays and mappings both use keccak256 for storage calculation!
@@ -1155,9 +1163,9 @@ contract DatatypesStorageSolution {
         require(_index < numbers.length, "Index out of bounds"); // Explicit check
         
         // 📖 ARRAY ACCESS: Calculate slot and read
-        // Slot calculation: keccak256(5) + _index
+        // Slot calculation: keccak256(6) + _index
         // This is similar to mapping access, but with sequential indices!
-        return numbers[_index]; // SLOAD from calculated slot: keccak256(5) + _index
+        return numbers[_index]; // SLOAD from calculated slot: keccak256(6) + _index
     }
 
     /**
@@ -1202,7 +1210,7 @@ contract DatatypesStorageSolution {
      *      If you need order, you'd use a different data structure anyway.
      *
      *      CONNECTION TO STORAGE:
-     *      Remember: array elements are stored at keccak256(5) + index
+     *      Remember: array elements are stored at keccak256(6) + index
      *      - Swapping: Just two storage writes (cheap!)
      *      - Shifting: N storage writes (expensive!)
      *
@@ -1315,7 +1323,7 @@ contract DatatypesStorageSolution {
      *
      *      CONNECTION TO STORAGE MODEL:
      *      Remember how mappings calculate slots? Same here!
-     *      The struct is stored starting at keccak256(_wallet, slot_6)
+     *      The struct is stored starting at keccak256(_wallet, slot_7)
      *      Each field occupies sequential slots after that.
      *
      *      REAL-WORLD ANALOGY:
@@ -1347,9 +1355,9 @@ contract DatatypesStorageSolution {
             isRegistered: true         // Field 3: bool (1 byte, but uses full slot)
         });
         // Behind the scenes, Solidity writes to 3 sequential storage slots:
-        // slot_0 = keccak256(_wallet, 6) + 0 → wallet
-        // slot_1 = keccak256(_wallet, 6) + 1 → balance
-        // slot_2 = keccak256(_wallet, 6) + 2 → isRegistered
+        // slot_0 = keccak256(_wallet, 7) + 0 → wallet
+        // slot_1 = keccak256(_wallet, 7) + 1 → balance
+        // slot_2 = keccak256(_wallet, 7) + 2 → isRegistered
 
         // 📢 EVENT: Log the registration
         // Events are perfect for off-chain indexing and frontend updates
