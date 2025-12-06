@@ -99,48 +99,107 @@ contract EventsLoggingSolution {
     /**
      * @dev Events with indexed parameters for filtering
      *
-     * INDEXED PARAMETERS: The Search Feature
-     * ════════════════════════════════════════
+     * 📢 EVENTS: The Bridge Between On-Chain and Off-Chain
+     * ═══════════════════════════════════════════════════════
      *
-     * Indexed parameters are like searchable tags:
-     * - Can filter events by indexed values
-     * - Up to 3 indexed parameters per event
-     * - Each indexed param costs ~375 gas extra
+     *      CONNECTION TO PROJECT 01 & 02:
+     *      Remember how we learned about storage in Project 01? Events are
+     *      the complement - they're cheaper than storage (~2k vs ~20k gas) and
+     *      perfect for off-chain systems. In Project 02, we emitted events
+     *      for deposits/withdrawals - here we dive deep into event design!
      *
-     * Example: Filter all Transfer events where from = 0x1234...
-     * ```javascript
-     * contract.on("Transfer", { from: "0x1234..." }, (event) => {
-     *     console.log("Transfer from 0x1234...!");
-     * });
-     * ```
+     *      HOW EVENTS WORK:
+     *      ┌─────────────────────────────────────────┐
+     *      │ Contract emits event                    │
+     *      │   ↓                                      │
+     *      │ Event data stored in transaction log    │ ← Cheaper than storage!
+     *      │   ↓                                      │
+     *      │ Off-chain systems listen to events       │ ← Indexers, frontends
+     *      │   ↓                                      │
+     *      │ UI updates in real-time                 │ ← Magic! ✨
+     *      └─────────────────────────────────────────┘
      *
-     * GAS OPTIMIZATION: Why use indexed parameters?
-     * - Indexed params: ~375 gas per indexed param (up to 3)
-     * - Non-indexed params: ~8 gas per byte
-     * - Indexed params enable filtering: can search by address
-     * - Trade-off: More expensive, but enables efficient off-chain queries
+     *      INDEXED PARAMETERS: The Search Feature
+     *      ════════════════════════════════════════
      *
-     * GAS COST BREAKDOWN:
-     * - LOG1 (no indexed): ~375 gas base + 8 gas/byte
-     * - LOG2 (1 indexed): ~750 gas base + 8 gas/byte
-     * - LOG3 (2 indexed): ~1,125 gas base + 8 gas/byte
-     * - LOG4 (3 indexed): ~1,500 gas base + 8 gas/byte
+     *      Indexed parameters are like searchable tags:
+     *      - Can filter events by indexed values
+     *      - Up to 3 indexed parameters per event
+     *      - Each indexed param costs ~375 gas extra
+     *      - Stored in bloom filter for fast O(1) lookup
      *
-     * ALTERNATIVE: Store data in mapping instead of events
-     *   mapping(address => uint256) public transferHistory;
-     *   Costs: ~20,000 gas per write (cold) vs ~1,500 gas for event
-     *   Savings: ~18,500 gas per event!
-     *   But: Can't filter efficiently, takes storage slots
+     *      EXAMPLE: Filter all Transfer events where from = 0x1234...
+     *      ```javascript
+     *      contract.on("Transfer", { from: "0x1234..." }, (event) => {
+     *          console.log("Transfer from 0x1234...!");
+     *      });
+     *      ```
      *
-     * REAL-WORLD ANALOGY: Like choosing between a receipt (event) and a database
-     * entry (storage). Receipts are cheaper and permanent, but you can't query
-     * them from the contract. Database entries are expensive but queryable.
+     *      UNDERSTANDING THE LOG STRUCTURE:
+     *      When you emit Transfer(0x1234..., 0x5678..., 100):
+     *      ```
+     *      Topics: [
+     *        keccak256("Transfer(address,address,uint256)"),  // Event signature
+     *        keccak256(0x1234...),                            // from (indexed)
+     *        keccak256(0x5678...)                            // to (indexed)
+     *      ]
+     *      Data: [100]  // amount (non-indexed, ABI-encoded)
+     *      ```
      *
-     * CONNECTION TO STORAGE:
-     * Events complement storage:
-     * - Storage: For on-chain state (expensive, persistent)
-     * - Events: For off-chain indexing (cheap, searchable)
-     * - Best practice: Use both! Store state, emit events for tracking.
+     *      GAS COST BREAKDOWN (from Project 01 knowledge):
+     *      ════════════════════════════════════════════════
+     *
+     *      LOG Opcodes:
+     *      - LOG1 (no indexed): ~375 gas base + 8 gas/byte
+     *      - LOG2 (1 indexed): ~750 gas base + 8 gas/byte
+     *      - LOG3 (2 indexed): ~1,125 gas base + 8 gas/byte
+     *      - LOG4 (3 indexed): ~1,500 gas base + 8 gas/byte
+     *
+     *      Example: Transfer event with 2 indexed params:
+     *      - LOG3 base: ~1,125 gas
+     *      - Data (uint256): 32 bytes × 8 gas = 256 gas
+     *      - Total: ~1,381 gas
+     *
+     *      COMPARISON TO STORAGE (from Project 01):
+     *      - Event: ~1,381 gas
+     *      - Storage: ~20,000 gas (cold) or ~5,000 gas (warm)
+     *      - Savings: ~18,619 gas (cold) or ~3,619 gas (warm)!
+     *
+     *      GAS OPTIMIZATION: Why use indexed parameters?
+     *      - Indexed params: ~375 gas per indexed param (up to 3)
+     *      - Non-indexed params: ~8 gas per byte
+     *      - Indexed params enable filtering: can search by address
+     *      - Trade-off: More expensive, but enables efficient off-chain queries
+     *
+     *      WHEN TO INDEX:
+     *      ✅ DO Index: Addresses, token IDs, user IDs (you'll filter by these)
+     *      ❌ DON'T Index: Large strings, arrays, rarely-filtered values
+     *
+     *      ALTERNATIVE: Store data in mapping instead of events
+     *      ```solidity
+     *      mapping(address => uint256) public transferHistory;
+     *      ```
+     *      Costs: ~20,000 gas per write (cold) vs ~1,500 gas for event
+     *      Savings: ~18,500 gas per event!
+     *      But: Can't filter efficiently, takes storage slots, not searchable
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like choosing between a receipt (event) and a database entry (storage):
+     *      - Receipts are cheaper and permanent, but you can't query them from the contract
+     *      - Database entries are expensive but queryable on-chain
+     *      - Best practice: Use both! Store state in database, print receipts for history
+     *
+     *      CONNECTION TO STORAGE (Project 01):
+     *      Events complement storage:
+     *      - Storage: For on-chain state (expensive, persistent, queryable)
+     *      - Events: For off-chain indexing (cheap, searchable, write-only)
+     *      - Best practice: Use both! Store state, emit events for tracking.
+     *
+     *      🎓 LEARNING MOMENT:
+     *      Events are your contract's "API" for off-chain systems! Frontends,
+     *      indexers, and analytics tools all rely on events. Without events,
+     *      off-chain systems would have to constantly poll storage (expensive
+     *      and inefficient!). Events make blockchain data accessible!
      */
     event Transfer(address indexed from, address indexed to, uint256 amount);
     event Approval(address indexed owner, address indexed spender, uint256 amount);

@@ -95,22 +95,7 @@ contract ModifiersRestrictionsSolution {
      */
     uint256 public counter;
 
-    /**
-     * @notice Nested mapping for role-based access control
-     * @dev roles[account][role] = true if account has role
-     *      CONNECTION TO PROJECT 01: Nested mappings!
-     *      This is a mapping of mappings: address → role → bool
-     *
-     * STORAGE LAYOUT:
-     *   For account 0x1234... and role ADMIN_ROLE:
-     *   Storage slot = keccak256(abi.encodePacked(
-     *     keccak256(abi.encodePacked(0x1234..., slot_number)),
-     *     ADMIN_ROLE
-     *   ))
-     *
-     * GAS COST: ~100 gas (warm) per role check
-     */
-    mapping(address => mapping(bytes32 => bool)) public roles;
+   114
 
     // ════════════════════════════════════════════════════════════════════════
     // EVENTS

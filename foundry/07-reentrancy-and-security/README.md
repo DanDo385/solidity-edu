@@ -38,32 +38,78 @@ By completing this project, you will:
 
 ## 🔑 Key Concepts
 
-### The Reentrancy Attack
+### The Reentrancy Attack: Understanding the Vulnerability
 
-A reentrancy attack occurs when a malicious contract calls back into the original contract before the first call completes, exploiting state that hasn't been updated yet.
+**FIRST PRINCIPLES: Call Stack and State Consistency**
 
-**The Vulnerability:**
+A reentrancy attack occurs when a malicious contract calls back into the original contract before the first call completes, exploiting state that hasn't been updated yet. This is a fundamental concurrency issue in smart contracts.
+
+**CONNECTION TO PROJECT 02**:
+We learned about Checks-Effects-Interactions in Project 02. Reentrancy attacks exploit contracts that violate this pattern!
+
+**THE VULNERABILITY**:
 ```solidity
-// ❌ VULNERABLE
+// ❌ VULNERABLE: Wrong order!
 function withdraw(uint256 amount) public {
-    require(balances[msg.sender] >= amount);  // Check
-    msg.sender.call{value: amount}("");       // Interaction FIRST!
-    balances[msg.sender] -= amount;           // Effect TOO LATE!
+    require(balances[msg.sender] >= amount);  // 1. CHECK ✅
+    msg.sender.call{value: amount}("");       // 2. INTERACTION FIRST! ❌
+    balances[msg.sender] -= amount;           // 3. EFFECT TOO LATE! ❌
 }
 ```
 
-**Attack Flow:**
+**DETAILED ATTACK FLOW**:
+
+```
+Call Stack Visualization:
+┌─────────────────────────────────────────┐
+│ withdraw(100) - First Call              │
+│   ↓                                      │
+│ Check: balance >= 100 ✅                 │ ← Passes
+│   ↓                                      │
+│ External call: send 100 ETH             │ ← Attacker receives ETH
+│   ↓                                      │
+│ [ATTACKER'S RECEIVE() EXECUTES]         │ ← Re-enters contract!
+│   ↓                                      │
+│ withdraw(100) - Second Call             │ ← Reentrant call!
+│   ↓                                      │
+│ Check: balance >= 100 ✅                 │ ← STILL PASSES! (not updated!)
+│   ↓                                      │
+│ External call: send 100 ETH             │ ← More ETH sent!
+│   ↓                                      │
+│ [ATTACKER'S RECEIVE() EXECUTES AGAIN]   │ ← Can repeat!
+│   ↓                                      │
+│ ... (continues until contract drained)  │
+│   ↓                                      │
+│ Finally: balance -= 100                 │ ← Too late! Already drained
+└─────────────────────────────────────────┘
+```
+
+**WHY IT WORKS**:
 1. Attacker calls `withdraw(100)`
-2. Contract sends 100 ETH to attacker
-3. Attacker's `receive()` function calls `withdraw(100)` again
-4. Balance still shows 100 (not updated yet!)
-5. Contract sends another 100 ETH
-6. Attacker drains contract! 💥
+2. Contract checks balance: ✅ Passes (balance = 100)
+3. Contract sends 100 ETH to attacker
+4. **Attacker's `receive()` function executes** (this is the key!)
+5. Attacker's `receive()` calls `withdraw(100)` again
+6. Contract checks balance: ✅ **STILL PASSES** (balance not updated yet!)
+7. Contract sends another 100 ETH
+8. Attacker repeats until contract drained! 💥
 
-### Checks-Effects-Interactions Pattern
+**THE ROOT CAUSE**:
+State is updated AFTER the external call. If the external call re-enters, the state check still sees the old value!
 
-The CEI pattern is THE fundamental security pattern for Solidity:
+**HISTORICAL CONTEXT**: 
+The DAO hack (2016) exploited this exact vulnerability, draining $60M. This led to the Ethereum hard fork and Ethereum Classic split. Understanding reentrancy is critical for secure Solidity development!
 
+### Checks-Effects-Interactions Pattern: The Golden Rule
+
+**FIRST PRINCIPLES: State Consistency Before External Calls**
+
+The CEI pattern is THE fundamental security pattern for Solidity. It ensures state is updated before external calls, preventing reentrancy attacks.
+
+**CONNECTION TO PROJECT 02**:
+We introduced this pattern in Project 02 when learning about secure ETH withdrawals. Here we dive deep into why it's critical!
+
+**THE SECURE PATTERN**:
 ```solidity
 // ✅ SECURE: Checks-Effects-Interactions
 function withdraw(uint256 amount) public {
@@ -73,12 +119,67 @@ function withdraw(uint256 amount) public {
 }
 ```
 
-**Why This Order Matters:**
-- **Checks**: Validate conditions first (fail early, save gas)
-- **Effects**: Update state second (prevents reentrancy)
-- **Interactions**: External calls last (safe because state already updated)
+**WHY THIS ORDER MATTERS**:
 
-**Real-world analogy**: Like a bank teller - they check your ID (checks), update your account balance (effects), THEN give you cash (interactions).
+**Phase 1: CHECKS** (Validate Conditions)
+- Validate all conditions first
+- Fail early if conditions aren't met (saves gas)
+- Examples: Balance checks, access control, input validation
+
+**Phase 2: EFFECTS** (Update State)
+- Update state BEFORE external calls
+- This is CRITICAL - prevents reentrancy!
+- Examples: Update balances, set flags, emit events
+
+**Phase 3: INTERACTIONS** (External Calls)
+- External calls LAST (after state updated)
+- Safe because if re-entered, state already changed
+- Examples: Send ETH, call other contracts
+
+**HOW IT PREVENTS REENTRANCY**:
+
+```
+Secure Call Flow:
+┌─────────────────────────────────────────┐
+│ withdraw(100) - First Call              │
+│   ↓                                      │
+│ Check: balance >= 100 ✅                 │ ← 1. CHECK
+│   ↓                                      │
+│ balance -= 100 ✅                        │ ← 2. EFFECT (state updated!)
+│   ↓                                      │
+│ External call: send 100 ETH             │ ← 3. INTERACTION
+│   ↓                                      │
+│ [ATTACKER'S RECEIVE() EXECUTES]         │ ← Re-enters contract
+│   ↓                                      │
+│ withdraw(100) - Second Call             │ ← Reentrant call
+│   ↓                                      │
+│ Check: balance >= 100 ❌                 │ ← FAILS! (balance = 0)
+│   ↓                                      │
+│ REVERT - Attack prevented! ✅            │
+└─────────────────────────────────────────┘
+```
+
+**GAS COST BREAKDOWN** (from Project 01 & 02 knowledge):
+
+**Vulnerable Pattern**:
+- Checks: ~100 gas (SLOAD)
+- Interactions: ~2,100 gas (external call)
+- Effects: ~5,000 gas (SSTORE)
+- Risk: Reentrancy attack possible!
+
+**Secure Pattern**:
+- Checks: ~100 gas (SLOAD)
+- Effects: ~5,000 gas (SSTORE)
+- Interactions: ~2,100 gas (external call)
+- Risk: Reentrancy attack prevented! ✅
+
+Same gas cost, but secure!
+
+**REAL-WORLD ANALOGY**: 
+Like a bank teller - they check your ID (checks), update your account balance in the system (effects), THEN give you cash (interactions). If someone tries to withdraw again immediately, the system already shows the balance is updated!
+
+**CONNECTION TO PROJECT 01**: 
+Remember storage costs? The `balances[msg.sender] -= amount` operation costs ~5,000 gas (warm SSTORE). By doing this BEFORE the external call, we ensure state is updated even if the external call fails or re-enters.
 
 ### OpenZeppelin ReentrancyGuard
 

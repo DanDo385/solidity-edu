@@ -54,23 +54,120 @@ Smart contracts are immutable by default:
 
 **Real-world analogy**: Like a building with replaceable wiring - the building (proxy/state) stays the same, but you can upgrade the electrical system (implementation/logic)!
 
-### Delegatecall Pattern
+### Delegatecall Pattern: Code Execution in Foreign Context
 
-`delegatecall` executes code from another contract in the context of the current contract:
+**FIRST PRINCIPLES: Context Preservation**
+
+`delegatecall` executes code from another contract in the context of the current contract. This is the magic behind proxy patterns!
+
+**CONNECTION TO PROJECT 02**:
+We learned about `.call()` in Project 02 for ETH transfers. `delegatecall` is similar but preserves the calling contract's context!
+
+**UNDERSTANDING THE DIFFERENCE**:
 
 ```solidity
-delegatecall(target, data)
-// Executes target's code, but:
-// - Uses current contract's storage
-// - Uses current contract's balance
-// - Uses current contract's address (msg.sender)
+// Regular call: Executes in target's context
+target.call(data);
+// - Uses target's storage
+// - Uses target's balance
+// - msg.sender = current contract
+
+// Delegatecall: Executes in current contract's context
+target.delegatecall(data);
+// - Uses CURRENT contract's storage ✅
+// - Uses CURRENT contract's balance ✅
+// - msg.sender = original caller ✅
 ```
 
-**Key difference from `call`:**
-- `call`: Executes in target's context
-- `delegatecall`: Executes in current contract's context
+**HOW IT WORKS**:
 
-**Real-world analogy**: Like hiring a consultant - they use your office (storage), your resources (balance), but bring their expertise (code)!
+```
+Delegatecall Execution Flow:
+┌─────────────────────────────────────────┐
+│ Proxy contract calls                     │
+│   implementation.delegatecall(data)      │
+│   ↓                                      │
+│ Implementation's code executes          │ ← Code from implementation
+│   ↓                                      │
+│ BUT: Uses proxy's storage!              │ ← Storage from proxy
+│   ↓                                      │
+│ BUT: Uses proxy's balance!              │ ← Balance from proxy
+│   ↓                                      │
+│ BUT: msg.sender = original caller!      │ ← Context preserved
+│   ↓                                      │
+│ State changes affect PROXY, not impl!   │ ← Key insight!
+└─────────────────────────────────────────┘
+```
+
+**STORAGE LAYOUT CRITICAL** (from Project 01 knowledge):
+
+**The Problem**: Implementation's storage layout must match proxy's!
+```solidity
+// Implementation V1
+contract ImplV1 {
+    uint256 public value;  // Slot 0
+}
+
+// Proxy
+contract Proxy {
+    address public implementation;  // Slot 0 ❌ COLLISION!
+    // Implementation's value would overwrite implementation address!
+}
+```
+
+**The Solution**: Use EIP-1967 storage slots!
+```solidity
+// Proxy uses specific slot for implementation
+bytes32 private constant IMPLEMENTATION_SLOT = 
+    bytes32(uint256(keccak256("eip1967.proxy.implementation")) - 1);
+// Implementation's storage starts at slot 0
+```
+
+**GAS COST BREAKDOWN**:
+
+**Delegatecall**:
+- Base call: ~2,100 gas
+- Code execution: Variable (depends on implementation)
+- Storage operations: Same as regular calls (~5k-20k per write)
+
+**COMPARISON TO RUST** (Conceptual):
+
+**Rust** (similar pattern with traits):
+```rust
+trait Implementation {
+    fn execute(&mut self, data: Vec<u8>);
+}
+
+struct Proxy {
+    implementation: Box<dyn Implementation>,
+    storage: Storage,
+}
+
+impl Proxy {
+    fn delegate_call(&mut self, data: Vec<u8>) {
+        // Execute implementation's code
+        // But use proxy's storage
+        self.implementation.execute(data);
+    }
+}
+```
+
+**Solidity** (delegatecall):
+```solidity
+function delegatecall(address impl, bytes memory data) {
+    impl.delegatecall(data);  // Code from impl, storage from this
+}
+```
+
+Both preserve context, but Solidity's delegatecall is built into the EVM!
+
+**REAL-WORLD ANALOGY**: 
+Like hiring a consultant:
+- **Regular call**: Consultant works in their office (target's storage)
+- **Delegatecall**: Consultant works in YOUR office (your storage), uses YOUR resources, but brings THEIR expertise (code)
+
+**SECURITY CONSIDERATION**:
+Delegatecall is powerful but dangerous - malicious implementation code can corrupt proxy storage if storage layout doesn't match!
 
 ### UUPS Proxy Pattern
 

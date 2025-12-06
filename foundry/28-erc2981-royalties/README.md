@@ -12,16 +12,73 @@ A comprehensive guide to implementing on-chain NFT royalties using the EIP-2981 
 - Handle royalty recipient updates
 - Understand limitations and considerations
 
-## What is EIP-2981?
+## What is EIP-2981? On-Chain Royalty Standard
+
+**FIRST PRINCIPLES: Creator Compensation**
 
 EIP-2981 is a standardized way to retrieve royalty payment information for Non-Fungible Tokens (NFTs). It allows NFT creators to receive ongoing royalties from secondary sales across different marketplaces.
 
+**CONNECTION TO PROJECT 09**:
+- **Project 09**: ERC721 NFT standard (ownership and transfers)
+- **Project 28**: ERC2981 royalty standard (creator compensation)
+- Both work together - NFTs can implement both standards!
+
 ### Key Features
 
+**UNDERSTANDING THE STANDARD**:
+
 1. **Standardized Interface**: All compliant contracts expose the same `royaltyInfo()` function
+   - Marketplaces can query any NFT for royalty info
+   - Consistent interface across all NFTs
+   - From Project 03: Standard interfaces enable composability!
+
 2. **Marketplace Agnostic**: Works with any marketplace that supports the standard
+   - OpenSea, LooksRare, Blur all support EIP-2981
+   - Creator gets royalties regardless of marketplace
+   - Decentralized royalty enforcement
+
 3. **Flexible Configuration**: Supports both global and per-token royalty settings
+   - Global: Same royalty for all tokens
+   - Per-token: Different royalty per NFT
+   - From Project 01: Uses mappings for per-token storage!
+
 4. **On-Chain Information**: Royalty data is stored directly on the blockchain
+   - No off-chain dependencies
+   - Verifiable and transparent
+   - Permanent record
+
+**HOW ROYALTIES WORK**:
+
+```
+Royalty Flow:
+┌─────────────────────────────────────────┐
+│ NFT listed for sale: 10 ETH            │
+│   ↓                                      │
+│ Marketplace queries royaltyInfo()      │ ← EIP-2981 call
+│   ↓                                      │
+│ Contract returns:                       │
+│   receiver = creator address            │
+│   royaltyAmount = 0.5 ETH (5%)         │
+│   ↓                                      │
+│ Marketplace splits payment:            │
+│   - Seller: 9.5 ETH                    │
+│   - Creator: 0.5 ETH (royalty)         │ ← Automatic!
+│   ↓                                      │
+│ Creator receives ongoing royalties      │ ← From all future sales!
+└─────────────────────────────────────────┘
+```
+
+**GAS COST** (from Project 01 & 03 knowledge):
+- `royaltyInfo()` call: ~100 gas (view function, free off-chain)
+- Royalty calculation: ~10 gas (arithmetic)
+- Total: ~110 gas (negligible!)
+
+**REAL-WORLD ANALOGY**: 
+Like artist royalties in music:
+- **First Sale**: Artist gets full price
+- **Secondary Sales**: Artist gets royalty percentage
+- **Ongoing**: Every resale generates royalty
+- **Standardized**: Same system works across all platforms
 
 ### The Standard Interface
 

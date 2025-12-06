@@ -20,23 +20,62 @@ By completing this project, you will:
 
 ### 1. Single-Function Reentrancy (Basic)
 
+**CONNECTION TO PROJECT 07**:
+We learned about basic reentrancy in Project 07. Here we dive deeper into advanced patterns!
+
 The classic DAO attack pattern where a function is reentered before state updates:
 
 ```solidity
 function withdraw(uint amount) external {
-    require(balances[msg.sender] >= amount);
-    // VULNERABLE: External call before state update
-    (bool success,) = msg.sender.call{value: amount}("");
+    require(balances[msg.sender] >= amount);  // CHECK ✅
+    // ❌ VULNERABLE: External call before state update
+    (bool success,) = msg.sender.call{value: amount}("");  // INTERACTION FIRST!
     require(success);
-    balances[msg.sender] -= amount; // State updated AFTER call
+    balances[msg.sender] -= amount; // ❌ EFFECT TOO LATE!
 }
 ```
 
-**Attack Flow:**
-1. Call withdraw(100)
-2. During ETH transfer, receive() is triggered
-3. Call withdraw(100) again (balance still shows 100)
-4. Repeat until drained
+**DETAILED ATTACK FLOW** (from Project 07 knowledge):
+
+```
+Call Stack Visualization:
+┌─────────────────────────────────────────┐
+│ withdraw(100) - First Call              │
+│   ↓                                      │
+│ Check: balance >= 100 ✅                 │ ← Passes
+│   ↓                                      │
+│ External call: send 100 ETH             │ ← Attacker receives ETH
+│   ↓                                      │
+│ [ATTACKER'S RECEIVE() EXECUTES]         │ ← Re-enters contract!
+│   ↓                                      │
+│ withdraw(100) - Second Call             │ ← Reentrant call!
+│   ↓                                      │
+│ Check: balance >= 100 ✅                 │ ← STILL PASSES! (not updated!)
+│   ↓                                      │
+│ External call: send 100 ETH             │ ← More ETH sent!
+│   ↓                                      │
+│ [ATTACKER'S RECEIVE() EXECUTES AGAIN]   │ ← Can repeat!
+│   ↓                                      │
+│ ... (continues until contract drained)  │
+│   ↓                                      │
+│ Finally: balance -= 100                 │ ← Too late! Already drained
+└─────────────────────────────────────────┘
+```
+
+**WHY IT WORKS**:
+- State updated AFTER external call
+- Reentrant call sees old state
+- Can drain contract before state updates
+
+**THE FIX** (Checks-Effects-Interactions from Project 07):
+```solidity
+function withdraw(uint amount) external {
+    require(balances[msg.sender] >= amount);  // CHECK ✅
+    balances[msg.sender] -= amount;           // EFFECT FIRST! ✅
+    (bool success,) = msg.sender.call{value: amount}("");  // INTERACTION LAST ✅
+    require(success);
+}
+```
 
 ### 2. Multi-Function Reentrancy (Cross-Function)
 

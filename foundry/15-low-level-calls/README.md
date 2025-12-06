@@ -15,45 +15,117 @@
 
 ### The Three Call Types
 
+**FIRST PRINCIPLES: Context Preservation**
+
+Low-level calls are the foundation of contract interaction. Understanding context (storage, balance, msg.sender) is critical!
+
+**CONNECTION TO PROJECT 02 & 10**:
+- **Project 02**: We learned about `.call{value:}()` for ETH transfers
+- **Project 10**: We learned about `delegatecall()` for proxies
+- **Project 15**: We dive deep into all three call types and their contexts!
+
 #### 1. call() - External Call
 Executes code in the **target contract's context**
 
 ```solidity
-// Storage context: Target contract
-// msg.sender: Your contract
-// msg.value: Sent value
+// Storage context: Target contract ✅
+// msg.sender: Your contract ✅
+// msg.value: Sent value ✅
 (bool success, bytes memory data) = target.call{value: 1 ether}(
     abi.encodeWithSignature("someFunction(uint256)", 123)
 );
 ```
 
+**HOW IT WORKS**:
+```
+Call Execution Flow:
+┌─────────────────────────────────────────┐
+│ YourContract.call(target, data)         │
+│   ↓                                      │
+│ Target's code executes                  │ ← Code from target
+│   ↓                                      │
+│ Uses TARGET's storage                   │ ← Storage from target
+│   ↓                                      │
+│ Uses TARGET's balance                   │ ← Balance from target
+│   ↓                                      │
+│ msg.sender = YourContract               │ ← Your contract is sender
+│   ↓                                      │
+│ Returns (success, data)                 │
+└─────────────────────────────────────────┘
+```
+
 **Use cases:**
 - Calling external contracts
-- Sending ETH
+- Sending ETH (from Project 02)
 - Interacting with unknown contracts
 - Proxy pattern calls
+
+**GAS COST** (from Project 02 knowledge):
+- Base call: ~2,100 gas
+- Forwarded gas: All remaining (unlike .transfer())
+- Return data: Variable (depends on function)
 
 #### 2. delegatecall() - Library Pattern
 Executes code in the **caller's context**
 
 ```solidity
-// Storage context: YOUR contract (DANGEROUS!)
-// msg.sender: Original caller
-// msg.value: Original value
+// Storage context: YOUR contract ⚠️ DANGEROUS!
+// msg.sender: Original caller ✅
+// msg.value: Original value ✅
 (bool success, bytes memory data) = target.delegatecall(
     abi.encodeWithSignature("someFunction(uint256)", 123)
 );
 ```
 
+**HOW IT WORKS**:
+```
+Delegatecall Execution Flow:
+┌─────────────────────────────────────────┐
+│ YourContract.delegatecall(target, data) │
+│   ↓                                      │
+│ Target's code executes                  │ ← Code from target
+│   ↓                                      │
+│ Uses YOUR storage!                      │ ← Storage from YOUR contract!
+│   ↓                                      │
+│ Uses YOUR balance!                      │ ← Balance from YOUR contract!
+│   ↓                                      │
+│ msg.sender = Original caller            │ ← Original caller preserved
+│   ↓                                      │
+│ State changes affect YOUR contract!     │ ← Key difference!
+└─────────────────────────────────────────┘
+```
+
 **Use cases:**
-- Proxy/implementation pattern
+- Proxy/implementation pattern (from Project 10)
 - Library contracts
 - Upgradeable contracts
 
-**⚠️ CRITICAL WARNING:**
-- Target code modifies YOUR storage
-- Storage layout must match exactly
+**⚠️ CRITICAL WARNING**:
+- Target code modifies **YOUR** storage
+- Storage layout must match **exactly**
 - One mistake = complete storage corruption
+- Always use EIP-1967 storage slots for proxies!
+
+**STORAGE COLLISION RISK** (from Project 01 & 10 knowledge):
+
+```solidity
+// Your Contract
+contract YourContract {
+    address public owner;      // Slot 0
+    uint256 public value;     // Slot 1
+}
+
+// Target Contract (WRONG LAYOUT!)
+contract Target {
+    uint256 public value;     // Slot 0 ❌ COLLISION!
+    address public owner;     // Slot 1 ❌ COLLISION!
+}
+
+// If you delegatecall Target:
+// Target's code writes to slot 0 (thinks it's value)
+// But YOUR slot 0 is owner!
+// Result: Owner address corrupted! 💥
+```
 
 #### 3. staticcall() - Read-Only
 Like call() but **reverts on state changes**

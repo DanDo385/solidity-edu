@@ -47,21 +47,80 @@ This project follows the same structure as Project 01:
 
 ## 📚 Key Concepts
 
-### Custom Errors Save Gas
+### Custom Errors: Gas-Efficient Error Handling
+
+**FIRST PRINCIPLES: Why Custom Errors Matter**
+
+Custom errors were introduced in Solidity 0.8.4+ to provide gas-efficient error handling. They replace expensive string messages with cheap error codes.
+
+**GAS COST COMPARISON**:
 
 ```solidity
-// Old: ~2,000 gas
+// ❌ OLD WAY: String message (~2,000 gas)
 require(balance >= amount, "Insufficient balance");
 
-// New: ~200 gas (90% savings!)
+// ✅ NEW WAY: Custom error (~200 gas - 90% savings!)
 if (balance < amount) revert InsufficientBalance(balance, amount);
 ```
 
-**Fun fact**: Before Solidity 0.4.22, `throw` reverted without data. Modern `revert` opcodes bubble encoded error data, which explorers and off-chain services can parse for better UX.
+**GAS BREAKDOWN**:
 
-Custom errors shine on L2s: fewer bytes in revert strings means smaller calldata when transactions revert during optimistic rollup dispute games.
+**String Message**:
+- String encoding: ~1,800 gas (depends on length)
+- REVERT opcode: ~200 gas
+- Total: ~2,000 gas
 
-**Real-world analogy**: Like using error codes instead of full messages. Error codes are faster to process and cheaper to transmit, but you need a reference guide to understand them.
+**Custom Error**:
+- Error selector: ~4 bytes (cheap)
+- Parameter encoding: ~100 gas (if any)
+- REVERT opcode: ~200 gas
+- Total: ~200-300 gas
+
+**Savings**: ~1,700-1,800 gas per revert! 🎉
+
+**CONNECTION TO PROJECT 02**:
+Remember how we used `require()` with string messages in Project 02? Custom errors replace those expensive strings with cheap error codes. Same functionality, 90% less gas!
+
+**HISTORICAL CONTEXT**: 
+Before Solidity 0.4.22, `throw` reverted without data. Modern `revert` opcodes bubble encoded error data, which explorers and off-chain services can parse for better UX. Custom errors (0.8.4+) take this further by making errors gas-efficient.
+
+**L2 ROLLUP CONSIDERATIONS**:
+Custom errors shine on L2s: fewer bytes in revert strings means smaller calldata when transactions revert during optimistic rollup dispute games. This reduces L2 fees significantly!
+
+**COMPARISON TO RUST** (Error Handling Pattern):
+
+**Rust** (Result type):
+```rust
+enum Error {
+    InsufficientBalance { available: u256, required: u256 },
+    Unauthorized { caller: Address },
+}
+
+fn withdraw(amount: u256) -> Result<(), Error> {
+    if balance < amount {
+        return Err(Error::InsufficientBalance { available: balance, required: amount })
+    } else {
+        Ok(())
+    }
+}
+```
+
+**Solidity** (Custom errors):
+```solidity
+error InsufficientBalance(uint256 available, uint256 required);
+
+function withdraw(uint256 amount) public {
+    if (balance < amount) {
+        revert InsufficientBalance(balance, amount);
+    }
+    // ...
+}
+```
+
+Both use typed error structures, but Solidity's custom errors are more gas-efficient because they're encoded at compile time.
+
+**REAL-WORLD ANALOGY**: 
+Like using error codes instead of full messages. Error codes are faster to process and cheaper to transmit, but you need a reference guide (ABI) to understand them. Custom errors are like HTTP status codes - efficient and standardized.
 
 ### When to Use Each Error Type
 

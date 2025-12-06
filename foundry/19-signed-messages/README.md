@@ -35,29 +35,99 @@ This project teaches you how to implement **EIP-712** (Typed Structured Data Has
 - **DAO voting** (off-chain signatures)
 - **Vouchers and coupons** (one-time use signatures)
 
-## Cryptographic Signatures Primer
+## Cryptographic Signatures Primer: ECDSA in Ethereum
+
+**FIRST PRINCIPLES: Asymmetric Cryptography**
+
+Ethereum uses ECDSA (Elliptic Curve Digital Signature Algorithm) over the secp256k1 curve for signatures. Understanding how signatures work is essential for meta-transactions and permit patterns!
+
+**CONNECTION TO PROJECT 08**:
+ERC20 Permit (EIP-2612) uses signatures to approve tokens without a transaction! This project teaches the fundamentals behind permit.
 
 ### ECDSA (Elliptic Curve Digital Signature Algorithm)
 
 Ethereum uses ECDSA over the secp256k1 curve. Here's how it works:
 
 ```
-Private Key (secret) -> Public Key -> Ethereum Address
-        |
-        v
-    Sign Message -> Signature (v, r, s)
-
-Message + Signature -> Verify -> Public Key/Address
+ECDSA Signature Flow:
+┌─────────────────────────────────────────┐
+│ Private Key (secret, 256 bits)          │ ← Only signer knows
+│   ↓                                      │
+│ Public Key (derived, 512 bits)          │ ← Can be shared
+│   ↓                                      │
+│ Ethereum Address (keccak256(public)[12:])│ ← 20 bytes
+│   ↓                                      │
+│ Sign Message                            │ ← Off-chain operation
+│   ↓                                      │
+│ Signature (v, r, s) - 65 bytes         │ ← Can be verified
+│   ↓                                      │
+│ Verify: Message + Signature → Address   │ ← On-chain verification
+└─────────────────────────────────────────┘
 ```
+
+**UNDERSTANDING THE MATHEMATICS** (DSA Concept):
+
+ECDSA uses elliptic curve cryptography:
+- **Private Key**: Random 256-bit number (secret)
+- **Public Key**: Point on elliptic curve (derived from private key)
+- **Signature**: Mathematical proof that private key holder signed message
+- **Verification**: Mathematical operation that recovers public key from signature
+
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (using secp256k1 crate):
+```rust
+use secp256k1::{SecretKey, PublicKey, Message, Signature};
+
+let secret = SecretKey::from_slice(&private_key_bytes)?;
+let public = PublicKey::from_secret_key(&secret);
+let message = Message::from_slice(&message_hash)?;
+let signature = secret.sign_ecdsa(&message);
+// Same ECDSA algorithm, different language
+```
+
+**Solidity** (using ecrecover):
+```solidity
+address signer = ecrecover(messageHash, v, r, s);
+// Built-in EVM function for signature recovery
+```
+
+Both use the same ECDSA algorithm - Solidity just provides built-in recovery!
 
 ### Signature Components
 
 An Ethereum signature consists of three parts:
 - **v** (1 byte): Recovery identifier (27 or 28, sometimes 0 or 1)
+  - Indicates which of two possible public keys to use
+  - 27 = uncompressed, 28 = compressed (legacy)
+  - 0/1 = EIP-155 compatible (chainId encoded)
+  
 - **r** (32 bytes): First part of the signature
+  - X coordinate on elliptic curve (mod n)
+  
 - **s** (32 bytes): Second part of the signature
+  - Signature proof value
 
-Total: 65 bytes
+**Total: 65 bytes** (1 + 32 + 32)
+
+**UNDERSTANDING RECOVERY**:
+
+```
+Signature Recovery:
+┌─────────────────────────────────────────┐
+│ Input: messageHash, v, r, s            │
+│   ↓                                      │
+│ ecrecover(messageHash, v, r, s)        │ ← EVM opcode
+│   ↓                                      │
+│ Mathematical operation                  │ ← Elliptic curve math
+│   ↓                                      │
+│ Output: address (public key)           │ ← Signer's address
+└─────────────────────────────────────────┘
+```
+
+**GAS COST**:
+- `ecrecover()`: ~3,000 gas (expensive cryptographic operation!)
+- Signature verification is one of the most expensive operations in Solidity
 
 ### Signing Process
 

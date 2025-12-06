@@ -38,17 +38,92 @@ By completing this project, you will:
 
 ## 🔑 Key Concepts
 
-### ERC721 Standard Overview
+### ERC721 Standard Overview: Non-Fungible Tokens
+
+**FIRST PRINCIPLES: Uniqueness and Ownership**
 
 ERC721 is the standard for non-fungible tokens (NFTs) - unique, indivisible tokens. Unlike ERC20 (fungible), each ERC721 token is unique and has its own tokenId.
 
-**Key Differences from ERC20:**
-- **ERC20**: Fungible (all tokens identical)
-- **ERC721**: Non-fungible (each token unique)
-- **ERC20**: Transfer by amount
-- **ERC721**: Transfer by tokenId
+**CONNECTION TO PROJECT 08**:
+- **Project 08**: ERC20 - fungible tokens (all identical)
+- **Project 09**: ERC721 - non-fungible tokens (each unique)
+- Both use similar patterns (mappings, events, approvals) but with key differences!
 
-**Real-world analogy**: Like trading cards vs currency - each card (NFT) is unique, while dollars (ERC20) are identical!
+**KEY DIFFERENCES FROM ERC20**:
+
+| Aspect | ERC20 | ERC721 |
+|--------|-------|--------|
+| **Fungibility** | Fungible (all identical) | Non-fungible (each unique) |
+| **Transfer** | By amount (`transfer(to, amount)`) | By tokenId (`transferFrom(from, to, tokenId)`) |
+| **Balance** | Total amount held | Count of NFTs owned |
+| **Storage** | `mapping(address => uint256)` | `mapping(uint256 => address)` |
+| **Approval** | Amount-based (`approve(spender, amount)`) | Token-based (`approve(spender, tokenId)`) |
+
+**STORAGE STRUCTURE** (from Project 01 knowledge):
+
+**ERC20**:
+```solidity
+mapping(address => uint256) public balanceOf;  // How many tokens?
+```
+
+**ERC721**:
+```solidity
+mapping(uint256 => address) public ownerOf;      // Who owns tokenId?
+mapping(address => uint256) public balanceOf;    // How many NFTs?
+```
+
+**UNDERSTANDING THE DIFFERENCE**:
+
+**ERC20 Transfer**:
+```solidity
+transfer(to, 100);  // Transfer 100 tokens
+// All 100 tokens are identical
+```
+
+**ERC721 Transfer**:
+```solidity
+transferFrom(from, to, 5);  // Transfer tokenId #5
+// Token #5 is unique - can't transfer "100 NFTs" like ERC20
+```
+
+**GAS COST COMPARISON** (from Project 01 & 08 knowledge):
+
+**ERC20 Transfer**:
+- 2 SLOADs (balances): ~200 gas
+- 2 SSTOREs (balances): ~10,000 gas
+- Event: ~1,500 gas
+- Total: ~11,700 gas
+
+**ERC721 Transfer**:
+- 2 SLOADs (ownerOf + balanceOf): ~200 gas
+- 2 SSTOREs (ownerOf + balanceOf): ~10,000 gas
+- Event: ~1,500 gas
+- Total: ~11,700 gas (similar!)
+
+**REAL-WORLD ANALOGY**: 
+Like trading cards vs currency:
+- **ERC20** = Dollar bills (all identical, transfer by amount)
+- **ERC721** = Trading cards (each unique, transfer by card number)
+
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (HashMap for ownership):
+```rust
+use std::collections::HashMap;
+
+struct NFT {
+    owner_of: HashMap<TokenId, Address>,
+    balance_of: HashMap<Address, u256>,
+}
+```
+
+**Solidity** (mappings):
+```solidity
+mapping(uint256 => address) public ownerOf;
+mapping(address => uint256) public balanceOf;
+```
+
+Both use hash-based structures for O(1) lookups, but Solidity's mappings are more gas-efficient!
 
 ### Core Functions
 

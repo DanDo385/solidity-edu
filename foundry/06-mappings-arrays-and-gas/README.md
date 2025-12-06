@@ -38,38 +38,164 @@ By completing this project, you will:
 
 ## 🔑 Key Concepts
 
-### Mapping Storage: O(1) Lookups
+### Mapping Storage: O(1) Lookups with Hash Tables
 
-Mappings provide constant-time lookups using keccak256 hashing:
+**FIRST PRINCIPLES: Hash Table Data Structure**
+
+Mappings provide constant-time O(1) lookups using keccak256 hashing. This is a fundamental hash table data structure implementation.
+
+**UNDERSTANDING THE STRUCTURE**:
 
 ```solidity
 mapping(address => uint256) public balances;
 // Storage slot: keccak256(abi.encodePacked(key, slot_number))
 ```
 
-**Gas Costs:**
-- Cold read: ~2,100 gas (first access)
-- Warm read: ~100 gas (recently accessed)
-- Write: ~5,000 gas (warm) or ~20,000 gas (cold)
+**HOW IT WORKS** (DSA Concept):
 
-**Real-world analogy**: Like a phone book - you know the name (key), you instantly find the number (value). No need to search through pages!
+```
+Hash Table Lookup:
+┌─────────────────────────────────────────┐
+│ Input: address key (0x1234...)          │
+│   ↓                                      │
+│ Hash: keccak256(key, slot_number)       │ ← O(1) hash operation
+│   ↓                                      │
+│ Storage slot calculated                  │ ← Direct access
+│   ↓                                      │
+│ Read value from slot                     │ ← O(1) access
+└─────────────────────────────────────────┘
 
-### Array Storage: Ordered but Expensive
+Time Complexity: O(1) - Constant time!
+Space Complexity: O(n) - Linear space for n entries
+```
 
-Arrays maintain order but require iteration for lookups:
+**CONNECTION TO PROJECT 01**: 
+We learned about mapping storage layout in Project 01. The storage slot calculation uses keccak256 hashing, which is what makes mappings O(1) lookups!
+
+**GAS COSTS** (from Project 01 knowledge):
+- Cold read: ~2,100 gas (first access - SLOAD from cold slot)
+- Warm read: ~100 gas (recently accessed - SLOAD from warm slot)
+- Write: ~5,000 gas (warm SSTORE) or ~20,000 gas (cold SSTORE)
+
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (HashMap):
+```rust
+use std::collections::HashMap;
+
+let mut balances: HashMap<Address, u256> = HashMap::new();
+
+// Insert: O(1) average case
+balances.insert(address, amount);
+
+// Lookup: O(1) average case
+let balance = balances.get(&address);
+```
+
+**Solidity** (mapping):
+```solidity
+mapping(address => uint256) public balances;
+
+// Write: O(1) - direct storage write
+balances[address] = amount;
+
+// Read: O(1) - direct storage read
+uint256 balance = balances[address];
+```
+
+Both use hash-based structures for O(1) operations, but Solidity's mapping is more gas-efficient because it's built into the EVM storage model.
+
+**REAL-WORLD ANALOGY**: 
+Like a phone book - you know the name (key), you instantly find the number (value). No need to search through pages! The hash function (keccak256) is like the alphabetical organization - it tells you exactly where to look.
+
+### Array Storage: Ordered Lists with Linear Complexity
+
+**FIRST PRINCIPLES: Array Data Structure**
+
+Arrays maintain order but require iteration for lookups. This is a fundamental array/vector data structure.
+
+**UNDERSTANDING THE STRUCTURE**:
 
 ```solidity
 address[] public users;
 // Storage: length at slot N, elements at keccak256(N), keccak256(N)+1, ...
 ```
 
-**Gas Costs:**
-- Push: ~20,000 gas (new slot)
-- Read: ~100 gas per element
-- Length: ~100 gas
+**HOW IT WORKS** (DSA Concept):
+
+```
+Array Lookup:
+┌─────────────────────────────────────────┐
+│ Input: index (e.g., 5)                  │
+│   ↓                                      │
+│ Calculate slot: keccak256(N) + index    │ ← O(1) calculation
+│   ↓                                      │
+│ Read value from slot                     │ ← O(1) access
+└─────────────────────────────────────────┘
+
+Array Search (find address):
+┌─────────────────────────────────────────┐
+│ Input: address to find                  │
+│   ↓                                      │
+│ Iterate through all elements            │ ← O(n) iteration
+│   ↓                                      │
+│ Compare each element                     │ ← O(n) comparisons
+│   ↓                                      │
+│ Return if found                          │
+└─────────────────────────────────────────┘
+
+Time Complexity:
+- Access by index: O(1) - Constant time
+- Search by value: O(n) - Linear time
+- Insertion: O(1) amortized (push to end)
+- Deletion: O(n) - Must shift elements
+```
+
+**CONNECTION TO PROJECT 01**: 
+We learned about array storage layout in Project 01. Arrays store length separately and elements at calculated slots, which enables O(1) access by index but O(n) search.
+
+**GAS COSTS** (from Project 01 knowledge):
+- Push: ~20,000 gas (new slot - cold SSTORE)
+- Read by index: ~100 gas per element (warm SLOAD)
+- Length: ~100 gas (SLOAD from base slot)
 - Iteration: n × ~103 gas (SLOAD + MLOAD per element)
 
-**Real-world analogy**: Like a guest list - ordered but you have to scan through to find someone. Great for iteration, bad for lookups!
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (Vec):
+```rust
+let mut users: Vec<Address> = Vec::new();
+
+// Push: O(1) amortized
+users.push(address);
+
+// Access by index: O(1)
+let user = users[5];
+
+// Search: O(n)
+let found = users.iter().find(|&x| x == target);
+```
+
+**Solidity** (array):
+```solidity
+address[] public users;
+
+// Push: O(1) - but expensive gas-wise
+users.push(address);
+
+// Access by index: O(1)
+address user = users[5];
+
+// Search: O(n) - must iterate
+for (uint i = 0; i < users.length; i++) {
+    if (users[i] == target) return true;
+}
+```
+
+Both have similar time complexity, but Solidity arrays are more expensive gas-wise due to storage costs.
+
+**REAL-WORLD ANALOGY**: 
+Like a guest list - ordered but you have to scan through to find someone. Great for iteration (going through the list), bad for lookups (finding a specific person). Arrays are perfect when you need order and iteration, but mappings are better for lookups!
 
 ### Gas Optimization: Track Totals Separately
 

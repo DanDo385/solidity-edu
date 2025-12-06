@@ -6,7 +6,16 @@ Learn how oracle manipulation attacks work and how to prevent them in DeFi proto
 
 Oracle manipulation is one of the most profitable attack vectors in DeFi. Attackers exploit the way protocols determine asset prices, often combining flashloans with price oracle vulnerabilities to drain millions of dollars.
 
-## Vulnerability Explained
+## Vulnerability Explained: Oracle Manipulation Attacks
+
+**FIRST PRINCIPLES: Trust in External Data**
+
+Oracle manipulation is one of the most profitable attack vectors in DeFi. Understanding how oracles work and how they can be manipulated is critical!
+
+**CONNECTION TO PROJECT 18**:
+- **Project 18**: We learned about Chainlink oracles (secure, decentralized)
+- **Project 34**: We learn about vulnerable oracles (manipulable, single-source)
+- Both teach oracle security - one shows secure patterns, one shows vulnerabilities!
 
 ### What is an Oracle?
 
@@ -16,20 +25,58 @@ An oracle is a mechanism that provides external data (like asset prices) to smar
 - Trigger liquidations
 - Value synthetic assets
 
+**CONNECTION TO PROJECT 11**:
+ERC-4626 vaults need price data to calculate share values! Vulnerable oracles can manipulate vault pricing!
+
 ### Oracle Manipulation Mechanics
 
-**The Attack Pattern:**
-1. **Setup**: Identify a protocol using a manipulable price oracle
-2. **Flashloan**: Borrow massive amounts of tokens (no collateral needed)
-3. **Manipulate**: Execute large trades to skew the oracle price
-4. **Exploit**: Use the manipulated price to extract value from the target protocol
-5. **Repay**: Return the flashloan and keep the profits
+**THE ATTACK PATTERN**:
 
-**Why It Works:**
-- Spot price oracles can be manipulated within a single transaction
-- Flashloans provide unlimited capital for manipulation
-- Atomic transactions ensure risk-free execution
-- Many protocols don't implement proper oracle protections
+```
+Oracle Manipulation Attack Flow:
+┌─────────────────────────────────────────┐
+│ Step 1: Setup                           │
+│   Identify protocol with weak oracle    │ ← Research phase
+│   ↓                                      │
+│ Step 2: Flashloan                       │
+│   Borrow massive amount (no collateral) │ ← Unlimited capital
+│   ↓                                      │
+│ Step 3: Manipulate                      │
+│   Execute large trades to skew price    │ ← Price manipulation
+│   ↓                                      │
+│ Step 4: Exploit                         │
+│   Use manipulated price to extract value│ ← Profit extraction
+│   ↓                                      │
+│ Step 5: Repay                           │
+│   Return flashloan, keep profits         │ ← Risk-free profit
+└─────────────────────────────────────────┘
+```
+
+**WHY IT WORKS**:
+
+1. **Spot Price Oracles**: Can be manipulated within a single transaction
+   - Read price from AMM reserves
+   - Large swap changes reserves
+   - Oracle reads manipulated price
+   - All in one transaction!
+
+2. **Flashloans**: Provide unlimited capital for manipulation
+   - No collateral needed
+   - Borrow millions, manipulate, repay
+   - From Project 02: Flashloans enable atomic operations!
+
+3. **Atomic Transactions**: Ensure risk-free execution
+   - All steps in one transaction
+   - Either all succeed or all revert
+   - No risk of partial execution
+
+4. **Missing Protections**: Many protocols don't implement proper oracle protections
+   - No TWAP (Time-Weighted Average Price)
+   - No price bounds checking
+   - No multiple oracle sources
+
+**REAL-WORLD ANALOGY**: 
+Like manipulating a stock price by buying/selling large amounts quickly, then using that manipulated price to execute profitable trades. Flashloans make this possible without capital!
 
 ### Types of Vulnerable Oracles
 

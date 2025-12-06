@@ -47,6 +47,9 @@ contract FunctionsPayable {
     //       2. Accepts ETH during deployment
     constructor() payable {
         owner = msg.sender;
+        if (msg.value > 0) {
+            emit Deposited(msg.sender, msg.value);
+        }
     }
     // ============================================================
     // RECEIVE AND FALLBACK
@@ -56,15 +59,9 @@ contract FunctionsPayable {
     //       1. Is external payable
     //       2. Emits Received event
     receive() external payable {
-        // TODO: Implement
-        // 1. Emit Received event with msg.sender and msg.value
         emit Received(msg.sender, msg.value);
     }
-    fallback() external payable {
-        // TODO: Implement
-        // 1. Emit FallbackCalled event with msg.sender, msg.value, and msg.data
-        emit FallbackCalled(msg.sender, msg.value, msg.data);
-    }
+    
     // TODO: Implement fallback() function that:
     //       1. Is external payable
     //       2. Emits FallbackCalled event with msg.data
@@ -72,7 +69,9 @@ contract FunctionsPayable {
     // handles plain envelopes (empty calldata) while fallback() routes unknown
     // parcels. Istanbul and later forks repriced gas, so avoid hardcoded limits
     // like transfer/send and stick to call with proper checks.
-
+    fallback() external payable {
+        emit FallbackCalled(msg.sender, msg.value, msg.data);
+    }
     // ============================================================
     // EXTERNAL FUNCTIONS
     // ============================================================
@@ -114,10 +113,10 @@ contract FunctionsPayable {
         // 2. Require _recipient is not zero address
         // 3. Increase balances[_recipient] by msg.value
         // 4. Emit Deposited event for _recipient
-        require(msg.value > 0, "Amount must be greater than 0");
-        require(_recipient != address(0), "Recipient must not be the zero address");
-        balances[_recipient] += msg.value;
-        emit Deposited(_recipient, msg.value);
+        require(msg.value > 0, "Amount must be greater than 0"); // prevent reentrancy
+        require(_recipient != address(0), "Recipient must not be the zero address"); // prevent reentrancy
+        balances[_recipient] += msg.value; // increase the balance of the recipient
+        emit Deposited(_recipient, msg.value); // emit the event
     }
 
     /**
@@ -139,12 +138,12 @@ contract FunctionsPayable {
         // Think of this as settling a tab: close your books before handing out cash
         // so a reentrant caller cannot ask twice. Rollups replay these calls in
         // fraud proofs, so deterministic ordering keeps disputes simple.
-        require(_amount > 0, "Amount must be greater than 0");
-        require(balances[msg.sender] >= _amount, "Insufficient balance");
-        balances[msg.sender] -= _amount;
-        payable(msg.sender).call{value: _amount}("");
-        require(success, "Withdrawal failed");
-        emit Withdrawn(msg.sender, _amount);
+        require( _amount > 0, "Amount must be greater than 0"); // prevent reentrancy
+        require( balances[msg.sender] >= _amount, "Insufficient balance"); // prevent reentrancy
+        balances[msg.sender] -= _amount; // decrease the balance of the sender
+        (bool success, ) = payable(msg.sender).call{value: _amount}(""); // send the ETH to the sender
+        require(success, "Withdrawal failed"); // prevent reentrancy
+        emit Withdrawn(msg.sender, _amount); // emit the event
     }
 
     /**
@@ -153,7 +152,14 @@ contract FunctionsPayable {
     function withdrawAll() public {
         // TODO: Implement
         // Use the same pattern as withdraw()
+        uint256 amount = balances[msg.sender]; 
+        require(amount > 0, "No balance to withdraw"); // prevent reentrancy
         
+        balances[msg.sender] = 0; 
+        // set the balance of the sender to 0
+        (bool success, ) = payable(msg.sender).call{value: amount}(""); // send the ETH to the sender
+        require(success, "Withdrawal failed"); // prevent reentrancy
+        emit Withdrawn(msg.sender, amount);     // emit the event
     }
 
     /**
@@ -166,7 +172,14 @@ contract FunctionsPayable {
         // 2. Calculate reserved funds (sum of all user balances conceptually)
         // 3. For simplicity, check contract balance >= _amount
         // 4. Send ETH to owner using .call
-        // 5. Require success
+        // 5. Require success and emit Withdrawn event
+        require(msg.sender == owner, "Only owner"); // prevent reentrancy
+        require(_amount > 0, "Amount must be greater than 0"); // prevent reentrancy
+        require(address(this).balance >= _amount, "Insufficient contract balance"); // prevent reentrancy
+        (bool success, ) = payable(owner).call{value: _amount}(""); // send the ETH to the owner
+        require(success, "Withdrawal failed"); // prevent reentrancy
+        emit Withdrawn(owner, _amount); // emit the event
+        
     }
 
     /**

@@ -38,7 +38,14 @@ MyContract instance = new MyContract();
 // Address depends on factory's nonce at deployment time
 ```
 
-### CREATE2 (Deterministic Deployment)
+### CREATE2 (Deterministic Deployment): Predictable Addresses
+
+**FIRST PRINCIPLES: Deterministic Address Calculation**
+
+CREATE2 calculates the address deterministically, enabling address prediction before deployment. This is powerful for counterfactual contracts and address-based logic!
+
+**CONNECTION TO PROJECT 01**:
+We learned about `keccak256` hashing in Project 01. CREATE2 uses keccak256 to calculate deterministic addresses!
 
 CREATE2 calculates the address as:
 
@@ -46,18 +53,85 @@ CREATE2 calculates the address as:
 address = keccak256(0xff ++ sender_address ++ salt ++ keccak256(initCode))[12:]
 ```
 
-**Characteristics:**
-- Address is deterministic and predictable
-- Independent of nonce
+**UNDERSTANDING THE FORMULA**:
+
+```
+CREATE2 Address Calculation:
+┌─────────────────────────────────────────┐
+│ Input Components:                       │
+│   1. 0xff (1 byte)                     │ ← Prefix to distinguish from CREATE
+│   2. sender_address (20 bytes)         │ ← Factory contract address
+│   3. salt (32 bytes)                    │ ← Chosen by deployer
+│   4. keccak256(initCode) (32 bytes)    │ ← Hash of creation bytecode
+│   ↓                                      │
+│ Concatenate: 0xff || sender || salt || hash │
+│   ↓                                      │
+│ Hash: keccak256(concatenated)           │ ← Single hash operation
+│   ↓                                      │
+│ Extract: last 20 bytes                  │ ← Address format
+│   ↓                                      │
+│ Result: Deterministic address!          │ ← Always the same!
+└─────────────────────────────────────────┘
+```
+
+**CHARACTERISTICS:**
+- Address is deterministic and predictable ✅
+- Independent of nonce ✅ (unlike CREATE)
 - Depends on: deployer address, salt, and contract bytecode
 - Enables address prediction before deployment
 - Requires assembly or specific syntax
 
-**Components:**
-1. `0xff` - Constant prefix to distinguish from CREATE
-2. `sender_address` - Factory contract address (20 bytes)
-3. `salt` - 32-byte value chosen by deployer
-4. `initCode` - Contract creation bytecode (constructor + runtime code)
+**COMPONENTS BREAKDOWN**:
+
+1. **`0xff`** - Constant prefix to distinguish from CREATE
+   - Prevents collision with CREATE addresses
+   - Single byte: `0xff`
+
+2. **`sender_address`** - Factory contract address (20 bytes)
+   - The contract deploying (factory)
+   - From Project 01: address type is 20 bytes
+
+3. **`salt`** - 32-byte value chosen by deployer
+   - Allows multiple deployments with same bytecode
+   - Different salt = different address
+   - From Project 01: bytes32 type
+
+4. **`initCode`** - Contract creation bytecode (constructor + runtime code)
+   - Includes constructor parameters
+   - Hash ensures bytecode changes = address changes
+
+**USE CASES**:
+
+1. **Counterfactual Contracts**: Deploy only when needed
+2. **Address-Based Logic**: Know address before deployment
+3. **Minimal Proxies**: Deploy many instances efficiently
+4. **State Channels**: Predictable addresses for channels
+
+**GAS COST** (from Project 01 knowledge):
+- CREATE2 deployment: ~32,000 gas (base) + contract size
+- Address calculation: ~100 gas (keccak256 computation)
+- Prediction: FREE (off-chain calculation)
+
+**COMPARISON TO RUST** (Conceptual):
+
+**Rust** (no direct equivalent):
+```rust
+// Rust doesn't have deterministic deployment
+// But similar concept: deterministic IDs based on content
+let id = sha256(format!("{}{}{}", prefix, salt, content));
+```
+
+**Solidity** (CREATE2):
+```solidity
+address predicted = address(uint160(uint256(keccak256(abi.encodePacked(
+    bytes1(0xff),
+    factory,
+    salt,
+    keccak256(initCode)
+)))));
+```
+
+CREATE2 is unique to EVM - enables powerful deployment patterns!
 
 ## How CREATE2 Works
 

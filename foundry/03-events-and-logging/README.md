@@ -62,16 +62,74 @@ cat out/EventsLogging.sol/EventsLogging.json | jq '.abi' > abi.json
 
 ## 📚 Key Concepts
 
-### Why This Matters
+### Why This Matters: Events as the Bridge Between On-Chain and Off-Chain
 
-Events are the bridge between on-chain and off-chain worlds. Without events, frontends would have to constantly poll storage (expensive and inefficient!). Events make blockchain data accessible to indexers, frontends, and analytics tools.
+**FIRST PRINCIPLES: The On-Chain/Off-Chain Divide**
 
-**Traditional code**: Logs go to console, then disappear
-**Solidity events**: Logs are permanently stored on blockchain, searchable forever
+Blockchain contracts run in isolation - they can't directly communicate with external systems. Events solve this by creating a one-way communication channel from contracts to the outside world.
 
-Solidity (started by Gavin Wood) added events early so frontends could react without polluting storage. The EVM keeps logs in a separate bloom-filtered structure for fast topic search.
+**THE PROBLEM WITHOUT EVENTS**:
+```
+Frontend needs to know: "Did Alice transfer tokens to Bob?"
+Without events:
+  - Frontend must constantly poll contract storage (expensive!)
+  - Must check every block for changes
+  - No efficient way to filter by address
+  - High RPC costs, slow updates
+```
 
-### What Are Events?
+**THE SOLUTION WITH EVENTS**:
+```
+Frontend needs to know: "Did Alice transfer tokens to Bob?"
+With events:
+  - Contract emits Transfer event when transfer happens
+  - Indexer (The Graph) listens to events automatically
+  - Frontend queries indexer (fast, free, filtered)
+  - Real-time updates, efficient filtering
+```
+
+**CONNECTION TO PROJECT 01 & 02**:
+- **Project 01**: We learned about storage (expensive, ~20k gas per write)
+- **Project 02**: We learned about functions and ETH handling
+- **Project 03**: Events complement storage - use storage for state, events for history!
+
+**COMPARISON TO OTHER LANGUAGES**:
+
+**Python**:
+```python
+print("Transfer:", from_addr, to_addr, amount)  # Goes to console, disappears
+# No persistence, no searchability
+```
+
+**Go**:
+```go
+log.Printf("Transfer: %s -> %s: %d", from, to, amount)  // Goes to log file
+// Persistent but not on-chain, not searchable by contracts
+```
+
+**Rust**:
+```rust
+println!("Transfer: {} -> {}: {}", from, to, amount);  // Console output
+// Not persistent, not on-chain
+```
+
+**Solidity**:
+```solidity
+emit Transfer(from, to, amount);  // Permanently stored on blockchain!
+// Persistent, searchable, filterable, accessible off-chain
+```
+
+**REAL-WORLD ANALOGY**: 
+- **Traditional logging** = Writing in a notebook (temporary, local, disappears)
+- **Solidity events** = Publishing in a newspaper (permanent, public, searchable forever)
+
+**HISTORICAL CONTEXT**: Solidity (started by Gavin Wood) added events early so frontends could react without polluting storage. The EVM keeps logs in a separate bloom-filtered structure for fast topic search. This design decision enables the entire DeFi ecosystem - without events, frontends would be prohibitively expensive to build!
+
+**GAS EFFICIENCY**: Events cost ~2,000 gas vs ~20,000 gas for storage writes. That's a **10x savings**! This is why events are essential for tracking history without bloating contract storage.
+
+### What Are Events? Understanding the Logging System
+
+**FIRST PRINCIPLES: Events as Write-Only Logs**
 
 Events are **logs** stored on the blockchain that:
 - ✅ Cost ~2,000 gas (vs ~20,000 for storage) - **10x cheaper!**
@@ -81,12 +139,109 @@ Events are **logs** stored on the blockchain that:
 - ❌ Cannot be read by contracts (write-only)
 - 🛰️ Survive chain reorgs with topics that clients can replay deterministically
 
-**Real-world analogy**: Events are like receipts at a store:
-- **Storage** = The actual inventory (expensive to update, queryable on-chain)
-- **Events** = Receipts (cheap to print, permanent record, searchable off-chain)
-- **Frontend** = Cash register display (shows events in real-time)
+**UNDERSTANDING THE EVM LOG STRUCTURE**:
 
-### Indexed Parameters
+The EVM stores events in a special log structure separate from contract storage:
+
+```
+Transaction Log Structure:
+┌─────────────────────────────────────────┐
+│ Block Number: 12345                     │
+│ Transaction Hash: 0xABCD...            │
+│ Contract Address: 0x1234...            │
+│ Event Topics: [topic1, topic2, ...]   │ ← Indexed parameters
+│ Event Data: [data1, data2, ...]        │ ← Non-indexed parameters
+└─────────────────────────────────────────┘
+```
+
+**HOW EVENTS ARE STORED**:
+
+1. **Topics** (Indexed Parameters):
+   - Up to 3 indexed parameters per event
+   - Stored in bloom filter for fast searching
+   - Each topic is 32 bytes (keccak256 hash for non-uint256 types)
+
+2. **Data** (Non-Indexed Parameters):
+   - All non-indexed parameters encoded as ABI-encoded data
+   - Stored in log data section
+   - Can be any size (strings, arrays, etc.)
+
+**CONNECTION TO PROJECT 01**: Remember storage slots? Events use a completely different storage mechanism:
+- **Storage**: SSTORE opcode, stored in contract's storage slots
+- **Events**: LOG opcodes, stored in transaction logs (separate from storage)
+
+**REAL-WORLD ANALOGY**: 
+- **Storage** = The actual inventory (expensive to update, queryable on-chain, like a warehouse)
+- **Events** = Receipts (cheap to print, permanent record, searchable off-chain, like transaction receipts)
+- **Frontend** = Cash register display (shows events in real-time, like a dashboard)
+
+**WHY WRITE-ONLY?**
+
+Events cannot be read by contracts because:
+1. **Gas efficiency**: Reading logs would require expensive operations
+2. **Design philosophy**: Events are for off-chain systems, not on-chain logic
+3. **Separation of concerns**: State (storage) vs history (events)
+
+**BLOOM FILTERS: The Magic Behind Fast Event Search**
+
+The EVM uses bloom filters to quickly check if an event might exist in a block:
+- **Bloom filter**: Probabilistic data structure (fast but may have false positives)
+- **Indexed parameters**: Stored in bloom filter for O(1) lookup
+- **Why it matters**: Enables fast event filtering without scanning all logs
+
+**EXAMPLE**:
+```solidity
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+// Bloom filter stores:
+// - keccak256(from) → topic1
+// - keccak256(to) → topic2
+// - amount → data (not in bloom filter)
+
+// To find all transfers FROM 0x1234...:
+// 1. Check bloom filter for topic1 = keccak256(0x1234...)
+// 2. If present, scan logs for exact match
+// 3. Much faster than scanning all logs!
+```
+
+**GAS COST BREAKDOWN**:
+
+**Event Emission**:
+- Base cost: ~375 gas (LOG1 opcode)
+- Per indexed parameter: +375 gas (LOG2/LOG3/LOG4)
+- Per byte of data: +8 gas
+
+**Example**:
+```solidity
+event Transfer(address indexed from, address indexed to, uint256 amount);
+emit Transfer(0x1234..., 0x5678..., 100);
+
+// Gas cost:
+// - LOG3 base: ~1,125 gas (3 indexed params)
+// - Data (uint256): +32 bytes × 8 gas = +256 gas
+// - Total: ~1,381 gas
+```
+
+**COMPARISON TO STORAGE**:
+- **Event**: ~1,381 gas (for Transfer with 2 indexed params)
+- **Storage**: ~20,000 gas (cold write) or ~5,000 gas (warm write)
+- **Savings**: ~18,619 gas (cold) or ~3,619 gas (warm)!
+
+**WHEN TO USE EVENTS**:
+- ✅ Logging state changes for off-chain systems
+- ✅ Tracking transfer history (cheaper than storage arrays)
+- ✅ Frontend notifications
+- ✅ Analytics and reporting
+- ✅ Audit trails
+
+**WHEN NOT TO USE EVENTS**:
+- ❌ Data needed by contract logic (use storage)
+- ❌ Current state that contracts read (use storage)
+- ❌ Values that change frequently and need on-chain access (use storage)
+
+### Indexed Parameters: The Search Feature
+
+**FIRST PRINCIPLES: Why Indexing Matters**
 
 Up to 3 parameters can be `indexed`:
 - Allows filtering events by specific values
@@ -94,23 +249,141 @@ Up to 3 parameters can be `indexed`:
 - Essential for efficient event queries
 - Great for L2s because you can stream only the topics you need instead of all calldata
 
-**Gas Cost Breakdown**:
-- LOG1 (no indexed): ~375 gas base + 8 gas/byte
-- LOG2 (1 indexed): ~750 gas base + 8 gas/byte  
-- LOG3 (2 indexed): ~1,125 gas base + 8 gas/byte
-- LOG4 (3 indexed): ~1,500 gas base + 8 gas/byte
+**UNDERSTANDING INDEXED VS NON-INDEXED**:
 
-**Example**:
+**Indexed Parameters**:
+- Stored as **topics** in the event log
+- Included in bloom filter for fast searching
+- Limited to 32 bytes (address, uint256, bytes32, etc.)
+- Can filter efficiently: "Show me all events where from = 0x1234..."
+
+**Non-Indexed Parameters**:
+- Stored as **data** in the event log
+- NOT included in bloom filter
+- Can be any size (strings, arrays, structs, etc.)
+- Cannot filter efficiently: Must read all logs and check data
+
+**HOW INDEXING WORKS**:
+
 ```solidity
 event Transfer(address indexed from, address indexed to, uint256 amount);
-// Can filter: "Show me all transfers FROM address X"
-// Can filter: "Show me all transfers TO address Y"
-// Cannot filter by amount (not indexed)
+
+// When emitted:
+emit Transfer(0x1234..., 0x5678..., 100);
+
+// Event log structure:
+// Topics: [
+//   keccak256("Transfer(address,address,uint256)"),  // Event signature
+//   keccak256(0x1234...),                            // from (indexed)
+//   keccak256(0x5678...)                            // to (indexed)
+// ]
+// Data: [100]  // amount (non-indexed, ABI-encoded)
 ```
 
-**Real-world analogy**: Indexed parameters are like searchable tags on blog posts. You can search for posts tagged "solidity" (indexed), but you can't efficiently search the full content (non-indexed).
+**GAS COST BREAKDOWN**:
 
-### Events vs Storage
+**LOG Opcodes**:
+- LOG1 (no indexed): ~375 gas base + 8 gas/byte of data
+- LOG2 (1 indexed): ~750 gas base + 8 gas/byte of data
+- LOG3 (2 indexed): ~1,125 gas base + 8 gas/byte of data
+- LOG4 (3 indexed): ~1,500 gas base + 8 gas/byte of data
+
+**Example Costs**:
+```solidity
+// Event with 0 indexed params:
+event SimpleEvent(uint256 value);
+emit SimpleEvent(100);
+// Cost: ~375 + (32 bytes × 8) = ~631 gas
+
+// Event with 2 indexed params:
+event Transfer(address indexed from, address indexed to, uint256 amount);
+emit Transfer(0x1234..., 0x5678..., 100);
+// Cost: ~1,125 + (32 bytes × 8) = ~1,381 gas
+// Extra cost: ~750 gas for indexing (but enables filtering!)
+```
+
+**WHEN TO INDEX**:
+
+✅ **DO Index**:
+- Addresses (you'll almost always filter by address)
+- Token IDs (for NFT transfers)
+- User IDs (for user-specific queries)
+- Timestamps (if you need to filter by time range)
+
+❌ **DON'T Index**:
+- Large strings (limited to 32 bytes anyway)
+- Arrays (can't index arrays directly)
+- Structs (can't index structs directly)
+- Values rarely filtered (saves gas)
+
+**EXAMPLE - GOOD EVENT DESIGN**:
+```solidity
+event Transfer(address indexed from, address indexed to, uint256 amount);
+// ✅ Addresses indexed (filterable)
+// ✅ Amount not indexed (rarely filtered, saves gas)
+// ✅ Matches ERC20 standard (compatible with tools)
+
+// Can filter efficiently:
+// - "Show me all transfers FROM address X"
+// - "Show me all transfers TO address Y"
+// - Cannot filter by amount (but that's OK - rarely needed)
+```
+
+**EXAMPLE - BAD EVENT DESIGN**:
+```solidity
+event Transfer(address from, address to, uint256 indexed amount);
+// ❌ Addresses not indexed (can't filter efficiently!)
+// ❌ Amount indexed (rarely filtered, wastes gas)
+// ❌ Breaks ERC20 standard (incompatible with tools)
+```
+
+**REAL-WORLD ANALOGY**: 
+- **Indexed parameters** = Searchable tags on blog posts (you can search for posts tagged "solidity")
+- **Non-indexed parameters** = Full blog post content (you can't efficiently search the full content)
+
+**CONNECTION TO PROJECT 01**: Remember how mappings use keccak256 for storage calculation? Indexed parameters work similarly - they're hashed and stored in a bloom filter for fast lookup!
+
+**L2 ROLLUP CONSIDERATIONS**:
+
+On Layer 2 rollups (Arbitrum, Optimism), calldata is expensive:
+- **Indexed params**: Stored as topics (cheaper on L2)
+- **Non-indexed params**: Stored as data (more expensive on L2)
+- **Best practice**: Index what you'll filter, keep data small
+
+**THE GRAPH INTEGRATION**:
+
+The Graph protocol indexes events for subgraphs:
+- Indexed params: Automatically indexed, fast queries
+- Non-indexed params: Must be decoded from data, slower queries
+- **Best practice**: Design events with indexers in mind!
+
+**FILTERING EXAMPLES**:
+
+```javascript
+// Filter by indexed parameter (FAST):
+contract.on("Transfer", { from: "0x1234..." }, (event) => {
+    console.log("Transfer from 0x1234...!");
+});
+
+// Filter by non-indexed parameter (SLOW):
+// Must read all Transfer events and check amount
+// Not recommended for production!
+```
+
+**GAS OPTIMIZATION TIP**:
+
+Only index what you'll actually filter by:
+- **3 indexed params**: ~1,500 gas base
+- **2 indexed params**: ~1,125 gas base
+- **Savings**: ~375 gas per event (if you don't need the 3rd index)
+
+### Events vs Storage: Choosing the Right Tool
+
+**FIRST PRINCIPLES: Complementary, Not Competing**
+
+Events and storage serve different purposes. Understanding when to use each is crucial for efficient contract design.
+
+**COMPREHENSIVE COMPARISON**:
 
 | Aspect | Events | Storage |
 |--------|--------|---------|
@@ -120,21 +393,155 @@ event Transfer(address indexed from, address indexed to, uint256 amount);
 | **Filterable?** | ✅ Yes (indexed params) | ❌ No (must read all) |
 | **Permanent?** | ✅ Yes | ✅ Yes |
 | **Modifiable?** | ❌ No | ✅ Yes (by contract) |
+| **Gas cost per write** | ~1,500-2,000 gas | ~5,000-20,000 gas |
+| **Gas cost per read (on-chain)** | N/A (can't read) | ~100-2,100 gas |
+| **Use case** | History, logging | Current state |
 
-**When to use events**:
+**CONNECTION TO PROJECT 01 & 02**:
+
+Remember from Project 01:
+- **Storage**: SSTORE opcode, ~20k gas (cold) or ~5k gas (warm)
+- **Storage reads**: SLOAD opcode, ~2.1k gas (cold) or ~100 gas (warm)
+
+Remember from Project 02:
+- We used storage for `balances` mapping (needed for contract logic)
+- We emitted events for deposits/withdrawals (needed for off-chain tracking)
+
+**THE GOLDEN RULE**:
+- **Storage**: For data contracts need to READ
+- **Events**: For data contracts need to LOG (but don't need to read)
+
+**WHEN TO USE EVENTS**:
+
+✅ **Use Events For**:
 - Logging state changes for off-chain systems
 - Tracking transfer history (cheaper than storage arrays)
 - Frontend notifications
 - Analytics and reporting
+- Audit trails
+- Historical data that doesn't need on-chain access
 
-**When to use storage**:
+**Example**:
+```solidity
+// ✅ GOOD: Use events for history
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+function transfer(address to, uint256 amount) public {
+    balances[msg.sender] -= amount;  // Storage (needed for logic)
+    balances[to] += amount;          // Storage (needed for logic)
+    emit Transfer(msg.sender, to, amount);  // Event (for history)
+}
+```
+
+**WHEN TO USE STORAGE**:
+
+✅ **Use Storage For**:
 - Data needed by contract logic
 - Current state that contracts read
 - Values that change frequently and need on-chain access
+- Mappings, arrays, structs needed for computation
 
-**Real-world analogy**: 
-- **Storage** = Your bank account balance (you need to check it, it changes)
-- **Events** = Your bank statement (history of transactions, you don't need to check it often, but it's useful for records)
+**Example**:
+```solidity
+// ✅ GOOD: Use storage for current state
+mapping(address => uint256) public balances;  // Needed for transfers
+
+function transfer(address to, uint256 amount) public {
+    require(balances[msg.sender] >= amount);  // Read from storage
+    balances[msg.sender] -= amount;          // Write to storage
+    balances[to] += amount;                 // Write to storage
+}
+```
+
+**THE COST COMPARISON**:
+
+**Tracking Transfer History**:
+
+**Option 1: Storage Array** (Expensive):
+```solidity
+struct Transfer {
+    address from;
+    address to;
+    uint256 amount;
+}
+Transfer[] public transferHistory;
+
+function transfer(address to, uint256 amount) public {
+    // ... transfer logic ...
+    transferHistory.push(Transfer(msg.sender, to, amount));
+    // Cost: ~20,000 gas (cold) per transfer!
+}
+```
+
+**Option 2: Events** (Cheap):
+```solidity
+event Transfer(address indexed from, address indexed to, uint256 amount);
+
+function transfer(address to, uint256 amount) public {
+    // ... transfer logic ...
+    emit Transfer(msg.sender, to, amount);
+    // Cost: ~1,500 gas per transfer!
+}
+```
+
+**Savings**: ~18,500 gas per transfer! 🎉
+
+**REAL-WORLD ANALOGY**: 
+- **Storage** = Your bank account balance (you need to check it frequently, it changes, you need it for transactions)
+- **Events** = Your bank statement (history of transactions, you don't need to check it often, but it's useful for records and audits)
+
+**BEST PRACTICE PATTERN**:
+
+```solidity
+contract Token {
+    // Storage: Current state (needed for logic)
+    mapping(address => uint256) public balances;
+    
+    // Events: History (needed for off-chain systems)
+    event Transfer(address indexed from, address indexed to, uint256 amount);
+    
+    function transfer(address to, uint256 amount) public {
+        // 1. Read from storage (needed for logic)
+        require(balances[msg.sender] >= amount);
+        
+        // 2. Update storage (needed for logic)
+        balances[msg.sender] -= amount;
+        balances[to] += amount;
+        
+        // 3. Emit event (needed for off-chain tracking)
+        emit Transfer(msg.sender, to, amount);
+    }
+}
+```
+
+**COMMON MISTAKES**:
+
+❌ **Storing history in storage arrays**:
+```solidity
+Transfer[] public history;  // ❌ Expensive!
+// Use events instead!
+```
+
+❌ **Trying to read events from contracts**:
+```solidity
+// ❌ Can't do this - events are write-only!
+uint256 lastTransfer = getLastTransfer();  // Not possible!
+```
+
+✅ **Using both appropriately**:
+```solidity
+mapping(address => uint256) public balances;  // ✅ Storage for state
+event Transfer(...);                          // ✅ Events for history
+```
+
+**GAS OPTIMIZATION TIP**:
+
+If you need to track history, use events instead of storage arrays:
+- **Storage array**: ~20,000 gas per entry (cold)
+- **Event**: ~1,500 gas per entry
+- **Savings**: ~18,500 gas per entry!
+
+**CONNECTION TO PROJECT 02**: Remember how we emitted events in deposit/withdraw functions? That's the perfect pattern - use storage for balances (needed for logic), events for history (needed for off-chain systems)!
 
 ### Event Design Best Practices
 

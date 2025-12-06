@@ -54,28 +54,128 @@ contract FunctionsPayableSolution {
      * @notice Contract owner (deployer)
      * @dev Used for access control in ownerWithdraw()
      *
-     * WHY OWNER PATTERN?
-     *   - Common access control mechanism
-     *   - Allows privileged operations
-     *   - Should be transferred to multi-sig in production
+     * 🏗️  OWNER PATTERN: The Foundation of Access Control
+     * ════════════════════════════════════════════════════
      *
-     * SECURITY: Single owner = single point of failure
-     *           Consider OpenZeppelin Ownable or AccessControl
+     *      The owner pattern is one of the most fundamental access control mechanisms
+     *      in Solidity. It establishes who has privileged access to certain functions.
+     *
+     *      HOW IT WORKS:
+     *      ┌─────────────────────────────────────────┐
+     *      │ Constructor sets owner = msg.sender     │ ← Deployer becomes owner
+     *      │   ↓                                      │
+     *      │ Owner can call privileged functions      │ ← Access control check
+     *      │   ↓                                      │
+     *      │ Non-owners are rejected                  │ ← require(msg.sender == owner)
+     *      └─────────────────────────────────────────┘
+     *
+     *      CONNECTION TO PROJECT 01:
+     *      Remember how we learned about address types? The owner is stored as an
+     *      address type (20 bytes) in slot 0. This is the same storage model we
+     *      learned about - just storing an address value!
+     *
+     *      WHY OWNER PATTERN?
+     *      - Common access control mechanism (used everywhere)
+     *      - Allows privileged operations (withdrawals, upgrades, etc.)
+     *      - Simple to understand and implement
+     *      - Should be transferred to multi-sig in production (security best practice)
+     *
+     *      STORAGE LAYOUT:
+     *      - Slot 0: owner (address, 20 bytes, uses full 32-byte slot)
+     *      - Gas cost: ~20,000 gas (cold write) or ~5,000 gas (warm write)
+     *
+     *      SECURITY CONSIDERATIONS:
+     *      ⚠️  Single owner = single point of failure
+     *      ⚠️  If owner's private key is compromised, attacker has full control
+     *      ⚠️  Consider OpenZeppelin Ownable or AccessControl for production
+     *      ⚠️  Use multi-sig wallets for owner in production (Gnosis Safe, etc.)
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like a bank vault - only the owner (bank manager) has the key.
+     *      Everyone else is locked out. But if the key is stolen, the vault
+     *      is compromised!
+     *
+     *      GAS COST:
+     *      - Reading owner: ~100 gas (warm SLOAD)
+     *      - Setting owner: ~20,000 gas (cold SSTORE) or ~5,000 gas (warm SSTORE)
+     *
+     *      🎓 LEARNING MOMENT:
+     *      This is the same address type we learned about in Project 01!
+     *      The owner is just an address stored in storage slot 0.
+     *      Access control is just checking if msg.sender matches the stored address.
      */
     address public owner;
 
     /**
      * @notice Tracks deposited ETH for each address
-     * @dev Maps address ’ balance in wei
+     * @dev Maps address to balance in wei
      *
-     * WHY TRACK BALANCES?
-     *   - Allows users to deposit and withdraw individually
-     *   - Provides accountability
-     *   - Enables pull-over-push withdrawal pattern
+     * 💰 BALANCE TRACKING: The Core of Deposit/Withdraw Systems
+     * ═══════════════════════════════════════════════════════════
      *
-     * NOTE: address(this).balance is contract's TOTAL ETH
-     *       balances[addr] is just the tracked portion
-     *       Contract can have ETH not tracked in balances (via receive/fallback)
+     *      This mapping is the heart of our deposit/withdraw system. It tracks
+     *      how much ETH each user has deposited and can withdraw.
+     *
+     *      CONNECTION TO PROJECT 01:
+     *      This is the EXACT same mapping type we learned about in Project 01!
+     *      Remember: mappings use keccak256(key, slot) to calculate storage locations.
+     *      For this mapping (slot 1), the storage slot for address 0x1234... is:
+     *      keccak256(abi.encodePacked(0x1234..., 1))
+     *
+     *      HOW IT WORKS:
+     *      ┌─────────────────────────────────────────┐
+     *      │ User deposits 1 ETH                     │
+     *      │   ↓                                      │
+     *      │ balances[user] += 1 ether               │ ← Storage write
+     *      │   ↓                                      │
+     *      │ User withdraws 0.5 ETH                 │
+     *      │   ↓                                      │
+     *      │ balances[user] -= 0.5 ether            │ ← Storage write
+     *      │   ↓                                      │
+     *      │ User checks balance                     │
+     *      │   ↓                                      │
+     *      │ balances[user] returns 0.5 ether        │ ← Storage read
+     *      └─────────────────────────────────────────┘
+     *
+     *      STORAGE CALCULATION:
+     *      For address 0xABCD...:
+     *      - Storage slot = keccak256(abi.encodePacked(0xABCD..., 1))
+     *      - This is the same calculation we learned in Project 01!
+     *
+     *      WHY TRACK BALANCES?
+     *      - Allows users to deposit and withdraw individually
+     *      - Provides accountability (who deposited what)
+     *      - Enables pull-over-push withdrawal pattern
+     *      - Separates user funds from contract funds
+     *
+     *      IMPORTANT DISTINCTION:
+     *      - address(this).balance = contract's TOTAL ETH (all sources)
+     *      - balances[addr] = tracked portion (only deposits via deposit())
+     *      - Contract can have ETH not tracked in balances (via receive/fallback)
+     *
+     *      EXAMPLE:
+     *      ```
+     *      Contract receives:
+     *      - 1 ETH via deposit() → balances[alice] = 1 ether
+     *      - 0.5 ETH via receive() → balances[alice] = 1 ether (unchanged!)
+     *      - address(this).balance = 1.5 ether (total)
+     *      ```
+     *
+     *      GAS COSTS (from Project 01):
+     *      - Cold read: ~2,100 gas (first access)
+     *      - Warm read: ~100 gas (subsequent reads)
+     *      - Cold write: ~20,000 gas (first write)
+     *      - Warm write: ~5,000 gas (subsequent writes)
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like a bank account ledger - it tracks how much each customer
+     *      has deposited. The bank's total cash (address(this).balance) might
+     *      be more than the sum of all customer balances (donations, fees, etc.).
+     *
+     *      🎓 LEARNING MOMENT:
+     *      This mapping uses the EXACT same storage model we learned in Project 01!
+     *      The storage slot calculation, gas costs, and behavior are identical.
+     *      The only difference is we're tracking ETH balances instead of arbitrary data.
      */
     mapping(address => uint256) public balances;
 
@@ -135,22 +235,86 @@ contract FunctionsPayableSolution {
      * @notice Deploys the contract and sets owner
      * @dev PAYABLE constructor allows ETH to be sent during deployment
      *
-     * WHY PAYABLE CONSTRUCTOR?
-     *   - Contract can receive initial funding
-     *   - Common for DeFi protocols (liquidity, rewards pool)
-     *   - Without payable, deployment with ETH reverts
+     * 🏗️  CONSTRUCTORS: The One-Time Setup (Revisited from Project 01)
+     * ═══════════════════════════════════════════════════════════════════
      *
-     * GAS: Constructor code is NOT stored on-chain
-     *      Only runtime bytecode is stored
+     *      CONNECTION TO PROJECT 01:
+     *      Remember constructors from Project 01? They run EXACTLY ONCE during
+     *      deployment. Here we're adding the `payable` keyword, which allows
+     *      the constructor to receive ETH during deployment!
      *
-     * DEPLOYMENT:
-     *   With ETH: new FunctionsPayableSolution{value: 1 ether}()
-     *   Without: new FunctionsPayableSolution()
+     *      HOW IT WORKS:
+     *      ┌─────────────────────────────────────────┐
+     *      │ Developer deploys contract              │
+     *      │   ↓                                      │
+     *      │ Constructor executes                    │ ← Runs ONCE, never again!
+     *      │   ↓                                      │
+     *      │ Sets owner = msg.sender                 │ ← Deployer becomes owner
+     *      │   ↓                                      │
+     *      │ If ETH sent, emits Deposited event      │ ← Optional initial funding
+     *      │   ↓                                      │
+     *      │ Contract is live on blockchain          │
+     *      │   ↓                                      │
+     *      │ Constructor code is DISCARDED           │ ← Not stored!
+     *      └─────────────────────────────────────────┘
+     *
+     *      WHY PAYABLE CONSTRUCTOR?
+     *      - Contract can receive initial funding (common in DeFi)
+     *      - Useful for liquidity pools, reward pools, etc.
+     *      - Without payable, deployment with ETH reverts
+     *      - Makes intent explicit (contract accepts ETH from the start)
+     *
+     *      DEPLOYMENT EXAMPLES:
+     *      ```solidity
+     *      // Without ETH:
+     *      new FunctionsPayableSolution()
+     *
+     *      // With ETH (requires payable constructor):
+     *      new FunctionsPayableSolution{value: 1 ether}()
+     *      ```
+     *
+     *      GAS COST BREAKDOWN:
+     *      - Constructor execution: Included in deployment cost
+     *      - Setting owner: ~20,000 gas (cold SSTORE to slot 0)
+     *      - Event emission (if ETH sent): ~2,000 gas
+     *      - Total deployment: ~200,000+ gas (includes bytecode storage)
+     *
+     *      FUN FACT: Constructor code is NOT stored on-chain!
+     *      Only the runtime bytecode (your functions) is stored.
+     *      The constructor runs during deployment, then disappears!
+     *      This saves gas - you don't pay to store initialization code forever.
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like opening a bank account with an initial deposit:
+     *      - Constructor = Opening the account (one-time setup)
+     *      - Owner = Account holder (who controls it)
+     *      - ETH sent = Initial deposit (optional funding)
+     *
+     *      SECURITY CONSIDERATION:
+     *      The owner is set to msg.sender during deployment. This means the
+     *      deployer becomes the owner. In production, consider:
+     *      - Using a multi-sig wallet as deployer
+     *      - Transferring ownership to a governance contract
+     *      - Using OpenZeppelin Ownable for better security
+     *
+     *      🎓 LEARNING MOMENT:
+     *      This constructor is almost identical to Project 01's constructor!
+     *      The only difference is the `payable` keyword, which allows ETH
+     *      to be sent during deployment. This is a common pattern in DeFi
+     *      protocols that need initial funding.
      */
     constructor() payable {
+        // 👤 SET OWNER: Critical security step!
+        // msg.sender during deployment = the address deploying the contract
+        // This establishes who "owns" the contract
+        // Common pattern: owner can call admin functions later
+        // GAS: ~20,000 gas (cold SSTORE to slot 0)
         owner = msg.sender;
 
-        // If ETH sent during deployment, emit event
+        // 💰 OPTIONAL INITIAL FUNDING:
+        // If ETH is sent during deployment, emit an event to track it
+        // This is useful for DeFi protocols that need initial liquidity
+        // GAS: ~2,000 gas (event emission)
         if (msg.value > 0) {
             emit Deposited(msg.sender, msg.value);
         }
@@ -162,32 +326,101 @@ contract FunctionsPayableSolution {
 
     /**
      * @notice Receives ETH sent with empty calldata
-     * @dev Called when:
-     *      - ETH sent to contract with empty msg.data
+     * @dev Called when ETH is sent to contract with empty msg.data
+     *
+     * 📬 RECEIVE(): The Plain ETH Handler
+     * ═══════════════════════════════════════
+     *
+     *      This is a SPECIAL function that handles plain ETH transfers.
+     *      It's called automatically when ETH is sent without calling a specific function.
+     *
+     *      HOW IT WORKS:
+     *      ┌─────────────────────────────────────────┐
+     *      │ User sends ETH with empty calldata        │
+     *      │   ↓                                        │
+     *      │ EVM checks: Is msg.data empty?            │ ← Yes!
+     *      │   ↓                                        │
+     *      │ EVM checks: Does receive() exist?        │ ← Yes!
+     *      │   ↓                                        │
+     *      │ EVM calls receive() automatically        │ ← Magic!
+     *      │   ↓                                        │
+     *      │ Contract receives ETH                      │
+     *      │   ↓                                        │
+     *      │ Event emitted for tracking                │
+     *      └─────────────────────────────────────────┘
+     *
+     *      WHEN IS IT CALLED?
+     *      These all trigger receive():
      *      - address(contract).transfer(amount)
      *      - address(contract).send(amount)
      *      - address(contract).call{value: amount}("")
+     *      - contract.receive{value: amount}()  // If receive() exists
      *
-     * REQUIREMENTS:
-     *   - Must be external
-     *   - Must be payable
-     *   - Cannot have arguments
-     *   - Cannot return anything
+     *      REQUIREMENTS (COMPILER ENFORCED):
+     *      ✅ Must be `external` (cannot be public/internal/private)
+     *      ✅ Must be `payable` (required keyword)
+     *      ✅ Cannot have arguments (no parameters allowed)
+     *      ✅ Cannot return anything (no return value)
      *
-     * GAS: Only 2,300 gas when called via transfer/send
-     *      All remaining gas when called via .call
+     *      GAS CONSIDERATIONS:
+     *      ⚠️  When called via .transfer() or .send(): Only 2,300 gas available!
+     *      ✅ When called via .call{value:}(): All remaining gas available
+     *      💡 BEST PRACTICE: Keep logic minimal (gas limit concerns)
      *
-     * BEST PRACTICE: Keep logic minimal (gas limit concerns)
+     *      GAS COST BREAKDOWN:
+     *      - Function execution: ~2,100 gas (base call)
+     *      - Event emission: ~2,000 gas
+     *      - Total: ~4,100 gas (if called via .call)
+     *      - Total: ~2,300 gas (if called via .transfer - may fail!)
      *
-     * PYTHON EQUIVALENT: __call__ magic method (but for ETH)
-     * RUST EQUIVALENT: No direct equivalent (blockchain-specific)
+     *      WHY WE DON'T UPDATE BALANCES HERE:
+     *      This ETH goes to the contract but isn't tracked per-user.
+     *      This is intentional! It allows:
+     *      - Contract funding (donations, fees)
+     *      - Untracked ETH (not part of user deposits)
+     *      - Flexibility (contract can have ETH beyond user balances)
+     *
+     *      CONNECTION TO PROJECT 01:
+     *      Remember events from Project 01? We're using the same event system!
+     *      Events are cheaper than storage (~2k gas vs ~20k gas) and perfect
+     *      for off-chain indexing. This is why we emit an event here instead
+     *      of storing the data.
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like an ATM slot - it only accepts cash (ETH) with no instructions.
+     *      Just drop money in, and it's accepted. No need to specify what to do
+     *      with it - the contract handles it automatically.
+     *
+     *      COMPARISON TO OTHER LANGUAGES:
+     *      - Python: `__call__` magic method (similar concept, but for function calls)
+     *      - Go/Rust: No direct equivalent (blockchain-specific feature)
+     *      - Solidity: Special function for ETH handling (unique to blockchain)
+     *
+     *      SECURITY CONSIDERATION:
+     *      If you want to track this ETH in user balances, you'd need to call
+     *      deposit() instead. receive() is for untracked ETH (donations, fees, etc.).
+     *
+     *      🎓 LEARNING MOMENT:
+     *      This function demonstrates the power of Solidity's special functions.
+     *      Unlike regular functions, receive() is called automatically by the EVM
+     *      when certain conditions are met. This is blockchain-specific behavior
+     *      that doesn't exist in traditional programming languages!
      */
     receive() external payable {
+        // 📢 EVENT EMISSION: Log the plain ETH transfer
+        // Events are cheaper than storage (~2k gas vs ~20k gas)
+        // Perfect for off-chain indexing and frontend updates
+        // GAS: ~2,000 gas (event emission)
         emit Received(msg.sender, msg.value);
 
-        // NOTE: We don't update balances here
-        //       This ETH goes to contract but isn't tracked per-user
-        //       Could be used for contract funding, donations, etc.
+        // 💡 DESIGN DECISION: We don't update balances here
+        // This ETH goes to contract but isn't tracked per-user
+        // Could be used for:
+        //   - Contract funding (donations, fees)
+        //   - Untracked ETH (not part of user deposits)
+        //   - Flexibility (contract can have ETH beyond user balances)
+        //
+        // If you want to track this ETH, users should call deposit() instead!
     }
 
     /**
@@ -230,48 +463,130 @@ contract FunctionsPayableSolution {
      * @notice Deposit ETH into your balance
      * @dev Must be payable to accept ETH
      *
-     * HOW IT WORKS:
-     *   1. User calls: contract.deposit{value: 1 ether}()
-     *   2. msg.value contains ETH amount in wei
-     *   3. ETH transferred to address(this)
-     *   4. We track it in balances mapping
+     * 💰 DEPOSIT(): The Foundation of ETH Handling
+     * ════════════════════════════════════════════
      *
-     * WHY REQUIRE msg.value > 0?
-     *   - Prevents useless transactions
-     *   - Saves gas for users
-     *   - Cleaner event logs
+     *      This function is the core of our deposit system. It accepts ETH and
+     *      tracks it in the balances mapping.
      *
-     * GAS COST BREAKDOWN:
-     *   - Transaction base: ~21,000 gas
-     *   - SLOAD balance: ~100 gas (warm)
-     *   - SSTORE balance: ~5,000 gas (warm, non-zero to non-zero)
-     *   - Event: ~1,500 gas
-     *   - Total: ~27,600 gas
+     *      CONNECTION TO PROJECT 01:
+     *      This function uses the EXACT same mapping operations we learned in
+     *      Project 01! The `balances[msg.sender] += msg.value` operation is:
+     *      1. Read from mapping (SLOAD: ~100 gas warm)
+     *      2. Add msg.value (ADD: ~3 gas)
+     *      3. Write back to mapping (SSTORE: ~5,000 gas warm)
+     *      This is the same read-modify-write pattern from Project 01!
      *
-     * GAS OPTIMIZATION: Why use += instead of separate read/write?
-     *   - balances[msg.sender] += msg.value: 1 SLOAD + 1 SSTORE = ~5,100 gas
-     *   - Alternative: uint256 bal = balances[msg.sender]; bal += msg.value; balances[msg.sender] = bal;
-     *     Costs: 1 SLOAD + 1 MLOAD + 1 SSTORE = ~5,103 gas
-     *   - Savings: ~3 gas (minimal, but += is cleaner)
+     *      HOW IT WORKS:
+     *      ┌─────────────────────────────────────────┐
+     *      │ User calls: deposit{value: 1 ether}()   │
+     *      │   ↓                                      │
+     *      │ msg.value = 1 ether (in wei)            │ ← ETH amount sent
+     *      │   ↓                                      │
+     *      │ Check: msg.value > 0?                    │ ← Validation
+     *      │   ↓                                      │
+     *      │ ETH automatically transferred to contract │ ← Magic!
+     *      │   ↓                                      │
+     *      │ balances[msg.sender] += msg.value        │ ← Track deposit
+     *      │   ↓                                      │
+     *      │ Event emitted for off-chain tracking     │ ← Log the deposit
+     *      └─────────────────────────────────────────┘
      *
-     * REAL-WORLD ANALOGY: Like depositing cash at a bank - the money goes
-     * into the bank's vault (contract balance), and your account balance
-     * (mapping) is updated to reflect the deposit.
+     *      UNDERSTANDING msg.value:
+     *      - Type: uint256
+     *      - Unit: Always in wei (smallest unit)
+     *      - Scope: Available in payable functions
+     *      - Value: Amount of ETH sent with the call
      *
-     * COMPARISON:
-     *   TypeScript: No built-in money, would be just numbers
-     *   Go: No built-in money, would be just numbers
-     *   Rust: No built-in money, would be just numbers
-     *   Solidity: Real ETH, permanent blockchain state
+     *      EXAMPLE:
+     *      ```solidity
+     *      // User sends 1 ETH:
+     *      contract.deposit{value: 1 ether}();
+     *      // msg.value = 1000000000000000000 wei
+     *      // balances[msg.sender] += 1000000000000000000
+     *      ```
+     *
+     *      WHY REQUIRE msg.value > 0?
+     *      - Prevents useless transactions (wasting gas)
+     *      - Saves gas for users (fail fast)
+     *      - Cleaner event logs (no zero deposits)
+     *      - Security best practice (validate inputs)
+     *
+     *      GAS COST BREAKDOWN (from Project 01 knowledge):
+     *      - Transaction base: ~21,000 gas (base transaction cost)
+     *      - require() check: ~3 gas (if passes)
+     *      - SLOAD balance: ~100 gas (warm read from mapping)
+     *      - ADD operation: ~3 gas (addition)
+     *      - SSTORE balance: ~5,000 gas (warm write to mapping)
+     *      - Event emission: ~2,000 gas
+     *      - Total: ~28,106 gas (first deposit)
+     *      - Total: ~28,106 gas (subsequent deposits, warm)
+     *
+     *      GAS OPTIMIZATION: Why use += instead of separate operations?
+     *      ```solidity
+     *      // ✅ GOOD: Single operation
+     *      balances[msg.sender] += msg.value;
+     *      // Costs: 1 SLOAD + 1 ADD + 1 SSTORE = ~5,103 gas
+     *
+     *      // ❌ LESS EFFICIENT: Separate operations
+     *      uint256 bal = balances[msg.sender];
+     *      bal += msg.value;
+     *      balances[msg.sender] = bal;
+     *      // Costs: 1 SLOAD + 1 MLOAD + 1 ADD + 1 SSTORE = ~5,106 gas
+     *      ```
+     *      Savings: ~3 gas (minimal, but += is cleaner and more readable)
+     *
+     *      SECURITY CONSIDERATIONS:
+     *      ✅ No reentrancy risk here (no external calls)
+     *      ✅ State updated before any external interactions
+     *      ✅ Input validation (msg.value > 0)
+     *      ✅ Event emitted for transparency
+     *
+     *      REAL-WORLD ANALOGY:
+     *      Like depositing cash at a bank:
+     *      - You hand over cash (send ETH)
+     *      - Bank puts it in vault (contract balance increases)
+     *      - Bank updates your account (balances mapping updated)
+     *      - Bank gives you receipt (event emitted)
+     *
+     *      COMPARISON TO OTHER LANGUAGES:
+     *      - TypeScript: No built-in money, would be just numbers in memory
+     *      - Go: No built-in money, would be just numbers
+     *      - Rust: No built-in money, would be just numbers
+     *      - Solidity: Real ETH, permanent blockchain state, costs gas
+     *
+     *      🎓 LEARNING MOMENT:
+     *      This function demonstrates the power of Solidity's `payable` keyword.
+     *      Without it, sending ETH would revert. With it, ETH is automatically
+     *      transferred to the contract. The `msg.value` variable gives us access
+     *      to the amount sent, which we use to update the balances mapping.
+     *      This is the same mapping pattern from Project 01, but now we're
+     *      handling real money!
      */
     function deposit() public payable {
+        // 🛡️  VALIDATION: Always check inputs!
+        // This prevents users from accidentally sending 0 ETH (wasting gas)
+        // It's also a security best practice - validate everything!
+        // GAS: ~3 gas (if check passes)
         require(msg.value > 0, "Must send ETH");
 
+        // 💵 READ-MODIFY-WRITE PATTERN (from Project 01):
+        // 1. Read: balances[msg.sender] (SLOAD: ~100 gas warm)
+        // 2. Modify: Add msg.value to existing balance (ADD: ~3 gas)
+        // 3. Write: Store back to mapping (SSTORE: ~5,000 gas warm)
+        //
+        // This is the EXACT same pattern we learned in Project 01!
+        // The only difference is we're handling real ETH instead of arbitrary data.
+        //
         // SECURITY: No reentrancy risk here (no external calls)
-        // GAS: 1 SLOAD + 1 SSTORE = ~5,100 gas (warm)
+        // GAS: 1 SLOAD + 1 ADD + 1 SSTORE = ~5,103 gas (warm)
         balances[msg.sender] += msg.value;
 
-        // GAS: Event emission = ~1,500 gas
+        // 📢 EVENT EMISSION: Log the deposit for transparency
+        // Events are cheaper than storage (~2k gas vs ~20k gas)
+        // Off-chain systems (like frontends) can listen to this event
+        // to show users their deposit history in real-time!
+        // GAS: ~2,000 gas (event emission)
         emit Deposited(msg.sender, msg.value);
     }
 

@@ -6,29 +6,97 @@ Learn how to use Merkle trees for efficient allowlist verification in smart cont
 
 This project teaches you how to implement gas-efficient allowlists using Merkle trees and Merkle proofs. Instead of storing thousands of allowlisted addresses on-chain, you store a single 32-byte Merkle root and verify proofs off-chain.
 
-## What are Merkle Trees?
+## What are Merkle Trees? Efficient Set Membership Proofs
+
+**FIRST PRINCIPLES: Hash Tree Data Structure**
 
 A Merkle tree (also called a hash tree) is a data structure where:
 - Each leaf node is a hash of some data
 - Each non-leaf node is a hash of its children
 - The root node represents the entire dataset
 
+**CONNECTION TO PROJECT 01**:
+We learned about `keccak256` hashing in Project 01. Merkle trees use keccak256 to build hierarchical hash structures!
+
+**UNDERSTANDING THE STRUCTURE** (DSA Concept):
+
 ```
-         Root Hash (Merkle Root)
+Merkle Tree Visualization:
+         Root Hash (Merkle Root) ← Only 32 bytes stored on-chain!
               /        \
-           H(AB)      H(CD)
+           H(AB)      H(CD)      ← Intermediate nodes (computed)
            /  \        /  \
-         H(A) H(B)  H(C) H(D)
+         H(A) H(B)  H(C) H(D)    ← Leaf nodes (hashes of data)
           |    |     |    |
-          A    B     C    D
+          A    B     C    D       ← Actual data (off-chain)
 ```
 
-### Properties
+**HOW IT WORKS** (from Project 01 knowledge):
+
+```
+Hash Calculation:
+┌─────────────────────────────────────────┐
+│ Leaf Level:                             │
+│   H(A) = keccak256(A)                   │ ← Hash of data
+│   H(B) = keccak256(B)                   │
+│   ↓                                      │
+│ Intermediate Level:                     │
+│   H(AB) = keccak256(H(A) || H(B))       │ ← Hash of children
+│   ↓                                      │
+│ Root Level:                              │
+│   Root = keccak256(H(AB) || H(CD))      │ ← Final hash
+└─────────────────────────────────────────┘
+```
+
+**PROPERTIES** (DSA Analysis):
 
 1. **Compact**: Only need to store the root hash (32 bytes)
+   - From Project 01: bytes32 = 32 bytes
+   - Can represent millions of addresses with one hash!
+   - Storage: ~20,000 gas (one SSTORE) vs millions for mappings
+
 2. **Verifiable**: Can prove a leaf is in the tree without revealing all leaves
+   - Proof size: O(log n) - logarithmic!
+   - For 1M addresses: ~20 hashes needed (log2(1M) ≈ 20)
+   - Privacy: Don't reveal entire allowlist
+
 3. **Immutable**: Changing any leaf changes the root hash
+   - From Project 01: keccak256 is one-way function
+   - Any change propagates to root
+   - Tamper-evident structure
+
 4. **Efficient**: Proof size is O(log n) where n is the number of leaves
+   - Time complexity: O(log n) verification
+   - Space complexity: O(log n) proof size
+   - From Project 06: Logarithmic is much better than linear!
+
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (Merkle tree implementation):
+```rust
+use sha2::{Sha256, Digest};
+
+struct MerkleTree {
+    root: [u8; 32],
+    leaves: Vec<[u8; 32]>,
+}
+
+impl MerkleTree {
+    fn verify(&self, leaf: [u8; 32], proof: Vec<[u8; 32]>) -> bool {
+        // O(log n) verification
+    }
+}
+```
+
+**Solidity** (Merkle proof verification):
+```solidity
+function verify(bytes32[] memory proof, bytes32 root, bytes32 leaf) 
+    public pure returns (bool) {
+    // O(log n) verification using keccak256
+}
+```
+
+Both use the same Merkle tree algorithm - Solidity just uses keccak256 (from Project 01)!
 
 ## How Merkle Proofs Work
 

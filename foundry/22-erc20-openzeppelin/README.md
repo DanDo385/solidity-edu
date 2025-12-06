@@ -12,22 +12,67 @@ This project explores OpenZeppelin's ERC-20 implementation, teaching you how to 
 - Compare gas costs between manual and OpenZeppelin implementations
 - Apply best practices for production token contracts
 
-## OpenZeppelin vs Manual Implementation
+## OpenZeppelin vs Manual Implementation: Production-Ready Patterns
+
+**FIRST PRINCIPLES: Battle-Tested vs Custom Code**
+
+OpenZeppelin provides production-ready implementations of common standards. Understanding when to use libraries vs custom code is crucial!
+
+**CONNECTION TO PROJECT 08**:
+- **Project 08**: We implemented ERC20 from scratch (learning the fundamentals)
+- **Project 22**: We use OpenZeppelin's ERC20 (production-ready implementation)
+- Both approaches have their place - understand fundamentals, use libraries in production!
 
 ### Why Use OpenZeppelin?
 
 **Advantages:**
 1. **Battle-tested**: Audited by multiple security firms and used by thousands of projects
-2. **Gas-optimized**: Carefully optimized for gas efficiency
+2. **Gas-optimized**: Carefully optimized for gas efficiency (though slightly more than custom)
 3. **Modular**: Extension pattern allows adding functionality without bloating base contract
 4. **Maintained**: Regular updates for security patches and new standards
 5. **Standardized**: Widely recognized code patterns reduce audit time
 
 **Disadvantages:**
-1. **Slightly higher gas costs**: Generic implementation trades some gas for flexibility
+1. **Slightly higher gas costs**: Generic implementation trades some gas for flexibility (~2% overhead)
 2. **Learning curve**: Need to understand the extension patterns
 3. **Dependency**: External dependency in your project
 4. **Less control**: Can't customize low-level behavior without forking
+
+**WHEN TO USE OPENZEPPELIN**:
+- ✅ Production contracts (security > gas savings)
+- ✅ Standard functionality (ERC20, ERC721, etc.)
+- ✅ When you need extensions (Pausable, Burnable, etc.)
+- ✅ When audit time is limited (battle-tested code)
+
+**WHEN TO USE CUSTOM**:
+- ✅ Learning/education (understand fundamentals)
+- ✅ Gas-critical applications (need every optimization)
+- ✅ Non-standard requirements (custom logic needed)
+- ✅ When you need full control (no dependencies)
+
+**COMPARISON TO RUST** (DSA/Library Pattern):
+
+**Rust** (using crates):
+```rust
+// Using standard library or crates
+use std::collections::HashMap;
+use serde::{Serialize, Deserialize};
+
+// Benefits: Battle-tested, maintained, standardized
+// Trade-off: Less control, dependency management
+```
+
+**Solidity** (using OpenZeppelin):
+```solidity
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MyToken is ERC20 {
+    // Benefits: Battle-tested, maintained, standardized
+    // Trade-off: Slightly more gas, dependency
+}
+```
+
+Both use library patterns - leverage existing code for production, write custom for learning!
 
 ### Gas Comparison
 

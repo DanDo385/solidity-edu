@@ -16,47 +16,130 @@ This project explores one of the most critical vulnerabilities in early Solidity
 8. [Learning Objectives](#learning-objectives)
 9. [Getting Started](#getting-started)
 
-## Understanding Integer Overflow/Underflow
+## Understanding Integer Overflow/Underflow: The Silent Wraparound Bug
+
+**FIRST PRINCIPLES: Fixed-Width Integer Arithmetic**
+
+Integer overflow/underflow occurs when arithmetic operations exceed the representable range. Understanding this is critical for secure Solidity development!
+
+**CONNECTION TO PROJECT 01**:
+We learned about `uint256` types in Project 01. Understanding their limits and overflow behavior is essential!
 
 ### What is Integer Overflow?
 
+**UNDERSTANDING THE CONCEPT** (DSA/Computer Science):
+
 Integer overflow occurs when an arithmetic operation attempts to create a numeric value outside the range that can be represented with a given number of bits.
 
-For `uint8` (0 to 255):
+**HOW IT WORKS**:
+
+For `uint8` (0 to 255, 8 bits):
 ```
-255 + 1 = 0  (overflow wraps around)
+Binary Representation:
+255 = 11111111 (8 bits, all 1s)
+255 + 1 = 100000000 (9 bits) → Wraps to 00000000 = 0
+
+Examples:
+255 + 1 = 0   (overflow wraps around)
 255 + 2 = 1
 255 + 10 = 9
 ```
 
 For `uint256` (0 to 2^256 - 1):
 ```
-2^256 - 1 + 1 = 0  (overflow wraps around)
+2^256 - 1 = 0xFFFF...FFFF (256 bits, all 1s)
+2^256 - 1 + 1 = 0x10000...0000 (257 bits) → Wraps to 0x0000...0000 = 0
+
+Example:
+type(uint256).max + 1 = 0  (overflow wraps around)
+```
+
+**UNDERSTANDING BINARY ARITHMETIC** (DSA Concept):
+
+```
+8-bit Addition Example:
+  11111111  (255)
++ 00000001  (1)
+-----------
+ 100000000  (256, but only 8 bits stored!)
+           ↓
+  00000000  (0, wraps around!)
 ```
 
 ### What is Integer Underflow?
+
+**UNDERSTANDING THE CONCEPT**:
 
 Underflow is the opposite - when subtraction goes below the minimum value:
 
 For `uint8` (0 to 255):
 ```
+Binary Representation:
+0 = 00000000 (8 bits, all 0s)
+0 - 1 = 11111111 (borrow wraps around) = 255
+
+Examples:
 0 - 1 = 255  (underflow wraps around)
 0 - 2 = 254
 ```
 
 For `uint256`:
 ```
-0 - 1 = 2^256 - 1  (a VERY large number)
+0 - 1 = 2^256 - 1  (a VERY large number!)
+// This is type(uint256).max
 ```
 
-### Why This is Dangerous
+**WHY THIS IS DANGEROUS**:
 
 In financial smart contracts, these wrapping behaviors can be catastrophic:
 
 1. **Balance Manipulation**: User with 0 tokens calls transfer(1) → balance becomes 2^256-1 tokens
+   ```solidity
+   // Pre-0.8.0: Silent underflow!
+   balances[user] = 0;
+   balances[user] -= 1;  // 0 - 1 = 2^256 - 1 (massive balance!)
+   ```
+
 2. **Access Control Bypass**: Counter expected to increase may wrap to 0
+   ```solidity
+   // Pre-0.8.0: Silent overflow!
+   uint8 counter = 255;
+   counter++;  // 255 + 1 = 0 (bypasses check!)
+   ```
+
 3. **Time Lock Bypass**: timestamp + delay might overflow to past timestamp
+   ```solidity
+   // Pre-0.8.0: Silent overflow!
+   uint256 unlockTime = type(uint256).max;
+   unlockTime += 1 day;  // Overflows to small number (immediate unlock!)
+   ```
+
 4. **Supply Manipulation**: Total supply calculations can be manipulated
+   ```solidity
+   // Pre-0.8.0: Silent overflow!
+   totalSupply = type(uint256).max;
+   totalSupply += 1;  // Wraps to 0 (supply reset!)
+   ```
+
+**HISTORICAL CONTEXT**: 
+Before Solidity 0.8.0 (February 2021), ALL arithmetic silently wrapped. This led to major exploits. Solidity 0.8.0+ automatically checks for overflow/underflow and reverts!
+
+**COMPARISON TO RUST** (DSA Concept):
+
+**Rust** (checked arithmetic):
+```rust
+// Rust checks overflow by default (panics in debug, wraps in release)
+let x: u8 = 255;
+let y = x + 1;  // Panic in debug mode!
+```
+
+**Solidity 0.8.0+** (checked arithmetic):
+```solidity
+uint8 x = 255;
+uint8 y = x + 1;  // Reverts transaction!
+```
+
+Both languages now protect against overflow by default!
 
 ## Pre-0.8.0 Behavior
 

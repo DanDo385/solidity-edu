@@ -55,18 +55,54 @@ ERC-4626 is a standard for tokenized vaults that:
 
 ## 🧮 Core Concepts
 
-### Asset vs Shares
+### Asset vs Shares: Understanding the Exchange Rate
+
+**FIRST PRINCIPLES: Fractional Reserve Banking**
+
+ERC-4626 vaults work like banks - you deposit assets and receive shares that represent your portion of the vault.
+
+**CONNECTION TO PROJECT 08**:
+- **Project 08**: ERC20 tokens (fungible)
+- **Project 11**: ERC-4626 vaults (also ERC20 tokens, but representing shares!)
+- Vault shares ARE ERC20 tokens - they're fungible tokens representing fractional ownership!
+
+**UNDERSTANDING THE CONCEPT**:
 
 ```solidity
 // User deposits 100 USDC (asset)
 // Vault mints 95 shares (based on current exchange rate)
 // Later: shares are worth more USDC due to yield
 
-asset = underlying token (USDC, WETH, etc.)
-shares = vault tokens (yUSDC, vWETH, etc.)
+asset = underlying token (USDC, WETH, etc.)  // What you deposit
+shares = vault tokens (yUSDC, vWETH, etc.)   // What you receive
 ```
 
-### Share Calculation
+**HOW IT WORKS**:
+
+```
+Vault Mechanics:
+┌─────────────────────────────────────────┐
+│ Initial State:                          │
+│   totalAssets = 1000 USDC               │
+│   totalSupply = 1000 shares             │
+│   Exchange rate: 1 share = 1 USDC      │
+│   ↓                                      │
+│ User deposits 100 USDC:                 │
+│   shares = (100 * 1000) / 1000 = 100   │ ← Mint 100 shares
+│   ↓                                      │
+│ Vault earns yield:                      │
+│   totalAssets = 1100 USDC (10% yield)   │
+│   totalSupply = 1100 shares             │
+│   Exchange rate: 1 share = 1 USDC      │ ← Still 1:1!
+│   ↓                                      │
+│ User withdraws 100 shares:             │
+│   assets = (100 * 1100) / 1100 = 100   │ ← But vault has 1100 USDC!
+│   User gets: 100 USDC                   │ ← Original deposit
+│   Vault keeps: 10 USDC yield            │ ← Profit!
+└─────────────────────────────────────────┘
+```
+
+**SHARE CALCULATION** (Precision Math):
 
 ```solidity
 // Deposit: shares = assets * totalSupply / totalAssets
@@ -75,6 +111,45 @@ shares = (assets * totalSupply) / totalAssets;
 // Withdraw: assets = shares * totalAssets / totalSupply  
 assets = (shares * totalAssets) / totalSupply;
 ```
+
+**UNDERSTANDING ROUNDING** (Critical for Security):
+
+**Always Round DOWN** (favor vault):
+```solidity
+// ✅ CORRECT: Round down (favor vault)
+shares = (assets * totalSupply) / totalAssets;  // Integer division rounds down
+
+// ❌ WRONG: Round up (favor attacker)
+shares = (assets * totalSupply + totalAssets - 1) / totalAssets;  // Rounds up!
+```
+
+**Why Round Down?**
+- Prevents inflation attacks
+- Ensures vault always has enough assets
+- Protects against precision manipulation
+
+**GAS COST BREAKDOWN** (from Project 01 & 06 knowledge):
+
+**Deposit**:
+- ERC20 transfer: ~50,000 gas (approve + transferFrom)
+- Share calculation: ~100 gas (MUL + DIV)
+- Mint shares: ~20,000 gas (SSTORE)
+- Event: ~2,000 gas
+- Total: ~72,100 gas
+
+**Withdraw**:
+- Share calculation: ~100 gas
+- Burn shares: ~5,000 gas (SSTORE to zero)
+- ERC20 transfer: ~50,000 gas
+- Event: ~2,000 gas
+- Total: ~57,100 gas
+
+**REAL-WORLD ANALOGY**: 
+Like buying shares of a mutual fund:
+- **Assets** = Cash you deposit (USDC)
+- **Shares** = Fund shares you receive
+- **Exchange Rate** = NAV (Net Asset Value)
+- **Yield** = Fund performance increases NAV
 
 ### Key Functions
 

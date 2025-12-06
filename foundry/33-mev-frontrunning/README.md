@@ -19,18 +19,72 @@ This project provides an in-depth exploration of **MEV (Maximal Extractable Valu
 
 ---
 
-## What is MEV?
+## What is MEV? Maximal Extractable Value
+
+**FIRST PRINCIPLES: Transaction Ordering and Value Extraction**
 
 **MEV (Maximal Extractable Value)**, formerly known as "Miner Extractable Value," is the maximum value that can be extracted from block production beyond the standard block reward and gas fees.
 
+**CONNECTION TO PROJECT 02 & 07**:
+- **Project 02**: We learned about transactions and gas
+- **Project 07**: We learned about reentrancy (one type of MEV)
+- **Project 33**: MEV is broader - exploiting transaction ordering!
+
 ### Why MEV Exists
+
+**UNDERSTANDING THE ROOT CAUSES**:
 
 MEV exists due to the following characteristics of blockchain systems:
 
 1. **Public Mempool**: Transactions are publicly visible before inclusion in a block
+   - Anyone can see pending transactions
+   - Attackers can observe and react
+   - From Project 02: Transactions are public before execution!
+
 2. **Transaction Ordering**: Block producers (miners/validators) can order transactions arbitrarily
+   - Can reorder transactions within a block
+   - Can exclude transactions
+   - Creates opportunities for value extraction
+
 3. **Deterministic Execution**: Smart contract behavior is predictable
+   - Can simulate transaction outcomes
+   - Can predict price changes
+   - Enables strategic positioning
+
 4. **Latency**: Network propagation creates timing opportunities
+   - Transactions propagate across network
+   - Time window for observation
+   - Can submit competing transactions
+
+**UNDERSTANDING THE MEV LANDSCAPE**:
+
+```
+MEV Extraction Flow:
+┌─────────────────────────────────────────┐
+│ 1. User submits transaction             │
+│    (e.g., large DEX swap)               │
+│   ↓                                      │
+│ 2. Transaction enters mempool           │ ← Public visibility
+│   ↓                                      │
+│ 3. Searcher observes transaction        │ ← MEV opportunity identified
+│   ↓                                      │
+│ 4. Searcher calculates profit           │ ← Predictable outcome
+│   ↓                                      │
+│ 5. Searcher submits front-run           │ ← Higher gas price
+│   ↓                                      │
+│ 6. Block producer orders transactions   │ ← Arbitrary ordering
+│    [Front-run, User TX, Back-run]      │
+│   ↓                                      │
+│ 7. Searcher extracts value              │ ← MEV captured!
+└─────────────────────────────────────────┘
+```
+
+**REAL-WORLD ANALOGY**: 
+Like insider trading in traditional markets:
+- **Public Mempool** = Public order book (visible to all)
+- **Transaction Ordering** = Exchange can prioritize orders
+- **MEV** = Exploiting information advantage
+- **Difference**: MEV is legal (by design), insider trading is illegal
 
 ### Types of MEV
 

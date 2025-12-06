@@ -18,36 +18,123 @@ By completing this project, you will:
 
 ## Block Properties Deep Dive
 
-### block.timestamp
+### block.timestamp: Human-Readable Time
 
-**What it is:** The Unix timestamp (seconds since January 1, 1970) when the block was mined.
+**FIRST PRINCIPLES: Miner-Controlled Time**
 
-**Key characteristics:**
-- Measured in seconds
-- Set by the block miner
-- Subject to ~15 second drift allowance
+`block.timestamp` is the Unix timestamp (seconds since January 1, 1970) when the block was mined. Understanding its limitations is critical for secure time-based logic!
+
+**CONNECTION TO PROJECT 11**:
+ERC-4626 vaults use `block.timestamp` for yield calculations and vesting schedules. Understanding timestamp manipulation is essential!
+
+**KEY CHARACTERISTICS**:
+- Measured in seconds (Unix timestamp)
+- Set by the block miner (not perfectly accurate!)
+- Subject to ~15 second drift allowance (manipulation possible!)
 - Can be manipulated within limits by miners
 - More human-readable for time periods
 
-**Example:**
+**UNDERSTANDING MINER MANIPULATION**:
+
+```
+Timestamp Setting Process:
+┌─────────────────────────────────────────┐
+│ Miner creates block                    │
+│   ↓                                      │
+│ Miner sets block.timestamp              │ ← Miner chooses!
+│   ↓                                      │
+│ Constraints:                            │
+│   - Must be > parent block timestamp    │ ← Can't go backwards
+│   - Must be within ~15s of real time    │ ← Can manipulate ±15s
+│   ↓                                      │
+│ Other nodes validate                    │ ← Reject if invalid
+│   ↓                                      │
+│ Block accepted if valid                  │
+└─────────────────────────────────────────┘
+```
+
+**EXAMPLE**:
 ```solidity
 // Current timestamp
-uint256 currentTime = block.timestamp;
+uint256 currentTime = block.timestamp;  // e.g., 1699876543
 
 // Check if 1 day has passed
 require(block.timestamp >= lastAction + 1 days, "Too soon");
+// 1 days = 86400 seconds
+// Safe for long periods (15s manipulation is negligible)
 ```
 
-### block.number
+**GAS COST** (from Project 01 knowledge):
+- Reading `block.timestamp`: ~2 gas (special opcode, very cheap!)
+- Time comparisons: ~3 gas (arithmetic operations)
 
-**What it is:** The sequential number of the current block in the blockchain.
+### block.number: Block-Based Time
 
-**Key characteristics:**
-- Increments by 1 for each block
+**FIRST PRINCIPLES: Deterministic Block Counting**
+
+`block.number` is the sequential number of the current block in the blockchain. It's more predictable than timestamp but less human-readable.
+
+**KEY CHARACTERISTICS**:
+- Increments by 1 for each block (deterministic!)
 - Cannot be manipulated (other than by controlling block production)
 - More predictable than timestamp
 - Average block time: ~12 seconds on Ethereum mainnet
-- Block time varies by network (e.g., 2s on Polygon)
+- Block time varies by network (e.g., 2s on Polygon, 1s on BSC)
+
+**UNDERSTANDING BLOCK TIME VARIANCE**:
+
+```
+Block Production:
+┌─────────────────────────────────────────┐
+│ Ethereum Mainnet:                       │
+│   Average: ~12 seconds per block         │
+│   Range: 10-20 seconds (variable)        │
+│                                          │
+│ Polygon:                                 │
+│   Average: ~2 seconds per block          │
+│   Range: 1-3 seconds                     │
+│                                          │
+│ block.number increments deterministically│ ← Always +1
+│   ↓                                      │
+│ Cannot be manipulated by miners!        │ ← More secure
+└─────────────────────────────────────────┘
+```
+
+**EXAMPLE**:
+```solidity
+// Current block number
+uint256 currentBlock = block.number;  // e.g., 18500000
+
+// Check if 100 blocks have passed (~20 minutes on Ethereum)
+require(block.number >= lastBlock + 100, "Too soon");
+// 100 blocks × 12 seconds = ~20 minutes
+// More predictable than timestamp!
+```
+
+**GAS COST**:
+- Reading `block.number`: ~2 gas (special opcode, very cheap!)
+- Block comparisons: ~3 gas (arithmetic operations)
+
+**COMPARISON TO RUST** (Conceptual):
+
+**Rust** (can get real time):
+```rust
+use std::time::{SystemTime, UNIX_EPOCH};
+
+let timestamp = SystemTime::now()
+    .duration_since(UNIX_EPOCH)
+    .unwrap()
+    .as_secs();
+// Real time, not manipulable
+```
+
+**Solidity** (blockchain time):
+```solidity
+uint256 timestamp = block.timestamp;  // Miner-controlled, ±15s variance
+uint256 blockNum = block.number;      // Deterministic, but time varies
+```
+
+Blockchain time is fundamentally different - it's approximate and miner-controlled!
 
 **Example:**
 ```solidity
@@ -58,19 +145,68 @@ uint256 currentBlock = block.number;
 require(block.number >= lastBlock + 100, "Too soon");
 ```
 
-## Miner Manipulation
+## Miner Manipulation: Understanding the Risks
+
+**FIRST PRINCIPLES: Trust in Decentralized Systems**
+
+Ethereum protocol allows miners to set `block.timestamp` with constraints. Understanding these limits is critical for secure time-based logic!
+
+**CONNECTION TO PROJECT 07**:
+Time-based logic can be exploited if not designed carefully. Understanding manipulation limits helps prevent vulnerabilities!
 
 ### The 15-Second Drift Rule
 
 Ethereum protocol allows miners to set `block.timestamp` with these constraints:
-- Must be greater than the parent block's timestamp
-- Must be within ~15 seconds of the actual time
-- Other nodes will reject blocks that violate these rules
+- Must be greater than the parent block's timestamp (monotonic)
+- Must be within ~15 seconds of the actual time (drift limit)
+- Other nodes will reject blocks that violate these rules (consensus enforcement)
 
-**What this means:**
-- Miners can manipulate timestamp by ±15 seconds
+**UNDERSTANDING THE CONSTRAINTS**:
+
+```
+Timestamp Validation:
+┌─────────────────────────────────────────┐
+│ Miner sets timestamp: T                 │
+│   ↓                                      │
+│ Check 1: T > parent.timestamp?          │ ← Must be increasing
+│   ❌ No → Block rejected                 │
+│   ✅ Yes → Continue                      │
+│   ↓                                      │
+│ Check 2: |T - real_time| < 15s?         │ ← Drift limit
+│   ❌ No → Block rejected                 │
+│   ✅ Yes → Block accepted                │
+└─────────────────────────────────────────┘
+```
+
+**WHAT THIS MEANS**:
+- Miners can manipulate timestamp by ±15 seconds (within limits)
 - For short time periods (<15 seconds), timestamp is unreliable
 - For longer periods (hours/days), manipulation is negligible
+
+**SECURITY IMPLICATIONS**:
+
+**Vulnerable Pattern**:
+```solidity
+// ❌ DANGEROUS: Short time window
+function claimReward() external {
+    require(block.timestamp % 10 == 0, "Only on even 10s");
+    // Miner can manipulate ±15s to hit this condition!
+    // Attack: Miner sets timestamp to even 10s, claims reward
+}
+```
+
+**Safe Pattern**:
+```solidity
+// ✅ SAFE: Long time period
+function claimReward() external {
+    require(block.timestamp >= lastClaim + 1 days, "24h cooldown");
+    // 15 second manipulation is negligible over 24 hours
+    // Attack: Miner can only manipulate ±15s (0.017% of 24h)
+}
+```
+
+**REAL-WORLD ANALOGY**: 
+Like a clock that can be set ±15 seconds - fine for long periods (days), but unreliable for short periods (seconds). Always design for worst-case manipulation!
 
 ### Attack Scenarios
 

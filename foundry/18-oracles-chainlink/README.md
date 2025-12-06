@@ -14,7 +14,9 @@
 
 ## 📚 Background: The Oracle Problem
 
-### What is an Oracle?
+### What is an Oracle? The Bridge to External Data
+
+**FIRST PRINCIPLES: Deterministic Isolation**
 
 Blockchains are deterministic, isolated systems. They cannot:
 - Access real-world data (stock prices, weather, sports scores)
@@ -22,7 +24,59 @@ Blockchains are deterministic, isolated systems. They cannot:
 - Generate truly random numbers
 - Know the current temperature in Tokyo
 
-**Oracles** are bridges that bring external data onto the blockchain in a trustworthy way.
+**CONNECTION TO PROJECT 11**:
+ERC-4626 vaults need price data to calculate share values! Oracles provide this external data securely.
+
+**WHY ORACLES ARE NEEDED**:
+
+```
+The Problem:
+┌─────────────────────────────────────────┐
+│ Blockchain (Deterministic)               │
+│   ↓                                      │
+│ Needs: ETH/USD price = $2,000           │ ← External data!
+│   ↓                                      │
+│ Cannot: Query CoinGecko API             │ ← No HTTP!
+│   ↓                                      │
+│ Solution: Oracle                         │ ← Bridge to external world
+│   ↓                                      │
+│ Oracle fetches price off-chain          │ ← External system
+│   ↓                                      │
+│ Oracle posts price on-chain             │ ← On-chain data
+│   ↓                                      │
+│ Contract reads price from oracle        │ ← Contract can use it!
+└─────────────────────────────────────────┘
+```
+
+**ORACLES ARE BRIDGES** that bring external data onto the blockchain in a trustworthy way.
+
+**THE ORACLE PROBLEM**:
+
+**Centralization Risk**: A single oracle is a single point of failure.
+```solidity
+// ❌ BAD: Trusting a single source
+uint256 price = oracle.getPrice(); // What if oracle is compromised?
+```
+
+**Solution**: Use decentralized oracle networks like Chainlink (multiple nodes, consensus).
+
+**COMPARISON TO RUST** (Conceptual):
+
+**Rust** (can make HTTP requests):
+```rust
+// Rust can directly access external APIs
+let response = reqwest::get("https://api.coingecko.com/price").await?;
+let price: f64 = response.json().await?;
+```
+
+**Solidity** (cannot make HTTP requests):
+```solidity
+// Solidity CANNOT access external APIs directly
+// Must use oracle pattern
+uint256 price = chainlinkOracle.getPrice();  // Oracle fetches off-chain
+```
+
+This is a fundamental difference - blockchains need oracles for external data!
 
 ### The Oracle Problem
 

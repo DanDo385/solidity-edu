@@ -37,35 +37,92 @@ function deposit(uint256 amount) external {
 
 ### The Solution: Share-Based Accounting
 
-Instead of tracking exact deposits, we mint **shares** representing proportional ownership:
+**FIRST PRINCIPLES: Proportional Ownership Through Shares**
+
+Instead of tracking exact deposits, we mint **shares** representing proportional ownership. This automatically handles yield distribution!
+
+**CONNECTION TO PROJECT 01 & 06**:
+- Uses mappings (Project 01) for O(1) lookups
+- Uses arithmetic operations (Project 06) for share calculations
+- Gas-efficient pattern for yield distribution!
 
 ```solidity
-// GOOD: Share-based accounting handles yield automatically
-mapping(address => uint256) public shares;
-uint256 public totalShares;
-uint256 public totalAssets;  // Tracks actual tokens in vault
+// ✅ GOOD: Share-based accounting handles yield automatically
+mapping(address => uint256) public shares;  // From Project 01!
+uint256 public totalShares;                 // Total shares minted
+uint256 public totalAssets;                 // Tracks actual tokens in vault
 
 function deposit(uint256 assets) external returns (uint256 shares) {
     shares = convertToShares(assets);  // Calculate proportional shares
-    totalShares += shares;
-    totalAssets += assets;
-    shares[msg.sender] += shares;
+    totalShares += shares;              // Update total shares
+    totalAssets += assets;              // Update total assets
+    shares[msg.sender] += shares;       // Credit user's shares
 }
 
 function convertToShares(uint256 assets) public view returns (uint256) {
     return totalShares == 0
-        ? assets
-        : (assets * totalShares) / totalAssets;
+        ? assets                        // First deposit: 1:1 ratio
+        : (assets * totalShares) / totalAssets;  // Proportional shares
 }
 ```
 
-**Now when yield accrues:**
+**HOW IT HANDLES YIELD AUTOMATICALLY**:
 
-1. Alice deposits 100 tokens → gets 100 shares
-2. Vault earns 10 tokens (totalAssets = 110, totalShares = 100)
-3. Bob deposits 110 tokens → gets 100 shares (same percentage ownership)
-4. Each share now represents 1.1 tokens (110 total / 100 shares)
-5. Alice withdraws her 100 shares → gets 110 tokens (her share of profit!)
+```
+Share-Based Accounting Flow:
+┌─────────────────────────────────────────┐
+│ Step 1: Alice deposits 100 tokens       │
+│   shares = (100 * 0) / 0 = 100         │ ← First deposit: 1:1
+│   totalShares = 100                     │
+│   totalAssets = 100                     │
+│   shares[alice] = 100                   │
+│   ↓                                      │
+│ Step 2: Vault earns 10 tokens yield    │
+│   totalAssets = 110 (increased!)        │ ← Yield increases assets
+│   totalShares = 100 (unchanged!)        │ ← Shares stay same
+│   Exchange rate: 110/100 = 1.1          │ ← Each share worth more!
+│   ↓                                      │
+│ Step 3: Bob deposits 110 tokens         │
+│   shares = (110 * 100) / 110 = 100     │ ← Gets same shares as Alice
+│   totalShares = 200                     │
+│   totalAssets = 220                     │
+│   shares[bob] = 100                     │
+│   ↓                                      │
+│ Step 4: Alice withdraws 100 shares     │
+│   assets = (100 * 220) / 200 = 110    │ ← Gets 110 tokens!
+│   Alice's profit: 10 tokens ✅          │ ← Automatic yield distribution!
+└─────────────────────────────────────────┘
+```
+
+**WHY THIS WORKS**:
+
+1. **Automatic Yield Distribution**: When assets increase, exchange rate increases
+2. **Fair Distribution**: Each share gets proportional profit
+3. **Gas Efficient**: No need to update individual user balances
+4. **Simple Math**: Just track totals, calculate on-demand
+
+**GAS COST BREAKDOWN** (from Project 01 & 06 knowledge):
+
+**Deposit**:
+- Share calculation: ~100 gas (MUL + DIV)
+- 2 SSTOREs (totalShares, totalAssets): ~10,000 gas (warm)
+- 1 SSTORE (user shares): ~5,000 gas (warm)
+- ERC20 transfer: ~50,000 gas
+- Total: ~65,100 gas
+
+**Withdraw**:
+- Share calculation: ~100 gas
+- 2 SSTOREs: ~10,000 gas
+- 1 SSTORE (user shares to zero): ~5,000 gas (may refund!)
+- ERC20 transfer: ~50,000 gas
+- Total: ~65,100 gas
+
+**REAL-WORLD ANALOGY**: 
+Like buying shares of a mutual fund:
+- **Deposit** = Buying fund shares
+- **Yield** = Fund performance increases NAV (Net Asset Value)
+- **Withdraw** = Selling shares at current NAV
+- **Profit** = Difference between buy and sell NAV
 
 ## Core Concepts
 
