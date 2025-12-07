@@ -8,17 +8,83 @@ This project teaches how to build resilient vault systems that can handle catast
 
 ## Concepts
 
-### What is Vault Insolvency?
+### What is Vault Insolvency? When Assets < Liabilities
+
+**FIRST PRINCIPLES: Solvency and Accounting**
 
 Vault insolvency occurs when the total assets held by a vault are less than the total claims (shares) against it. This means users cannot fully redeem their shares for the underlying assets they deposited.
 
-**Causes of Insolvency:**
-- Strategy losses (exploit, bad trade, liquidation)
-- Oracle manipulation or failure
-- Smart contract exploits in underlying protocols
-- Cascading liquidations
-- Flash loan attacks
-- Protocol-level failures
+**CONNECTION TO PROJECT 11, 20, & 42**:
+- **Project 11**: ERC-4626 vault standard
+- **Project 20**: Share-based accounting
+- **Project 42**: Rounding precision (affects solvency!)
+- **Project 46**: What happens when vault becomes insolvent!
+
+**UNDERSTANDING SOLVENCY**:
+
+```
+Solvency Check:
+┌─────────────────────────────────────────┐
+│ Vault State:                            │
+│   totalAssets = 1,000 tokens            │ ← What vault has
+│   totalShares = 1,000 shares            │ ← What users own
+│   ↓                                      │
+│ Expected Value:                         │
+│   expectedValue = totalShares × pricePerShare│
+│   expectedValue = 1,000 × 1.0 = 1,000  │ ← What users expect
+│   ↓                                      │
+│ Solvency Check:                         │
+│   totalAssets >= expectedValue?          │
+│   1,000 >= 1,000? ✅ SOLVENT            │ ← Can honor withdrawals
+│                                          │
+│ After Loss:                             │
+│   totalAssets = 800 tokens (loss!)      │ ← Strategy lost funds
+│   totalShares = 1,000 shares            │ ← Unchanged
+│   ↓                                      │
+│ Solvency Check:                         │
+│   800 >= 1,000? ❌ INSOLVENT           │ ← Cannot honor withdrawals!
+└─────────────────────────────────────────┘
+```
+
+**CAUSES OF INSOLVENCY**:
+
+1. **Strategy Losses**: Underlying strategy loses funds
+   - Exploit in yield protocol (from Project 34: oracle manipulation)
+   - Liquidation with slippage
+   - Impermanent loss beyond tolerable levels
+   - Smart contract bugs (from Project 07: reentrancy, etc.)
+
+2. **Oracle Manipulation or Failure** (from Project 18 & 34):
+   - Flash loan price manipulation
+   - Oracle outage or stale data
+   - Cross-chain bridge failures
+
+3. **Smart Contract Exploits**: In underlying protocols
+   - Reentrancy attacks (from Project 07)
+   - Access control bugs (from Project 36)
+   - Precision errors (from Project 42)
+
+4. **Cascading Liquidations**:
+   - One liquidation triggers others
+   - Slippage accumulates
+   - Vault loses more than expected
+
+5. **Flash Loan Attacks** (from Project 33):
+   - Price manipulation
+   - Governance attacks
+   - Oracle manipulation
+
+6. **Protocol-Level Failures**:
+   - Entire protocol exploited
+   - Bridge hacks
+   - Centralized failure points
+
+**REAL-WORLD ANALOGY**: 
+Like a bank run:
+- **Solvent**: Bank has enough cash to honor all withdrawals
+- **Insolvent**: Bank doesn't have enough cash (assets < liabilities)
+- **Vault**: Shares represent claims, assets must cover claims
+- **Problem**: When assets < shares × price, vault is insolvent!
 
 ### Bad Debt Scenarios
 

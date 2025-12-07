@@ -4,19 +4,70 @@ A meta-vault that wraps one or more ERC-4626 vaults, enabling yield aggregation,
 
 ## Concepts
 
-### Meta-Vault Architecture
+### Meta-Vault Architecture: Vaults Investing in Vaults
+
+**FIRST PRINCIPLES: Recursive Composition**
+
+A meta-vault is an ERC-4626 vault that invests in other ERC-4626 vaults rather than directly in assets. This creates a recursive structure!
+
+**CONNECTION TO PROJECT 11, 20, & 45**:
+- **Project 11**: ERC-4626 vault standard
+- **Project 20**: Share-based accounting fundamentals
+- **Project 45**: Multi-asset vaults (similar concept)
+- **Project 48**: Meta-vaults (vaults of vaults!)
+
+**UNDERSTANDING THE ARCHITECTURE**:
+
 ```
-User → MetaVault (ERC-4626)
-          ↓
-          → Underlying Vault A (ERC-4626)
-          → Underlying Vault B (ERC-4626)
-          → Underlying Vault C (ERC-4626)
+Meta-Vault Structure:
+┌─────────────────────────────────────────┐
+│ User deposits: 1000 DAI                 │
+│   ↓                                      │
+│ MetaVault (ERC-4626)                    │ ← Top-level vault
+│   Receives: 1000 DAI                   │
+│   Mints: X shares to user               │ ← Meta-vault shares
+│   ↓                                      │
+│ MetaVault allocates to:                 │
+│   ├─ UnderlyingVault A (ERC-4626)      │ ← 40% allocation
+│   │   Receives: 400 DAI                 │
+│   │   Mints: Y shares to MetaVault      │ ← Underlying shares
+│   │                                      │
+│   ├─ UnderlyingVault B (ERC-4626)      │ ← 30% allocation
+│   │   Receives: 300 DAI                 │
+│   │   Mints: Z shares to MetaVault      │
+│   │                                      │
+│   └─ UnderlyingVault C (ERC-4626)      │ ← 30% allocation
+│       Receives: 300 DAI                 │
+│       Mints: W shares to MetaVault      │
+└─────────────────────────────────────────┘
 ```
 
 A meta-vault is an ERC-4626 vault that invests in other ERC-4626 vaults rather than directly in assets. This creates a recursive structure where:
 - Users deposit assets into the meta-vault
 - The meta-vault deposits into underlying vaults
 - The meta-vault can rebalance between vaults to optimize yield
+
+**UNDERSTANDING RECURSIVE SHARES** (from Project 11 & 20 knowledge):
+
+When a user wants to know their asset value:
+```
+User's shares → MetaVault.convertToAssets()
+              → Underlying shares
+              → UnderlyingVault.convertToAssets()
+              → Actual assets
+```
+
+**GAS COST** (from Project 01 & 11 knowledge):
+- Meta-vault conversion: ~100 gas (view function)
+- Underlying vault conversion: ~100 gas × N vaults
+- Total: ~100 + (100 × N) gas (cheap for view functions!)
+
+**REAL-WORLD ANALOGY**: 
+Like a mutual fund investing in other mutual funds:
+- **Meta-vault** = Fund of funds
+- **Underlying vaults** = Individual funds
+- **Shares** = Units of ownership
+- **Recursive** = Fund value depends on underlying fund values
 
 ### Recursive Share Calculations
 

@@ -22,28 +22,107 @@ Yield-bearing vaults are smart contracts that accept user deposits and automatic
 6. Implement performance fee mechanisms
 7. Integrate with lending protocols and other yield sources
 
-## Core Concepts
+## Core Concepts: Yield Generation and Share Appreciation
+
+**FIRST PRINCIPLES: Compound Interest on Blockchain**
+
+Yield-bearing vaults automatically generate returns for depositors. Understanding how yield accrues and affects share prices is fundamental!
+
+**CONNECTION TO PROJECT 11 & 20**:
+- **Project 11**: ERC-4626 standard for tokenized vaults
+- **Project 20**: Share-based accounting fundamentals
+- **Project 43**: Yield generation and auto-compounding!
 
 ### Yield-Bearing Vault Mechanics
+
+**UNDERSTANDING YIELD ACCRUAL**:
 
 A yield vault manages the relationship between shares and assets:
 
 ```
 Initial State:
-- User deposits 100 tokens
-- Receives 100 shares (1:1 ratio)
-
-After Yield Accrual:
-- Total assets: 110 tokens (10 from yield)
-- Total shares: 100 shares
-- Share price: 1.1 tokens per share
-- User can redeem 100 shares for 110 tokens
+┌─────────────────────────────────────────┐
+│ User deposits: 100 tokens              │
+│ Receives: 100 shares (1:1 ratio)       │
+│ totalAssets = 100                       │
+│ totalShares = 100                       │
+│ shareValue = 1.0                        │
+│   ↓                                      │
+│ Vault deploys to strategy               │
+│   (e.g., Aave lending)                 │
+│   ↓                                      │
+│ Strategy generates yield:              │
+│   +10 tokens (10% APY)                 │
+│   ↓                                      │
+│ After Yield Accrual:                    │
+│   totalAssets = 110 tokens              │ ← Increased!
+│   totalShares = 100 shares              │ ← Unchanged!
+│   shareValue = 1.1 tokens per share    │ ← Appreciated!
+│   ↓                                      │
+│ User redeems 100 shares:                │
+│   Gets: 110 tokens                      │ ← 10 token profit!
+└─────────────────────────────────────────┘
 ```
 
-**Key Formula:**
+**KEY FORMULA** (from Project 11 & 20 knowledge):
+
 ```
-shareValue = totalAssets / totalSupply
+shareValue = totalAssets / totalShares
+
+When yield accrues:
+- totalAssets increases (more tokens in vault)
+- totalShares stays same (no new shares minted)
+- shareValue increases (each share worth more!)
 ```
+
+**UNDERSTANDING AUTO-COMPOUNDING**:
+
+```
+Compound Interest Effect:
+┌─────────────────────────────────────────┐
+│ Year 1:                                 │
+│   Deposit: 100 tokens                   │
+│   Yield: 10 tokens (10%)                │
+│   Total: 110 tokens                     │
+│   ↓                                      │
+│ Year 2:                                 │
+│   Principal: 110 tokens                 │ ← Yield reinvested!
+│   Yield: 11 tokens (10% of 110)        │ ← More yield!
+│   Total: 121 tokens                     │ ← Compound growth!
+│   ↓                                      │
+│ Year 3:                                 │
+│   Principal: 121 tokens                 │
+│   Yield: 12.1 tokens                    │
+│   Total: 133.1 tokens                  │ ← Exponential growth!
+└─────────────────────────────────────────┘
+```
+
+**GAS COST BREAKDOWN** (from Project 01 & 11 knowledge):
+
+**Deposit**:
+- Share calculation: ~100 gas
+- Mint shares: ~20,000 gas (cold SSTORE)
+- Strategy deposit: ~50,000 gas (external call)
+- Total: ~70,100 gas
+
+**Harvest** (yield collection):
+- Strategy harvest: ~100,000 gas (complex DeFi operations)
+- Reinvest: ~50,000 gas
+- Total: ~150,000 gas (shared across all users!)
+
+**Withdraw**:
+- Share calculation: ~100 gas
+- Burn shares: ~5,000 gas (SSTORE to zero)
+- Strategy withdraw: ~50,000 gas
+- Total: ~55,100 gas
+
+**REAL-WORLD ANALOGY**: 
+Like a savings account with automatic reinvestment:
+- **Deposit** = Put money in account
+- **Yield** = Interest earned
+- **Auto-compound** = Interest reinvested automatically
+- **Shares** = Account balance (grows with interest)
+- **Withdraw** = Take money out (get more than deposited!)
 
 ### Strategy Pattern
 

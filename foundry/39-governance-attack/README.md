@@ -8,24 +8,96 @@ Decentralized Autonomous Organizations (DAOs) rely on token-based governance whe
 
 ## Governance Attack Vectors
 
-### 1. Flashloan Governance Attacks
+### 1. Flashloan Governance Attacks: Borrowed Voting Power
 
-**The Vulnerability:**
+**FIRST PRINCIPLES: Token-Based Voting**
+
 Many DAOs use token balance as voting power. Attackers can flashloan massive amounts of governance tokens, vote on proposals, and return the tokens in the same transaction.
 
-**Attack Flow:**
-```
-1. Attacker creates malicious proposal
-2. Attacker takes flashloan of governance tokens
-3. Attacker votes with borrowed tokens
-4. Proposal passes due to inflated voting power
-5. Attacker returns flashloan
-6. Malicious proposal executes later
+**CONNECTION TO PROJECT 08 & 33**:
+- **Project 08**: ERC20 tokens (governance tokens are ERC20)
+- **Project 33**: MEV and flashloans (borrowing for manipulation)
+- **Project 39**: Flashloans used to manipulate governance!
+
+**UNDERSTANDING THE VULNERABILITY**:
+
+**THE PROBLEM**:
+```solidity
+// ❌ VULNERABLE: Voting power = current balance
+function vote(uint256 proposalId, bool support) public {
+    uint256 votingPower = governanceToken.balanceOf(msg.sender);  // Current balance!
+    // Attacker can flashloan tokens, vote, return tokens!
+    proposals[proposalId].votes[msg.sender] = votingPower;
+}
 ```
 
-**Real Example:**
+**ATTACK FLOW**:
+
+```
+Flashloan Governance Attack:
+┌─────────────────────────────────────────┐
+│ Step 1: Attacker creates proposal        │
+│   Proposal: "Send funds to attacker"     │ ← Malicious proposal
+│   ↓                                      │
+│ Step 2: Flashloan governance tokens      │
+│   Borrow: 1,000,000 tokens (no collateral!)│ ← From Project 33
+│   ↓                                      │
+│ Step 3: Vote with borrowed tokens        │
+│   votingPower = 1,000,000 tokens         │ ← Massive voting power!
+│   Vote: YES                              │
+│   ↓                                      │
+│ Step 4: Proposal passes                  │
+│   Attacker has majority voting power     │ ← Proposal approved!
+│   ↓                                      │
+│ Step 5: Return flashloan                 │
+│   Return: 1,000,000 tokens                │ ← No tokens owned!
+│   ↓                                      │
+│ Step 6: Proposal executes later          │
+│   Funds sent to attacker                 │ ← Attack succeeds!
+└─────────────────────────────────────────┘
+```
+
+**REAL EXAMPLE**:
 - **Beanstalk DAO (April 2022)**: Attacker used flashloans to acquire 79% voting power, passed a malicious proposal that drained $182M
 - The attacker borrowed over $1B in assets across multiple DeFi protocols to gain voting majority
+- All in a single transaction (atomic attack)!
+
+**WHY IT WORKS**:
+- Voting power = current token balance (not historical)
+- Flashloans provide unlimited capital (no collateral needed)
+- Atomic transactions (borrow, vote, repay in one TX)
+- No time delay between borrowing and voting
+
+**THE FIX** (Snapshot Voting Power):
+
+```solidity
+// ✅ SAFE: Snapshot voting power at proposal creation
+mapping(uint256 => mapping(address => uint256)) public votingPowerSnapshots;  // From Project 01!
+
+function createProposal(...) public {
+    uint256 proposalId = nextProposalId++;
+    // ✅ Snapshot voting power NOW (can't be manipulated later!)
+    votingPowerSnapshots[proposalId][msg.sender] = governanceToken.balanceOf(msg.sender);
+    // ... create proposal
+}
+
+function vote(uint256 proposalId, bool support) public {
+    // ✅ Use snapshot, not current balance!
+    uint256 votingPower = votingPowerSnapshots[proposalId][msg.sender];
+    require(votingPower > 0, "No voting power");
+    // ... record vote
+}
+```
+
+**GAS COST** (from Project 01 knowledge):
+- Snapshot: ~20,000 gas (cold SSTORE) per voter
+- Vote: ~100 gas (read snapshot)
+- Total: ~20,100 gas per voter (one-time snapshot cost)
+
+**REAL-WORLD ANALOGY**: 
+Like an election where you can borrow votes temporarily:
+- **Vulnerable**: Count votes at election time (can borrow votes!)
+- **Safe**: Lock in voter eligibility at registration (can't borrow later!)
 
 **Prevention:**
 - Snapshot voting power at proposal creation time

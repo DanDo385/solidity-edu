@@ -14,18 +14,90 @@ A multi-signature (multi-sig) wallet is a smart contract that requires multiple 
 - Learn from production systems like Gnosis Safe
 - Apply security best practices for asset custody
 
-## Multi-Sig Wallet Design Patterns
+## Multi-Sig Wallet Design Patterns: Secure Asset Custody
+
+**FIRST PRINCIPLES: Distributed Trust**
+
+A multi-signature wallet requires multiple parties to approve transactions, eliminating single points of failure. This is critical for high-value asset custody!
+
+**CONNECTION TO PROJECT 04 & 19**:
+- **Project 04**: We learned about access control and roles
+- **Project 19**: We learned about EIP-712 signatures
+- **Project 40**: Multi-sig combines both - multiple owners with signature verification!
 
 ### Basic Architecture
+
+**UNDERSTANDING THE COMPONENTS**:
 
 A multi-sig wallet typically consists of:
 
 1. **Owner Set**: A list of authorized signers
+   - From Project 01: `address[] public owners;`
+   - Multiple addresses with voting power
+   - Can add/remove owners (with approval)
+
 2. **Threshold**: The minimum number of signatures required (M-of-N)
+   - Example: 3-of-5 (3 signatures needed from 5 owners)
+   - Balances security vs convenience
+   - From Project 04: Threshold-based access control!
+
 3. **Transaction Proposal System**: Mechanism to propose transactions
+   - Anyone (or owners) can propose transactions
+   - Proposals stored until approved
+   - From Project 01: Structs for transaction data!
+
 4. **Approval/Signature Collection**: Tracking who has approved
+   - From Project 01: `mapping(uint256 => mapping(address => bool)) public confirmations;`
+   - Nested mapping tracks approvals per transaction
+   - From Project 04: Similar to role-based access control!
+
 5. **Execution Logic**: Execute when threshold is met
+   - Check: `approvalCount >= threshold`
+   - Execute transaction (send ETH, call contract, etc.)
+   - From Project 02: ETH transfers and external calls!
+
 6. **Nonce System**: Prevent replay attacks
+   - From Project 38: Nonces prevent signature replay!
+   - Each transaction has unique nonce
+   - Prevents reusing signatures
+
+**UNDERSTANDING M-OF-N** (from Project 04 knowledge):
+
+```
+M-of-N Multi-Sig Example (3-of-5):
+┌─────────────────────────────────────────┐
+│ Owners: [Alice, Bob, Carol, Dave, Eve]  │ ← 5 owners
+│ Threshold: 3                             │ ← Need 3 approvals
+│                                          │
+│ Transaction Proposal:                   │
+│   Send 10 ETH to recipient             │
+│   ↓                                      │
+│ Approvals Collected:                    │
+│   ✅ Alice approves                     │ ← 1/3
+│   ✅ Bob approves                       │ ← 2/3
+│   ✅ Carol approves                     │ ← 3/3 ✅ Threshold met!
+│   ↓                                      │
+│ Transaction Executes                    │ ← 10 ETH sent
+└─────────────────────────────────────────┘
+```
+
+**GAS COST BREAKDOWN** (from Project 01 & 19 knowledge):
+
+**On-Chain Confirmation Pattern**:
+- Each confirmation: ~20,000 gas (SSTORE)
+- Execution: ~23,000 gas (ETH transfer)
+- Total for 3-of-5: ~83,000 gas (3 confirmations + execution)
+
+**Off-Chain Signature Pattern**:
+- Signature verification: ~3,000 gas × 3 = ~9,000 gas
+- Execution: ~23,000 gas
+- Total: ~32,000 gas (much cheaper!)
+
+**REAL-WORLD ANALOGY**: 
+Like a bank vault requiring multiple keys:
+- **Single owner**: One key opens vault (single point of failure)
+- **Multi-sig**: Multiple keys required (distributed trust)
+- **Threshold**: Need M keys out of N total keys
 
 ### Design Pattern 1: On-Chain Confirmation
 

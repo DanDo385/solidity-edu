@@ -8,30 +8,72 @@ This project teaches how to safely integrate price oracles into vault systems. O
 
 ## Concepts
 
-### Oracle Integration for Vaults
+### Oracle Integration for Vaults: Secure Price Feeds
+
+**FIRST PRINCIPLES: Trust in External Data**
+
+Vaults need accurate price data to calculate values and prevent manipulation. Understanding oracle security is critical!
+
+**CONNECTION TO PROJECT 11, 18, & 34**:
+- **Project 11**: ERC-4626 vaults need price data
+- **Project 18**: Chainlink oracle integration
+- **Project 34**: Oracle manipulation attacks
+- **Project 47**: Secure oracle integration for vaults!
 
 Vaults need accurate price data to:
 - Calculate total value locked (TVL)
-- Determine share prices
+- Determine share prices (from Project 11: `convertToAssets()`)
 - Enforce price-based limits
-- Trigger rebalancing
-- Prevent sandwich attacks
+- Trigger rebalancing (from Project 45: multi-asset vaults)
+- Prevent sandwich attacks (from Project 33: MEV protection)
 
-**Key Challenges:**
+**KEY CHALLENGES**:
+
+**VULNERABLE PATTERN**:
 ```solidity
-// BAD: Direct oracle usage without validation
+// ❌ BAD: Direct oracle usage without validation
 function getShareValue() external view returns (uint256) {
-    uint256 price = oracle.getPrice();  // No staleness check!
-    return (totalAssets() * price) / totalSupply();
-}
-
-// GOOD: Validated oracle usage
-function getShareValue() external view returns (uint256) {
-    (uint256 price, bool isValid) = _getValidatedPrice();
-    require(isValid, "Invalid oracle price");
-    return (totalAssets() * price) / totalSupply();
+    uint256 price = oracle.getPrice();  // ❌ No staleness check!
+    return (totalAssets() * price) / totalSupply();  // From Project 11!
 }
 ```
+
+**PROBLEMS**:
+- Stale data: Oracle might not have updated recently
+- Manipulation: Flash loan attacks can manipulate price (from Project 34)
+- Failure: Oracle might be down or returning bad data
+
+**SECURE PATTERN**:
+```solidity
+// ✅ GOOD: Validated oracle usage
+function getShareValue() external view returns (uint256) {
+    (uint256 price, bool isValid) = _getValidatedPrice();  // ✅ Validation!
+    require(isValid, "Invalid oracle price");  // ✅ Revert if invalid
+    return (totalAssets() * price) / totalSupply();
+}
+
+function _getValidatedPrice() internal view returns (uint256, bool) {
+    (uint256 price, uint256 updatedAt) = oracle.getPrice();
+    
+    // ✅ Check staleness (from Project 18 knowledge)
+    if (block.timestamp - updatedAt > MAX_STALENESS) {
+        return (0, false);  // Stale data!
+    }
+    
+    // ✅ Check price bounds (prevent manipulation)
+    if (price < MIN_PRICE || price > MAX_PRICE) {
+        return (0, false);  // Suspicious price!
+    }
+    
+    return (price, true);
+}
+```
+
+**GAS COST** (from Project 01 & 18 knowledge):
+- Oracle call: ~100 gas (view function)
+- Staleness check: ~10 gas (arithmetic)
+- Bounds check: ~20 gas (comparisons)
+- Total: ~130 gas (cheap security check!)
 
 ### TWAP (Time-Weighted Average Price)
 

@@ -6,21 +6,86 @@ Learn about one of the most dangerous vulnerabilities in Solidity - delegatecall
 
 Delegatecall is a powerful feature in Solidity that allows a contract to execute code from another contract while maintaining its own storage context. However, when used incorrectly, it can lead to severe storage corruption vulnerabilities.
 
-## How Delegatecall Works
+## How Delegatecall Works: Context Preservation
 
-### Normal Call vs Delegatecall
+**FIRST PRINCIPLES: Code Execution vs Storage Context**
 
-**Normal Call (`call`)**:
-- Executes code in the target contract's context
-- Uses target contract's storage
+Delegatecall is a powerful but dangerous feature. Understanding context preservation is critical for secure proxy patterns!
+
+**CONNECTION TO PROJECT 10 & 15**:
+- **Project 10**: We learned about UUPS proxies using delegatecall
+- **Project 15**: We learned about low-level calls including delegatecall
+- **Project 35**: We dive deep into delegatecall storage corruption risks!
+
+### Normal Call vs Delegatecall: Understanding Context
+
+**NORMAL CALL (`call`)** (from Project 15 knowledge):
+- Executes code in the **target contract's context**
+- Uses **target contract's storage**
 - `msg.sender` is the calling contract
-- Storage changes affect the target contract
+- Storage changes affect the **target contract**
 
-**Delegatecall (`delegatecall`)**:
-- Executes target contract's code in the calling contract's context
-- Uses calling contract's storage
+**DELEGATECALL (`delegatecall`)**:
+- Executes **target contract's code** in the **calling contract's context**
+- Uses **calling contract's storage** ⚠️
 - Preserves original `msg.sender` and `msg.value`
-- Storage changes affect the calling contract
+- Storage changes affect the **calling contract** ⚠️
+
+**UNDERSTANDING THE DIFFERENCE**:
+
+```
+Normal Call:
+┌─────────────────────────────────────────┐
+│ Contract A calls Contract B             │
+│   ↓                                      │
+│ B's code executes                       │ ← Code from B
+│   ↓                                      │
+│ Uses B's storage                        │ ← Storage from B
+│   ↓                                      │
+│ Changes affect B                        │ ← B's state changes
+└─────────────────────────────────────────┘
+
+Delegatecall:
+┌─────────────────────────────────────────┐
+│ Contract A delegatecalls Contract B     │
+│   ↓                                      │
+│ B's code executes                       │ ← Code from B
+│   ↓                                      │
+│ Uses A's storage!                       │ ← Storage from A!
+│   ↓                                      │
+│ Changes affect A!                       │ ← A's state changes!
+└─────────────────────────────────────────┘
+```
+
+**THE CRITICAL INSIGHT**:
+Delegatecall uses **target's code** but **caller's storage**. This is powerful for proxies but dangerous if storage layouts don't match!
+
+**STORAGE CORRUPTION RISK** (from Project 01 & 10 knowledge):
+
+```solidity
+// Proxy Contract (A)
+contract Proxy {
+    address public implementation;  // Slot 0
+    uint256 public value;           // Slot 1
+}
+
+// Implementation Contract (B) - WRONG LAYOUT!
+contract Implementation {
+    uint256 public value;           // Slot 0 ❌ COLLISION!
+    address public owner;            // Slot 1 ❌ COLLISION!
+    
+    function setValue(uint256 _value) public {
+        value = _value;  // Writes to Proxy's slot 0 (implementation address!)
+        // Corrupts implementation address! 💥
+    }
+}
+```
+
+**REAL-WORLD ANALOGY**: 
+Like hiring a consultant:
+- **Normal call**: Consultant works in their office (target's storage)
+- **Delegatecall**: Consultant works in YOUR office (your storage), but uses their methods (target's code)
+- **Risk**: If consultant's methods expect different office layout, they'll mess up your files!
 
 ### Visual Representation
 

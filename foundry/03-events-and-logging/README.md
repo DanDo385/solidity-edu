@@ -559,6 +559,14 @@ event Transfer(address indexed from, address indexed to, uint256 amount);
 // ✅ Matches ERC20 standard (compatible with tools)
 ```
 
+## 🔍 Deep Dive: Contract Walkthrough
+
+- **Constructor**: Sets `owner` to deployer and mints `1_000_000 * 10**18` in one write—one-time init pattern you'll reuse for ownership (see Project 04). Single multiplication beats loops of `SSTORE`s.
+- **transfer**: CEI ordering (Project 02). Two mapping writes follow the Project 01 layout, then the ERC20-style `Transfer` event so off-chain tools can index by `from`/`to`. Emitting after state avoids paying for logs on reverts.
+- **approve**: Nested mapping (`owner => spender => allowance`) showcases the double `keccak256` slot math. Direct assignment overwrites old approvals on purpose to match ERC20 and save a read; use `+=` only when you intentionally allow incremental approvals.
+- **deposit**: `payable` enables ETH flow (Project 02). Uses `+=` read-modify-write on balances, and the `Deposit` event carries the timestamp instead of storing an extra slot—cheap history, same state.
+- **updateStatus**: Demonstrates expensive dynamic strings. Caches the previous status in memory before the write to avoid two `SLOAD`s, emits `StatusChanged` for history, and hints that `bytes32` is a cheaper option for fixed phrases.
+
 ## 🔧 What You'll Build
 
 A contract demonstrating:
@@ -680,6 +688,15 @@ Try these experiments:
 3. Test with multiple events in one transaction
 4. Build a simple frontend that listens to events
 5. Measure gas: indexed vs non-indexed parameters
+
+## ✅ Key Takeaways & Common Pitfalls
+
+- Events are ~10x cheaper than storage writes; keep state in storage and history in logs.
+- Indexed params (max 3) make filtering possible—log addresses/token IDs, not giant strings.
+- Logs are write-only for contracts, so design read paths with storage and view functions.
+- Cache storage reads (like the old status) before writing to avoid extra `SLOAD`s.
+- Strings/dynamic data are pricey; prefer `bytes32` when the shape is fixed and log the rest.
+- Emit after state changes so reverted transactions don't still pay for useless logs.
 
 ## 🧪 Test Coverage
 

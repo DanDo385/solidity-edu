@@ -18,27 +18,107 @@ Gas DoS attacks exploit the gas mechanics of the Ethereum Virtual Machine to mak
 
 ## DoS Attack Vectors
 
-### 1. Unbounded Loops and Iteration
+### 1. Unbounded Loops and Iteration: The Gas Limit Trap
 
-**Vulnerability:**
-Loops that iterate over dynamically-sized arrays can grow beyond the block gas limit, making functions permanently unusable.
+**FIRST PRINCIPLES: Block Gas Limits**
 
-**Example:**
+Loops that iterate over dynamically-sized arrays can grow beyond the block gas limit, making functions permanently unusable. This is a fundamental DoS vector!
+
+**CONNECTION TO PROJECT 06 & 12**:
+- **Project 06**: We learned about array iteration costs (O(n) gas)
+- **Project 12**: We learned about push vs pull patterns
+- **Project 37**: Unbounded loops can exceed block gas limit (DoS)!
+
+**UNDERSTANDING THE VULNERABILITY**:
+
+**VULNERABLE PATTERN**:
 ```solidity
-address[] public participants;
+address[] public participants;  // From Project 01: Dynamic array
 
 function distributeRewards() public {
     for (uint i = 0; i < participants.length; i++) {
         // Gas cost grows with array size
-        payable(participants[i]).transfer(1 ether);
+        payable(participants[i]).transfer(1 ether);  // ~23,000 gas per transfer
     }
 }
 ```
 
-**Impact:**
+**GAS COST ANALYSIS** (from Project 01, 02, & 06 knowledge):
+
+```
+Gas Cost Per Iteration:
+┌─────────────────────────────────────────┐
+│ Loop overhead: ~10 gas                 │
+│ Array access: ~100 gas (SLOAD)         │
+│ Transfer: ~23,000 gas                  │
+│ Total per iteration: ~23,110 gas        │
+│                                          │
+│ Block gas limit: ~30,000,000 gas        │
+│ Max iterations: ~1,300 iterations       │ ← Can exceed this!
+└─────────────────────────────────────────┘
+```
+
+**IMPACT**:
 - Function becomes uncallable when array grows too large
 - Permanent DoS if no alternative access pattern exists
 - Attackers can deliberately add entries to bloat arrays
+
+**ATTACK SCENARIO**:
+
+```
+DoS Attack Flow:
+┌─────────────────────────────────────────┐
+│ Attacker calls addParticipant()        │
+│   (if public or accessible)            │
+│   ↓                                      │
+│ Attacker adds 2,000 addresses          │ ← Bloat array
+│   ↓                                      │
+│ Legitimate user calls distributeRewards()│
+│   ↓                                      │
+│ Loop tries to process 2,000 addresses   │
+│   ↓                                      │
+│ Gas required: 2,000 × 23,110 = 46M gas  │ ← Exceeds limit!
+│   ↓                                      │
+│ Transaction REVERTS                      │ ← DoS achieved!
+│   ↓                                      │
+│ Function permanently unusable! 💥       │
+└─────────────────────────────────────────┘
+```
+
+**THE FIX** (Pull Pattern from Project 12):
+
+```solidity
+// ✅ SAFE: Pull pattern (from Project 12)
+mapping(address => uint256) public pendingRewards;  // From Project 01!
+
+function distributeRewards(address[] calldata recipients, uint256[] calldata amounts) public {
+    // Update mappings only (cheap!)
+    for (uint i = 0; i < recipients.length; i++) {
+        pendingRewards[recipients[i]] += amounts[i];  // ~5,000 gas per update
+    }
+}
+
+function withdrawReward() public {
+    // Users withdraw individually (no DoS!)
+    uint256 amount = pendingRewards[msg.sender];
+    pendingRewards[msg.sender] = 0;
+    payable(msg.sender).transfer(amount);
+}
+```
+
+**GAS COMPARISON**:
+
+**Push Pattern** (Vulnerable):
+- 1,000 recipients: ~23,110,000 gas (exceeds limit!)
+- DoS risk: HIGH
+
+**Pull Pattern** (Safe):
+- Distributor: ~5,000,000 gas (updates only)
+- Users: ~23,000 gas each (withdraw individually)
+- DoS risk: NONE
+
+**REAL-WORLD ANALOGY**: 
+Like trying to deliver mail to everyone in a city at once (push) vs having people pick up their mail (pull). Push can fail if there's too much mail, pull scales infinitely!
 
 **Mitigation:**
 - Use pull payment patterns instead of push

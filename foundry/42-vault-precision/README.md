@@ -16,28 +16,86 @@ By completing this project, you will:
 8. **Create comprehensive test suites** for precision edge cases
 9. **Understand production-grade rounding** implementations
 
-## Why Rounding Matters
+## Why Rounding Matters: Precision and Security
+
+**FIRST PRINCIPLES: Integer Division and Rounding**
+
+Rounding direction is critical for vault security. Understanding why rounding must favor the vault prevents precision-based attacks!
+
+**CONNECTION TO PROJECT 11 & 20**:
+- **Project 11**: ERC-4626 vaults use share-based accounting
+- **Project 20**: We learned share calculation fundamentals
+- **Project 42**: We dive deep into rounding precision and security!
 
 ### The Golden Rule of Vault Rounding
 
-**Rounding must ALWAYS favor the vault** to maintain security and solvency.
+**ROUNDING MUST ALWAYS FAVOR THE VAULT** to maintain security and solvency.
+
+**UNDERSTANDING THE RULES**:
 
 - **Deposit/Mint**: Round DOWN shares given to user
   - User deposits assets, vault gives shares
-  - Give fewer shares = vault favorable
+  - Give fewer shares = vault favorable (vault keeps extra)
+  - Formula: `shares = (assets * totalShares) / totalAssets` (rounds down)
 
 - **Withdraw/Redeem**: Round UP assets taken from vault
   - User burns shares, vault gives assets
   - Take more assets from user (fewer assets out) = vault favorable
+  - Formula: `assets = (shares * totalAssets + totalShares - 1) / totalShares` (rounds up)
 
-### Security Implications
+**WHY THIS MATTERS** (Mathematical Proof):
+
+```
+Example: Deposit 100.5 assets
+┌─────────────────────────────────────────┐
+│ totalAssets = 1000                      │
+│ totalShares = 1000                      │
+│ Exchange rate: 1.0                      │
+│                                          │
+│ User deposits: 100.5 assets             │
+│                                          │
+│ Calculation:                            │
+│   shares = (100.5 * 1000) / 1000       │
+│   shares = 100500 / 1000                │
+│   shares = 100.5 (but must be integer!) │
+│                                          │
+│ Round DOWN: shares = 100                │ ← Vault keeps 0.5 assets
+│ Round UP: shares = 101                   │ ← Vault loses 0.5 assets ❌
+└─────────────────────────────────────────┘
+```
+
+**SECURITY IMPLICATIONS**:
 
 Incorrect rounding can lead to:
 
 1. **Vault Insolvency**: Users can extract more value than deposited
+   ```solidity
+   // ❌ WRONG: Rounding up on withdraw
+   assets = (shares * totalAssets + totalShares - 1) / totalShares;  // Rounds UP
+   // User gets MORE assets than they should!
+   // Vault becomes insolvent over time!
+   ```
+
 2. **Inflation Attacks**: First depositor can manipulate share price
+   - Deposit 1 wei → get 1 share
+   - Donate 1,000,000 tokens directly to vault
+   - Withdraw: Get 1,000,000 tokens for 1 share!
+   - If rounding wrong, attacker profits!
+
 3. **Precision Drain**: Repeated operations drain vault reserves
+   - Each operation with wrong rounding loses small amount
+   - Over many operations, losses accumulate
+   - Vault becomes insolvent
+
 4. **Share Manipulation**: Attackers exploit rounding to steal funds
+   - Precision errors can be amplified
+   - Rounding direction determines who benefits
+
+**REAL-WORLD ANALOGY**: 
+Like a bank rounding:
+- **Round DOWN deposits**: Bank keeps extra (vault favorable)
+- **Round UP withdrawals**: Bank gives less (vault favorable)
+- **Wrong direction**: Bank loses money over time (insolvency!)
 
 ## Mathematical Foundation
 

@@ -6,15 +6,84 @@ A comprehensive educational project demonstrating the inflation attack vulnerabi
 
 The inflation attack (also known as the donation attack or first depositor attack) is a critical vulnerability that can affect ERC-4626 vault implementations. This attack exploits the share calculation mechanism to steal funds from depositors through share price manipulation.
 
-## What is an Inflation Attack?
+## What is an Inflation Attack? Share Price Manipulation
 
-An inflation attack occurs when an attacker manipulates the share price of a vault to cause rounding errors that work in their favor. The attack exploits the fundamental share calculation in ERC-4626:
+**FIRST PRINCIPLES: Rounding Exploitation**
+
+An inflation attack occurs when an attacker manipulates the share price of a vault to cause rounding errors that work in their favor. This is a critical vulnerability in ERC-4626 vaults!
+
+**CONNECTION TO PROJECT 11, 20, & 42**:
+- **Project 11**: ERC-4626 vault standard
+- **Project 20**: Share-based accounting fundamentals
+- **Project 42**: Rounding precision and security
+- **Project 44**: Inflation attack exploits rounding vulnerabilities!
+
+**UNDERSTANDING THE ATTACK**:
+
+The attack exploits the fundamental share calculation in ERC-4626:
 
 ```solidity
-shares = assets * totalSupply / totalAssets
+shares = assets * totalSupply / totalAssets  // From Project 11 & 20!
 ```
 
+**THE VULNERABILITY**:
+
 When `totalAssets` is much larger than `totalSupply`, small deposits can round down to zero shares, effectively donating the deposited assets to existing shareholders.
+
+**HOW IT WORKS** (Mathematical Exploitation):
+
+```
+Normal State:
+┌─────────────────────────────────────────┐
+│ totalAssets = 1000                      │
+│ totalShares = 1000                      │
+│ Exchange rate: 1.0                      │
+│                                          │
+│ User deposits: 100 assets               │
+│   shares = (100 * 1000) / 1000 = 100   │ ← Works fine
+└─────────────────────────────────────────┘
+
+Attacked State:
+┌─────────────────────────────────────────┐
+│ Attacker deposits: 1 wei                │
+│   shares = 1 (first deposit)            │
+│   totalAssets = 1 wei                    │
+│   totalShares = 1                        │
+│   ↓                                      │
+│ Attacker donates: 1,000,000 tokens      │ ← Direct transfer!
+│   totalAssets = 1,000,001 wei           │ ← Inflated!
+│   totalShares = 1 (unchanged!)          │ ← Not increased!
+│   Exchange rate: 1,000,001 wei/share   │ ← Manipulated!
+│   ↓                                      │
+│ Victim deposits: 1,000,000 wei          │
+│   shares = (1,000,000 * 1) / 1,000,001  │
+│   shares = 0.999999...                   │
+│   shares = 0 (rounds down!)            │ ← Gets nothing!
+│   ↓                                      │
+│ Attacker redeems 1 share:              │
+│   assets = (1 * 2,000,001) / 1 = 2,000,001│
+│   Attacker gets victim's deposit! 💥    │
+└─────────────────────────────────────────┘
+```
+
+**WHY IT WORKS**:
+
+The attack exploits three key properties:
+
+1. **Integer Division** (from Project 01): Solidity uses integer math, which rounds down
+   - `999,999 / 1,000,000 = 0` (rounds down to zero!)
+
+2. **External Donations**: Tokens can be sent directly to the vault
+   - From Project 02: Contracts can receive tokens via `receive()` or direct transfer
+   - Donation increases `totalAssets` without minting shares!
+
+3. **Share Price Calculation**: Price = totalAssets / totalSupply
+   - When assets >> shares, price is very high
+   - Small deposits result in fractional shares
+   - Fractional shares round down to zero!
+
+**REAL-WORLD ANALOGY**: 
+Like manipulating a stock price by donating shares to the company, then buying at the inflated price. The donation inflates the price, making small purchases worthless!
 
 ## Attack Mechanism
 

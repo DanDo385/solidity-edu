@@ -27,28 +27,92 @@ mapping(address => uint256) public assetIndex;
 - Vault internally manages multiple positions
 - Shares are minted/burned based on NAV
 
-### 2. Weighted NAV Calculation
+### 2. Weighted NAV Calculation: Portfolio Valuation
 
-Net Asset Value (NAV) represents the total value of all vault holdings.
+**FIRST PRINCIPLES: Net Asset Value**
 
-**NAV Formula:**
+Net Asset Value (NAV) represents the total value of all vault holdings. This is fundamental to multi-asset vaults!
+
+**CONNECTION TO PROJECT 11, 18, & 20**:
+- **Project 11**: ERC-4626 vaults calculate share prices
+- **Project 18**: Oracles provide price data
+- **Project 20**: Share-based accounting fundamentals
+- **Project 45**: Multi-asset NAV combines all concepts!
+
+**NAV FORMULA**:
+
 ```
 NAV = Σ (balance_i × price_i) for all assets i
 
 Price Per Share = NAV / Total Shares
 ```
 
-**Example Calculation:**
-```
-Asset A: 100 tokens × $10 = $1,000
-Asset B: 200 tokens × $5  = $1,000
-Asset C: 50 tokens × $20  = $1,000
------------------------------------
-Total NAV = $3,000
+**UNDERSTANDING THE CALCULATION** (from Project 01 & 18 knowledge):
 
-If 1,000 shares exist:
-Price Per Share = $3,000 / 1,000 = $3.00
 ```
+NAV Calculation Flow:
+┌─────────────────────────────────────────┐
+│ For each asset in vault:                │
+│   1. Get balance: balanceOf(vault)     │ ← From Project 08 (ERC20)
+│   2. Get price: oracle.getPrice()      │ ← From Project 18 (Oracle)
+│   3. Calculate value: balance × price   │ ← Arithmetic
+│   4. Sum all values                     │ ← Accumulator pattern
+│   ↓                                      │
+│ NAV = sum of all asset values           │ ← Total portfolio value
+│   ↓                                      │
+│ Price per share = NAV / totalShares     │ ← From Project 11!
+└─────────────────────────────────────────┘
+```
+
+**EXAMPLE CALCULATION**:
+
+```
+Multi-Asset Portfolio:
+┌─────────────────────────────────────────┐
+│ Asset A (ETH):                          │
+│   Balance: 100 tokens                   │
+│   Price: $2,000 (from oracle)          │
+│   Value: 100 × $2,000 = $200,000       │
+│                                          │
+│ Asset B (USDC):                         │
+│   Balance: 500,000 tokens               │
+│   Price: $1.00 (stablecoin)             │
+│   Value: 500,000 × $1.00 = $500,000    │
+│                                          │
+│ Asset C (WBTC):                         │
+│   Balance: 10 tokens                    │
+│   Price: $30,000 (from oracle)         │
+│   Value: 10 × $30,000 = $300,000       │
+│   ↓                                      │
+│ Total NAV = $1,000,000                  │ ← Portfolio value
+│                                          │
+│ If 1,000,000 shares exist:              │
+│   Price Per Share = $1,000,000 / 1,000,000│
+│   Price Per Share = $1.00               │ ← Share value
+└─────────────────────────────────────────┘
+```
+
+**GAS COST BREAKDOWN** (from Project 01, 06, & 18 knowledge):
+
+**NAV Calculation**:
+- Oracle calls: ~100 gas × N assets (view functions)
+- Balance reads: ~100 gas × N assets (SLOAD from ERC20)
+- Arithmetic: ~10 gas × N assets (multiplication)
+- Total: ~210 gas × N assets (for N assets)
+
+**Example** (3 assets):
+- Oracle calls: ~300 gas
+- Balance reads: ~300 gas
+- Arithmetic: ~30 gas
+- Total: ~630 gas (cheap for portfolio valuation!)
+
+**REAL-WORLD ANALOGY**: 
+Like calculating the value of an investment portfolio:
+- **Assets** = Different stocks/bonds in portfolio
+- **Prices** = Current market prices (from exchanges/oracles)
+- **NAV** = Total portfolio value
+- **Shares** = Units of ownership in the portfolio
+- **Price per share** = NAV / shares (how much each share is worth)
 
 **Weighted Allocation:**
 ```solidity

@@ -345,6 +345,30 @@ The test suite covers:
 
 - **Best practices**: Always use custom errors in production code. String messages are only for development/debugging.
 
+## 🧠 Deep Dive: Computer Science First Principles
+
+- **Revert opcode internals**: Both `require` and `revert` compile down to the `REVERT` opcode, which unwinds the call stack and refunds remaining gas. The payload is ABI-encoded—custom errors shrink that payload while keeping typed data.
+- **Panic vs. custom errors**: `assert` triggers a Panic error selector (`0x4e487b71`) that consumes all gas, while `require`/`revert` refund remaining gas. Use Panic only for invariants that must never fail.
+- **Call stack bubbling**: Errors propagate up the call stack. External callers should expect and handle bubbled errors (later projects use this for cross-contract UX).
+- **Data size economics**: Strings bloat bytecode and calldata. Custom errors keep revert data to a fixed selector + parameters, which is crucial for rollups where calldata drives cost.
+- **State updates**: All branches revert before SSTORE writes to ensure state is never partially updated—a nod to transactional consistency from database theory.
+
+## 🔗 How Concepts Build on Each Other
+
+- **From Project 01**: Storage layout knowledge explains why reverts happen before writes; the `getBalance` helper mirrors those storage reads.
+- **From Project 02**: The same validation checks now use custom errors for cheaper failures, demonstrating evolution from string-based `require`.
+- **From Project 04**: Access control in `depositWithCustomError` uses the same owner gate you built earlier, but returns structured error data.
+- **Forward to Project 06**: Arrays/mappings rely on revert reasons for safe bounds checks; the patterns here prepare you for those structures.
+- **Forward to Project 08 (ERC20)**: Balance updates and custom errors mirror real token contracts where precise failure reasons improve wallet UX.
+
+## 📝 Key Takeaways & Common Mistakes
+
+- **Prefer custom errors** for production-grade reverts; reserve strings for debugging or console logs.
+- **Gate state writes** with validation up front—reverting after partial updates is a classic bug.
+- **Use `assert` sparingly**; if you can explain an issue to a user, it should be a `require`/custom error instead of Panic.
+- **Always include parameters** when they help debugging (e.g., `InsufficientBalance(balance, amount)`); they add context for free compared to strings.
+- **Test revert surfaces** explicitly with `expectRevert` selectors so refactors do not silently change error shapes.
+
 ## ✅ Completion Checklist
 
 - [ ] Defined custom errors (`InsufficientBalance`, `Unauthorized`, `InvalidAmount`, `InvariantViolation`)
