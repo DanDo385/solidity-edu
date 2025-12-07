@@ -198,6 +198,7 @@ contract FunctionsPayable {
     function getContractBalance() public view returns (uint256) {
         // TODO: Implement
         // Return address(this).balance
+        return address(this).balance;
     }
 
     /**

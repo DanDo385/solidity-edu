@@ -327,6 +327,15 @@ The test suite covers:
 - ✅ Error propagation
 - ✅ Error decoding
 
+## 🔍 Contract Walkthrough (Solution Highlights)
+
+- **State & ownership**: `owner`, `balance`, and `totalDeposits` follow the same slot layout from Project 01 so you can reason about storage writes before and after a revert. The constructor pins `owner` for the access checks you formalized in Project 04.
+- **`depositWithRequire`**: Keeps the classic `require` + string form around for contrast. It’s intentionally verbose so you can measure bytecode and gas overhead when strings live in production contracts.
+- **`depositWithCustomError`**: Repeats the same logic but swaps strings for typed errors. `InvalidAmount()` and `Unauthorized(msg.sender)` show how to pass context without inflating calldata, a pattern we’ll reuse for ERC20/721 reverts.
+- **`withdraw`**: Demonstrates parameterized custom errors (`InsufficientBalance(balance, amount)`) so wallets can surface the exact failure. The state write happens only after all checks, reinforcing the CEI discipline from Project 02.
+- **`checkInvariant`**: Uses `assert` to lock in `totalDeposits >= balance`; it’s a reminder that Panic codes are for “should never happen” states (think unit-test invariants) while user-facing paths should revert with custom errors.
+- **`getBalance`**: Mirrors the auto-generated getter but stays explicit so you can trace a pure storage read when comparing revert vs view costs.
+
 ## 🛰️ Real-World Analogies & Fun Facts
 
 - **Airplane checklists**: `require` is the preflight checklist; if anything is missing, you stop before takeoff. `assert` is the "wing still attached" invariant—if it fails, something is fundamentally wrong.

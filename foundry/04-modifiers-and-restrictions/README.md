@@ -505,6 +505,22 @@ The test suite covers:
 - ✅ Access control failures (wrong caller, missing role, paused contract)
 - ✅ Gas benchmarking
 
+## 🔍 Contract Walkthrough (Solution Highlights)
+
+- **State + role scaffolding**: `owner`, `paused`, and `counter` sit beside the nested `roles[address][role]` mapping so you can trace every storage write from Projects 01–03. The constructor seeds both `ADMIN_ROLE` and `MINTER_ROLE` for the deployer, so your tests start with one known admin/minter without extra setup.
+- **Modifier library**: `onlyOwner`, `onlyRole`, `whenNotPaused`, and `whenPaused` are intentionally tiny—just a `require` each—so you can compose them freely. `transferOwnership` highlights the pattern of caching `owner` once before writing/ emitting, which saves a second SLOAD.
+- **Role lifecycle**: `grantRole` / `revokeRole` guard against redundant writes, flip the nested mapping flag, and emit `RoleGranted`/`RoleRevoked` so explorers, bots, and dashboards stay in sync with on-chain authority changes.
+- **Circuit breaker**: `pause` (only ADMIN) and `unpause` (ADMIN + `whenPaused`) let you exercise modifier order: role check → pause flag check → function body. Both fire events that double as incident-response alerts for monitoring systems.
+- **Usage sites**: `incrementCounter` is the simple “business logic” hook you can call through different modifiers, `mint` demonstrates stacking role + pause guards before any external side effect, and `hasRole` rounds out the API so frontends can query permissions off-chain.
+
+## ✅ Key Takeaways & Common Pitfalls
+
+- Keep modifiers short and reusable; complex logic belongs inside functions where the compiler can better optimize ordering.
+- Emit events for every ownership or role change—state alone cannot tell off-chain systems who is in control or when it changed.
+- Cache storage reads you plan to reuse in the same function (e.g., old owner for an event) to avoid double `SLOAD`s when modifiers already do heavy lifting.
+- Validate inputs inside gated functions (`newOwner != address(0)`, prevent duplicate role grants) to avoid soft-locking the contract or wasting gas on no-ops.
+- Order modifiers by cost: cheap checks like `whenNotPaused` should run before nested mapping lookups performed in `onlyRole`.
+
 ## 🛰️ Real-World Analogies & Fun Facts
 
 - **Bouncer at a club**: `onlyOwner` is the bouncer checking IDs before anyone enters the function. Stacking modifiers is like needing both a ticket and a VIP wristband.

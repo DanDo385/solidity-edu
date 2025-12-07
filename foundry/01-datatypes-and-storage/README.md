@@ -864,6 +864,23 @@ The test suite covers:
 - ✅ Fuzz testing with randomized inputs
 - ✅ Gas benchmarking
 
+## 🔍 Contract Walkthrough (Solution Highlights)
+
+- **State layout**: `number`, `owner`, `isActive`, and `data` sit in consecutive slots to make the 32-byte alignment rules tangible. The `message` string shows how dynamic types spill into extra slots, while `balances` and `users` reuse the mapping slot math introduced earlier.
+- **Events vs storage**: Every mutating function emits an event (e.g., `NumberUpdated`, `FundsDeposited`) to reinforce that history should live in logs while queryable state stays in storage (see Project 03).
+- **Mappings & arrays**: `setBalance` uses direct assignment (no read-modify-write) when overwriting, while `addNumber`/`removeNumber` demonstrate the length write + element write pattern and the swap-and-pop gas saver (order not preserved).
+- **Data locations**: `sumMemoryArray` vs `getFirstElement` contrast `memory` (cheap, copyable) and `calldata` (cheapest, zero-copy) so you can connect the theory from the “Data Locations” section to concrete syntax.
+- **Structs**: `User` shows the simple “one slot per field” layout; `PackedData` shows how grouping small types reclaims a slot. `registerUser` writes directly to storage to avoid extra memory copies, while `getUser` copies to memory before returning multiple values.
+- **Owner pattern**: The constructor sets `owner` once—seed for the access-control modifiers you’ll formalize in Project 04.
+
+## ✅ Key Takeaways & Common Pitfalls
+
+- Events are the cheap history channel; keep queryable state in storage and log context in events (don’t reverse it).
+- Mapping keys that were never written return `0`—track existence separately if `0` is ambiguous.
+- Dynamic types (`string`, `bytes`) cost multiple slots; prefer `bytes32` for fixed-size labels and use events for change history.
+- Arrays grow via two writes (length + element); unbounded growth can DoS iteration—prefer mappings + events for scalable lists.
+- Cache storage reads in memory before emitting events to avoid double `SLOAD`s.
+
 ## 🛰️ Real-World Analogies & Fun Facts
 
 - **Elevator vs stairs**: Reading storage is like waiting for an elevator (slow but reaches every floor), while memory is taking the stairs for quick trips that don't persist.

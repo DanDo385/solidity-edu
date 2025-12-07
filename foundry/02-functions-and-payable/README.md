@@ -974,6 +974,23 @@ The test suite covers:
 - ✅ Fuzz testing with randomized inputs
 - ✅ Gas benchmarking
 
+## 🔍 Contract Walkthrough (Solution Highlights)
+
+- **Owner slot**: Constructor pins `owner` in slot 0 to foreshadow the access-control checks you’ll build formally in Project 04.
+- **Visibility tour**: `publicSquare`, `externalCube`, `internalDouble`, and `privateTriple` show how the same math changes call semantics (external saves a calldata copy, internal/ private enable optimizer inlining).
+- **Payable paths**: `deposit`, `receive`, and `fallback` all credit `balances[msg.sender]` to keep accounting consistent. The fallback stays minimal to avoid reentrancy surprises when unknown selectors hit the contract.
+- **Withdrawals and CEI**: `withdraw` debits storage before calling out with `.call{value: amount}("")`, reinforcing the checks-effects-interactions ordering and why `.transfer()`’s 2,300 gas stipend is unsafe post-EIP-1884.
+- **Owner withdrawal**: Mirrors production “treasury drain” flows while reminding you to gate by `owner` and to check contract balance first.
+- **Helpers**: `viewBalance` surfaces mapping reads for frontends; `demoInternalCall` exercises internal/private visibility from another public function.
+
+## ✅ Key Takeaways & Common Pitfalls
+
+- Always mark ETH-receiving functions `payable`; without it, sends revert and users waste gas.
+- Keep fallback logic tiny—every extra opcode widens the attack surface and raises gas for legit callers.
+- Update storage before sending ETH (CEI) and always check the boolean returned by `.call`.
+- Prefer `.call` over `.transfer`/`.send`; modern wallets and proxies routinely need more than 2,300 gas.
+- `external` + `calldata` avoids copying large inputs; switch to `public` when you need internal reuse.
+
 ## 🛰️ Real-World Analogies & Fun Facts
 
 - **ATM vs call center**: `receive()` is the ATM slot—silent, only accepts cash. `fallback()` is the call center routing unknown requests.
