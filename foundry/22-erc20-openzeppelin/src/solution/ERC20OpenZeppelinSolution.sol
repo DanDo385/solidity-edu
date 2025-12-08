@@ -12,16 +12,18 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
 /**
- * @title BasicTokenSolution
- * @dev A simple ERC20 token using OpenZeppelin's implementation
- *
- * This demonstrates the most basic usage of OpenZeppelin's ERC20:
- * - Inherits all standard ERC20 functionality
- * - Sets token name and symbol
- * - Mints initial supply to deployer
- *
- * Gas cost for deployment: ~750k gas
- * Gas cost for transfer: ~52k gas
+ * @title ERC20OpenZeppelinSolution
+ * @notice OpenZeppelin ERC20 implementation with extensions
+ * 
+ * PURPOSE: Production-ready ERC20 using battle-tested OpenZeppelin contracts
+ * CS CONCEPTS: Inheritance, extension pattern, composability
+ * 
+ * CONNECTIONS:
+ * - Project 08: Custom ERC20 implementation (this uses library)
+ * - Project 04: Access control patterns (Ownable)
+ * - Project 19: Permit extension (gasless approvals)
+ * 
+ * KEY: OpenZeppelin provides secure, audited, gas-optimized implementations
  */
 contract BasicTokenSolution is ERC20 {
     /**

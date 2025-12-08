@@ -351,6 +351,22 @@ forge test -vvv
 
 ⚠️ **CRITICAL SECURITY TOPIC** - Understand thoroughly before using!
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/LowLevelCallsSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployLowLevelCallsSolution.s.sol` - Deployment script patterns
+- `test/solution/LowLevelCallsSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains message passing, execution context, call vs delegatecall differences
+- **Connections to Project 02**: .call{value:}() for ETH transfers
+- **Connections to Project 10**: delegatecall for proxy patterns
+- **Connections to Project 14**: ABI encoding for call data
+- **Real-World Context**: Foundation for all contract interactions and upgradeable proxies
+
 ## 🚀 Next Steps
 
 - Study OpenZeppelin proxy implementations

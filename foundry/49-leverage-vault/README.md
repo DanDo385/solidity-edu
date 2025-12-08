@@ -554,6 +554,22 @@ function compound() external {
 }
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/LeverageVaultSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployLeverageVaultSolution.s.sol` - Deployment script patterns
+- `test/solution/LeverageVaultSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains leverage mechanics, borrow-deposit loops, liquidation prevention, health factors
+- **Connections to Project 11**: ERC-4626 vault standard (this adds leverage)
+- **Connections to Project 20**: Share-based accounting (leverage affects share prices)
+- **Connections to Project 43**: Yield-bearing vaults (leverage amplifies yield)
+- **Real-World Context**: Advanced DeFi strategy - amplifies yield but increases risk
+
 ## Security Considerations
 
 1. **Oracle Manipulation**: Use TWAP or multiple oracles

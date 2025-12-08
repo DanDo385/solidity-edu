@@ -749,6 +749,20 @@ forge script script/DeployProject33.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast
 3. Create batch auction system
 4. Test mitigation effectiveness
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MEVFrontrunningSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMEVFrontrunningSolution.s.sol` - Deployment script patterns
+- `test/solution/MEVFrontrunningSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains MEV extraction, front-running, sandwich attacks, commit-reveal schemes
+- **Connections to Project 02**: Transaction ordering and mempool mechanics
+- **Real-World Context**: MEV is a major concern in DeFi - understanding attacks and defenses is critical
+
 ### Stage 4: Advanced Topics
 
 1. Study Flashbots integration

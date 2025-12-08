@@ -816,6 +816,21 @@ Your implementation should:
 
 ---
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/DeFiCapstoneSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployDeFiCapstoneSolution.s.sol` - Deployment script patterns
+- `test/solution/DeFiCapstoneSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains protocol design, composability, upgradeability, security patterns
+- **Connections to ALL Projects**: Combines ERC20, ERC721, ERC4626, proxies, oracles, governance
+- **Real-World Context**: Complete DeFi protocol demonstrating composability and security best practices
+- **Integration Mastery**: Shows how all concepts work together in production-grade systems
+
 ## Conclusion
 
 This capstone project represents the culmination of your Solidity journey. It's not just about writing code—it's about understanding the intricate dance of security, efficiency, and user experience that defines production-grade DeFi protocols.

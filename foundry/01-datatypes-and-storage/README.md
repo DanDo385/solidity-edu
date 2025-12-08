@@ -788,11 +788,17 @@ Open `test/DatatypesStorage.t.sol` and write comprehensive tests:
 ### Task 4: Study the Solutions
 
 After implementing your own solutions, compare with:
-- `src/solution/DatatypesStorageSolution.sol` - Reference contract implementation
+- `src/solution/DatatypesStorageSolution.sol` - Reference contract implementation with comprehensive CS concept explanations
 - `script/solution/DeployDatatypesStorageSolution.s.sol` - Deployment script patterns
 - `test/solution/DatatypesStorageSolution.t.sol` - Comprehensive test examples
 
 **Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Each solution file explains computer science principles from first principles (hash tables, dynamic arrays, memory management)
+- **Syntax Explanations**: Detailed comments explain Solidity syntax and why certain patterns are used
+- **Cross-Project Connections**: Solutions reference how concepts build on each other across projects
+- **Purpose Statements**: Each contract includes a clear explanation of real-world use cases
 
 ### Task 5: Compile and Test
 
@@ -865,6 +871,20 @@ The test suite covers:
 - ✅ Gas benchmarking
 
 ## 🔍 Contract Walkthrough (Solution Highlights)
+
+### Enhanced Solution Files
+
+The solution files (`src/solution/DatatypesStorageSolution.sol`) have been enhanced with:
+
+1. **Computer Science Concepts**: Explanations of hash tables, dynamic arrays, memory management, and storage layout from first principles
+2. **Purpose Statements**: Clear descriptions of what each contract could be used for in real-world scenarios
+3. **Syntax Explanations**: Detailed comments explaining Solidity syntax and patterns
+4. **Cross-Project Connections**: References to how concepts from this project are used in later projects
+
+**Key Learning Approach**: The solution files are designed to reinforce learning by:
+- Explaining CS concepts that apply across all programming languages
+- Showing how storage patterns are fundamental to all Solidity contracts
+- Building connections to future projects (functions, events, tokens, etc.)
 
 - **State layout**: `number`, `owner`, `isActive`, and `data` sit in consecutive slots to make the 32-byte alignment rules tangible. The `message` string shows how dynamic types spill into extra slots, while `balances` and `users` reuse the mapping slot math introduced earlier.
 - **Events vs storage**: Every mutating function emits an event (e.g., `NumberUpdated`, `FundsDeposited`) to reinforce that history should live in logs while queryable state stays in storage (see Project 03).

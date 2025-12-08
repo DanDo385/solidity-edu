@@ -2,17 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project19Solution - Signed Messages & EIP-712
- * @notice Complete implementation of EIP-712 typed structured data signing
- * @dev Production-ready signature verification with comprehensive security measures
- *
- * IMPLEMENTATION DETAILS:
- * - Full EIP-712 compliance with domain separation
- * - ECDSA signature verification using ecrecover
- * - Nonce-based replay protection
- * - Deadline-based signature expiration
- * - Signature malleability prevention
- * - Support for permits, meta-transactions, and vouchers
+ * @title SignedMessagesSolution
+ * @notice EIP-712 typed structured data signing and verification
+ * 
+ * PURPOSE: Gasless transactions (meta-transactions), permits, vouchers
+ * CS CONCEPTS: Cryptographic signatures (ECDSA), domain separation, replay protection
+ * 
+ * CONNECTIONS:
+ * - Project 08: ERC20 permit pattern (gasless approvals)
+ * - Project 05: Error handling for invalid signatures
+ * - Project 14: ABI encoding for structured data hashing
+ * 
+ * KEY: EIP-712 enables human-readable signatures with domain separation
  */
 contract Project19Solution {
     /*//////////////////////////////////////////////////////////////

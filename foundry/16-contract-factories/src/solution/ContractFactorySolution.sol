@@ -2,21 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title ContractFactorySolution: Contract Factories (CREATE2)
- * @notice Complete implementation of CREATE2 factory with deterministic deployment
- * @dev Demonstrates address prediction, bytecode handling, and assembly usage
+ * @title ContractFactorySolution
+ * @notice CREATE2 factory pattern - deterministic contract deployment
  * 
- * REAL-WORLD ANALOGY: CREATE2 is like reserving a specific parking spot before
- * you arrive. You can predict exactly where your contract will be deployed,
- * which is useful for counterfactual deployments and upgrade patterns.
+ * PURPOSE: Deploy contracts at predictable addresses (counterfactual deployments)
+ * CS CONCEPTS: Deterministic hashing, address prediction, bytecode handling
  * 
- * GAS OPTIMIZATION: CREATE2 vs CREATE
- * - CREATE: ~32,000 gas (deployment cost)
- * - CREATE2: ~32,000 gas (same deployment cost)
- * - BUT: CREATE2 enables address prediction, saving gas on:
- *   - Pre-computing addresses (no need to deploy to find address)
- *   - Counterfactual interactions (interact before deployment)
- *   - Gas savings from predictable addresses in complex systems
+ * CONNECTIONS:
+ * - Project 01: keccak256 for address calculation (like mapping slots)
+ * - Project 14: ABI encoding for bytecode construction
+ * - Project 17: Used with minimal proxies for gas-efficient cloning
+ * 
+ * KEY: CREATE2 enables address prediction before deployment - enables counterfactual patterns
  */
 
 /**

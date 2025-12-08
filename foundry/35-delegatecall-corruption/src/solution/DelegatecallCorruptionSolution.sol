@@ -2,23 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project 35 Solution: Delegatecall Storage Corruption
- * @notice Complete implementation demonstrating delegatecall vulnerabilities and safe patterns
- */
-
-/**
- * @notice VULNERABLE PROXY - Demonstrates storage collision vulnerability
- *
- * STORAGE LAYOUT:
- * ┌──────────────────────────────────┐
- * │ Slot 0: implementation (address) │ ← Can be overwritten!
- * │ Slot 1: owner (address)          │ ← Can be overwritten!
- * └──────────────────────────────────┘
- *
- * VULNERABILITY:
- * - Implementation contracts write to slots by position
- * - If implementation has variables at slots 0 and 1, it overwrites proxy state
- * - Attacker can become owner and control the proxy
+ * @title DelegatecallCorruptionSolution
+ * @notice Storage collision vulnerabilities in proxy patterns
+ * 
+ * PURPOSE: Demonstrates how delegatecall can corrupt proxy storage
+ * CS CONCEPTS: Storage layout collisions, delegatecall execution context
+ * 
+ * CONNECTIONS:
+ * - Project 10: Upgradeable proxies (this shows the vulnerability)
+ * - Project 15: delegatecall mechanism
+ * - Project 01: Storage slot layout understanding
+ * 
+ * KEY: Storage slots must match between proxy and implementation (EIP-1967 solves this)
  */
 contract VulnerableProxy {
     address public implementation; // slot 0

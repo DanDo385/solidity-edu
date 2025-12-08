@@ -8,9 +8,18 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title Project 43 Solution: Yield-Bearing Vault
- * @notice Complete implementation of a yield vault with auto-compounding
- * @dev Full solution with multiple strategies and performance fees
+ * @title YieldVaultSolution
+ * @notice ERC-4626 yield vault with pluggable strategies and auto-compounding
+ * 
+ * PURPOSE: Generate yield on deposited assets via external strategies (Aave, Compound)
+ * CS CONCEPTS: Strategy pattern, yield compounding, performance fee calculation
+ * 
+ * CONNECTIONS:
+ * - Project 11: ERC-4626 base implementation
+ * - Project 20: Share-based accounting for yield distribution
+ * - Project 18: Oracle integration for strategy valuation
+ * 
+ * KEY: Strategies are pluggable - vault can switch strategies without user action
  */
 
 interface IYieldStrategy {

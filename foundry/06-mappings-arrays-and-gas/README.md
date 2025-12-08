@@ -340,6 +340,21 @@ Your tests should verify:
 - [ ] Write comprehensive test suite
 - [ ] Run `forge test --gas-report` to compare gas costs
 - [ ] Verify iteration is more expensive than tracking
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MappingsArraysGasSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMappingsArraysGasSolution.s.sol` - Deployment script patterns
+- `test/solution/MappingsArraysGasSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains hash tables (O(1) lookups), dynamic arrays (O(n) iteration), running totals pattern (O(1) vs O(n))
+- **Connections to Project 01**: References mapping/array storage patterns, builds on storage layout concepts
+- **THE KEY OPTIMIZATION**: Running totals pattern - 99% gas savings vs iteration (critical for all balance systems)
+- **Real-World Context**: This pattern is used in all DeFi protocols (Uniswap, Aave, Compound)
+
 - [ ] Review solution implementation
 - [ ] Understand gas optimization patterns
 

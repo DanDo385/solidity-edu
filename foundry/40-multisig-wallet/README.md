@@ -740,6 +740,22 @@ This implementation provides a solid foundation, but for production use, conside
 - Proper key management procedures
 - Emergency procedures
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MultiSigWalletSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMultiSigWalletSolution.s.sol` - Deployment script patterns
+- `test/solution/MultiSigWalletSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains threshold cryptography, consensus mechanisms, state machines
+- **Connections to Project 04**: Access control patterns (extended to multi-party)
+- **Connections to Project 07**: CEI pattern for secure execution
+- **Connections to Project 05**: Error handling for invalid transactions
+- **Real-World Context**: Transaction lifecycle - Submit → Confirm (M times) → Execute
+
 ## Additional Resources
 
 - [Gnosis Safe Contracts](https://github.com/safe-global/safe-contracts)

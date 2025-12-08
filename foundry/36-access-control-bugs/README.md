@@ -463,6 +463,21 @@ forge test --match-test testUninitializedOwner -vvv
 forge test --gas-report
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/AccessControlBugsSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployAccessControlBugsSolution.s.sol` - Deployment script patterns
+- `test/solution/AccessControlBugsSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains access control vulnerabilities, tx.origin vs msg.sender, initialization patterns
+- **Connections to Project 04**: Modifiers and access control (this shows common bugs)
+- **Connections to Project 10**: Proxy initialization (uninitialized owner is a common bug)
+- **Real-World Context**: Access control bugs are among the most common vulnerabilities
+
 ## Key Takeaways
 
 1. **Always initialize ownership**: Never leave owner uninitialized

@@ -343,6 +343,22 @@ function rebalance() external {
 - [ ] Gas costs are acceptable for operations
 - [ ] Rounding errors don't accumulate significantly
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MetaVaultSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMetaVaultSolution.s.sol` - Deployment script patterns
+- `test/solution/MetaVaultSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains recursive composition, vault-of-vaults pattern, yield aggregation
+- **Connections to Project 11**: ERC-4626 vault standard (meta-vault is also ERC-4626)
+- **Connections to Project 20**: Share-based accounting (recursive shares)
+- **Connections to Project 45**: Multi-asset vaults (similar concept, different implementation)
+- **Real-World Context**: Yield aggregators use this pattern to optimize returns across multiple strategies
+
 ## Learning Objectives
 
 1. Understand vault composition patterns

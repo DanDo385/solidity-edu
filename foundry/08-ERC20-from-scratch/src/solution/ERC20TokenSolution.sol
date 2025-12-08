@@ -3,45 +3,19 @@ pragma solidity ^0.8.20;
 
 /**
  * @title ERC20TokenSolution
- * @notice Complete ERC20 implementation from scratch
- * @dev This contract implements the ERC20 token standard without using libraries.
- *      It demonstrates all core ERC20 functionality: transfers, approvals, and delegated transfers.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- *                        CONCEPTUAL OVERVIEW
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * ERC20 TOKEN STANDARD: The Foundation of DeFi
- * ═════════════════════════════════════════════
- *
- * ERC20 is the most widely used token standard on Ethereum. It defines a
- * common interface for fungible tokens, enabling interoperability between
- * different applications, wallets, and exchanges.
- *
- * KEY COMPONENTS:
- * 1. **Balance Tracking**: Mapping of addresses to token balances
- * 2. **Transfer Function**: Direct token transfers between addresses
- * 3. **Approval System**: Delegated spending mechanism
- * 4. **TransferFrom**: Allows approved addresses to transfer tokens
- * 5. **Events**: Transfer and Approval events for off-chain tracking
- *
- * REAL-WORLD ANALOGY:
- * Like a standardized currency format - every ERC20 token follows the same
- * rules, so wallets and exchanges can handle them all the same way!
- *
- * CONNECTION TO PROJECT 01: Storage Patterns!
- * ═══════════════════════════════════════════
- *
- * We use the storage patterns we learned:
- * - Mappings for O(1) balance lookups
- * - Nested mappings for allowance tracking
- * - Events for off-chain indexing (Project 03)
- *
- * CONNECTION TO PROJECT 02: Function Visibility!
- * ═════════════════════════════════════════════
- *
- * All ERC20 functions are public, enabling external calls from wallets,
- * contracts, and DEXs.
+ * @notice Complete ERC20 token implementation combining all previous concepts
+ * 
+ * PURPOSE: The foundation of DeFi - fungible token standard enabling interoperability
+ * CS CONCEPTS: Hash tables (balances), nested mappings (allowances), delegation pattern
+ * 
+ * CONNECTIONS:
+ * - Project 01: Mapping storage for balances, nested mappings for allowances
+ * - Project 02: Public functions, CEI pattern for transfers
+ * - Project 03: Transfer/Approval events (required by standard)
+ * - Project 04: Access control patterns (for minting/burning extensions)
+ * - Project 05: Error handling for validation
+ * 
+ * REAL-WORLD: Used by 500,000+ tokens, foundation for all DeFi protocols
  */
 contract ERC20TokenSolution {
     // ════════════════════════════════════════════════════════════════════════
@@ -214,119 +188,21 @@ contract ERC20TokenSolution {
     // ════════════════════════════════════════════════════════════════════════
 
     /**
-     * @notice Transfer tokens to another address
-     * @param to Recipient address
-     * @param amount Amount of tokens to transfer
-     * @return success True if transfer succeeded
-     *
-     * @dev TRANSFER OPERATION: Direct Token Transfer
-     * ═══════════════════════════════════════════════
-     *
-     *      This function implements the core ERC20 transfer functionality.
-     *      It moves tokens from the caller's balance to the recipient's balance.
-     *
-     *      EXECUTION FLOW:
-     *      ┌─────────────────────────────────────────┐
-     *      │ 1. VALIDATION: Check recipient          │
-     *      │    - Must not be zero address           │
-     *      │    ↓                                      │
-     *      │ 2. VALIDATION: Check balance             │
-     *      │    - Sender must have sufficient tokens │
-     *      │    ↓                                      │
-     *      │ 3. UPDATE BALANCES: Decrease sender      │
-     *      │    - balanceOf[sender] -= amount         │
-     *      │    ↓                                      │
-     *      │ 4. UPDATE BALANCES: Increase recipient   │
-     *      │    - balanceOf[recipient] += amount       │
-     *      │    ↓                                      │
-     *      │ 5. EMIT EVENT: Transfer event             │
-     *      │    - Log the transfer                    │
-     *      │    ↓                                      │
-     *      │ 6. RETURN: Return true                   │
-     *      └─────────────────────────────────────────┘
-     *
-     *      CONNECTION TO PROJECT 01: Mapping Storage Updates!
-     *      ═════════════════════════════════════════════════
-     *
-     *      We're updating two mapping storage slots:
-     *      - Sender's balance: keccak256(abi.encodePacked(sender, slot))
-     *      - Recipient's balance: keccak256(abi.encodePacked(recipient, slot))
-     *
-     *      CONNECTION TO PROJECT 02: Checks-Effects-Interactions!
-     *      ════════════════════════════════════════════════════
-     *
-     *      This follows the CEI pattern:
-     *      - Checks: Validate inputs
-     *      - Effects: Update state
-     *      - Interactions: Emit event (off-chain interaction)
-     *
-     *      CONNECTION TO PROJECT 03: Event Emission!
-     *      ══════════════════════════════════════════
-     *
-     *      Transfer event is required by ERC20 standard.
-     *      Frontends and indexers listen to this event!
-     *
-     *      GAS COST BREAKDOWN:
-     *      ┌─────────────────────┬──────────────┬─────────────────┐
-     *      │ Operation           │ Gas (warm)   │ Gas (cold)      │
-     *      ├─────────────────────┼──────────────┼─────────────────┤
-     *      │ require() checks    │ ~6 gas       │ ~6 gas          │
-     *      │ SLOAD sender balance│ ~100 gas     │ ~2,100 gas      │
-     *      │ SSTORE sender       │ ~5,000 gas   │ ~20,000 gas     │
-     *      │ SLOAD recipient bal │ ~100 gas     │ ~2,100 gas      │
-     *      │ SSTORE recipient    │ ~5,000 gas   │ ~20,000 gas     │
-     *      │ Event emission      │ ~1,500 gas   │ ~1,500 gas      │
-     *      ├─────────────────────┼──────────────┼─────────────────┤
-     *      │ TOTAL (warm)        │ ~11,706 gas  │                 │
-     *      │ TOTAL (cold)        │              │ ~45,706 gas     │
-     *      └─────────────────────┴──────────────┴─────────────────┘
-     *
-     *      REAL-WORLD ANALOGY:
-     *      ═══════════════════
-     *
-     *      Like transferring money between bank accounts:
-     *      - **Validation** = Check accounts exist and have funds
-     *      - **Update balances** = Debit sender, credit recipient
-     *      - **Event** = Transaction receipt (permanent record)
-     *
-     *      SECURITY CONSIDERATIONS:
-     *      ═════════════════════════
-     *
-     *      ⚠️  Always validate recipient is not zero address:
-     *      - Sending to address(0) would burn tokens
-     *      - This is a common mistake that can lead to permanent loss
-     *
-     *      ⚠️  Always check balance before transfer:
-     *      - Prevents underflow errors (Solidity 0.8.0+ reverts automatically)
-     *      - Provides clear error message
+     * @notice Transfer tokens (core ERC20 function)
+     * @dev CS: State transition with validation - CEI pattern
+     * CONNECTION: Project 01 (mapping storage), Project 02 (CEI), Project 03 (events)
+     * 
+     * EXECUTION: Validate → Update balances → Emit event
+     * Required by ERC20 standard - enables token transfers
      */
     function transfer(address to, uint256 amount) public returns (bool) {
-        // 🛡️  VALIDATION: Check recipient is not zero address
-        // CONNECTION TO PROJECT 02: Input validation!
-        // Prevents accidental token burning
-        require(to != address(0), "Invalid recipient");
-
-        // 🛡️  VALIDATION: Check sender has sufficient balance
-        // CONNECTION TO PROJECT 01: Mapping storage read!
-        // Reading from balances mapping: ~100 gas (warm) or ~2,100 gas (cold)
-        require(balanceOf[msg.sender] >= amount, "Insufficient balance"); // SLOAD: ~100 gas
-
-        // 💾 UPDATE SENDER BALANCE: Decrease balance
-        // CONNECTION TO PROJECT 01: Mapping storage write!
-        // Using -= operator (read-modify-write pattern)
-        balanceOf[msg.sender] -= amount; // SSTORE: ~5,000 gas (warm)
-
-        // 💾 UPDATE RECIPIENT BALANCE: Increase balance
-        // CONNECTION TO PROJECT 01: Mapping storage write!
-        // Using += operator (read-modify-write pattern)
-        balanceOf[to] += amount; // SSTORE: ~5,000 gas (warm)
-
-        // 📢 EVENT EMISSION: Log the transfer
-        // CONNECTION TO PROJECT 03: Event emission!
-        // Required by ERC20 standard. Frontends listen to this event!
-        emit Transfer(msg.sender, to, amount); // ~1,500 gas
-
-        // ✅ RETURN: ERC20 standard requires bool return
+        require(to != address(0), "Invalid recipient"); // CONNECTION: Project 05 error handling
+        require(balanceOf[msg.sender] >= amount, "Insufficient balance"); // CONNECTION: Project 01 mapping read
+        
+        balanceOf[msg.sender] -= amount; // CONNECTION: Project 01 mapping write
+        balanceOf[to] += amount; // CONNECTION: Project 01 mapping write
+        
+        emit Transfer(msg.sender, to, amount); // CONNECTION: Project 03 event (required by ERC20)
         return true;
     }
 
@@ -421,22 +297,11 @@ contract ERC20TokenSolution {
      *      Without approvals, DeFi wouldn't work!
      */
     function approve(address spender, uint256 amount) public returns (bool) {
-        // 🛡️  VALIDATION: Check spender is not zero address
-        // CONNECTION TO PROJECT 02: Input validation!
-        require(spender != address(0), "Invalid spender");
-
-        // 💾 SET ALLOWANCE: Update nested mapping
-        // CONNECTION TO PROJECT 01: Nested mapping storage write!
-        // This OVERWRITES any previous approval!
-        // Storage: Two-level keccak256 calculation
-        allowance[msg.sender][spender] = amount; // SSTORE: ~5,000 gas (warm)
-
-        // 📢 EVENT EMISSION: Log the approval
-        // CONNECTION TO PROJECT 03: Event emission!
-        // Required by ERC20 standard. Frontends listen to this event!
-        emit Approval(msg.sender, spender, amount); // ~1,500 gas
-
-        // ✅ RETURN: ERC20 standard requires bool return
+        require(spender != address(0), "Invalid spender"); // CONNECTION: Project 05 validation
+        
+        allowance[msg.sender][spender] = amount; // CONNECTION: Project 01 nested mapping write
+        emit Approval(msg.sender, spender, amount); // CONNECTION: Project 03 event (required by ERC20)
+        
         return true;
     }
 

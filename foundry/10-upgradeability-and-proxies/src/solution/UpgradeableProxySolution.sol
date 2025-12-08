@@ -3,51 +3,18 @@ pragma solidity ^0.8.20;
 
 /**
  * @title UUPSProxy
- * @notice Minimal UUPS (Universal Upgradeable Proxy Standard) proxy implementation
- * @dev This proxy contract enables upgradeability by delegating all calls to an
- *      implementation contract while maintaining state in the proxy.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- *                        CONCEPTUAL OVERVIEW
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * PROXY PATTERN: Separating Logic from State
- * ═══════════════════════════════════════════
- *
- * Smart contracts are immutable - once deployed, code cannot be changed.
- * Proxies enable upgradeability by separating:
- * - **Proxy Contract**: Stores state, delegates calls
- * - **Implementation Contract**: Contains logic, can be upgraded
- *
- * HOW IT WORKS:
- * ┌─────────────────────────────────────────┐
- * │ User calls proxy function               │
- * │   ↓                                      │
- * │ Proxy fallback() catches call            │
- * │   ↓                                      │
- * │ delegatecall to implementation          │
- * │   ↓                                      │
- * │ Implementation code executes            │
- * │   ↓                                      │
- * │ State changes stored in PROXY           │
- * │   ↓                                      │
- * │ Return value forwarded to user          │
- * └─────────────────────────────────────────┘
- *
- * REAL-WORLD ANALOGY:
- * Like a building with replaceable wiring:
- * - **Proxy** = Building structure (permanent, holds state)
- * - **Implementation** = Electrical system (upgradeable, contains logic)
- * - **Upgrade** = Replacing electrical system without rebuilding building
- *
- * CONNECTION TO PROJECT 01: Storage Patterns!
- * ════════════════════════════════════════════
- *
- * We use EIP-1967 storage slots to avoid collisions with implementation storage.
- * These slots are calculated using keccak256, just like mapping storage!
- *
- * CONNECTION TO PROJECT 02: Delegatecall!
- * ══════════════════════════════════════════
+ * @notice UUPS proxy pattern enabling contract upgradeability
+ * 
+ * PURPOSE: Separate logic (upgradeable) from state (persistent) - enables bug fixes/upgrades
+ * CS CONCEPTS: Delegation pattern, storage layout separation, fallback functions
+ * 
+ * CONNECTIONS:
+ * - Project 01: EIP-1967 storage slots (keccak256-based, like mappings)
+ * - Project 02: delegatecall (executes code in proxy's context)
+ * - Project 04: Access control for upgrades
+ * 
+ * HOW IT WORKS: User → Proxy fallback() → delegatecall → Implementation → State in proxy
+ */
  *
  * Delegatecall executes code from another contract in current contract's context.
  * This is THE key mechanism that makes proxies work!

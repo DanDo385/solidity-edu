@@ -424,6 +424,22 @@ const adminSlot: bigint = BigInt(keccak256("eip1967.proxy.admin")) - 1n;
 - **Impact**: Proxy functions can't be called
 - **Solution**: Use transparent proxy pattern
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/DelegatecallCorruptionSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployDelegatecallCorruptionSolution.s.sol` - Deployment script patterns
+- `test/solution/DelegatecallCorruptionSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains storage layout collisions, delegatecall execution context
+- **Connections to Project 10**: Upgradeable proxies (this shows the vulnerability)
+- **Connections to Project 15**: delegatecall mechanism
+- **Connections to Project 01**: Storage slot layout understanding
+- **Real-World Context**: Storage slots must match between proxy and implementation (EIP-1967 solves this)
+
 ## Learning Objectives
 
 By completing this project, you will:

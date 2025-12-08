@@ -579,6 +579,21 @@ After completing this project:
 2. Complete the TODOs in order
 3. Run tests: `forge test --match-path test/Project26.t.sol`
 4. Compare with solution when stuck
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC1155MultiTokenSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC1155MultiTokenSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC1155MultiTokenSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains batch operations, multi-token accounting, efficient storage patterns
+- **Connections to Projects 08 & 09**: Combines ERC20 (fungible) and ERC721 (non-fungible) concepts
+- **Real-World Context**: Used in gaming, marketplaces, and multi-asset systems
+
 5. Deploy locally: `forge script script/DeployProject26.s.sol`
 
 Happy coding! 🎮

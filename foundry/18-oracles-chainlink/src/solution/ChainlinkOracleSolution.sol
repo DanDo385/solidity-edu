@@ -2,25 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project18Solution - Chainlink Oracle Integration (Complete Implementation)
- * @notice Production-ready Chainlink price feed integration with comprehensive safety checks
- * @dev This is the SOLUTION - study this after attempting the skeleton contract
- *
- * KEY LEARNING POINTS:
- * 1. Always validate oracle data (staleness, bounds, completeness)
- * 2. Circuit breakers protect against extreme price movements
- * 3. Multiple safety layers prevent oracle manipulation
- * 4. Proper error handling for oracle failures
- * 5. Gas-efficient caching strategies
- *
- * SECURITY FEATURES IMPLEMENTED:
- * ✅ Stale price detection
- * ✅ Price range validation
- * ✅ Round completeness check
- * ✅ Circuit breaker pattern
- * ✅ Emergency pause mechanism
- * ✅ Owner-controlled configuration
- * ✅ Comprehensive event logging
+ * @title ChainlinkOracleSolution
+ * @notice Chainlink price oracle integration with security validations
+ * 
+ * PURPOSE: Secure external data integration - price feeds for DeFi protocols
+ * CS CONCEPTS: External data validation, circuit breakers, staleness detection
+ * 
+ * CONNECTIONS:
+ * - Project 04: Access control for oracle configuration
+ * - Project 05: Error handling for oracle failures
+ * - Project 13: Time-based staleness checks
+ * 
+ * KEY: Always validate external data - staleness, bounds, completeness checks
  */
 
 // Chainlink AggregatorV3Interface

@@ -2,9 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project 31 Solution: Advanced Reentrancy Lab
- * @notice Complete solutions with both vulnerable and secure implementations
- * @dev Comprehensive attack demonstrations and mitigation strategies
+ * @title ReentrancyLabSolution
+ * @notice Advanced reentrancy patterns - cross-function, read-only, and mitigations
+ * 
+ * PURPOSE: Deep dive into reentrancy attack vectors and defense patterns
+ * CS CONCEPTS: State machine attacks, read-only reentrancy, mutex patterns
+ * 
+ * CONNECTIONS:
+ * - Project 07: Basic reentrancy and CEI pattern
+ * - Project 02: CEI pattern foundation
+ * - Project 12: ReentrancyGuard implementation
+ * 
+ * KEY: Cross-function and read-only reentrancy are harder to detect than direct reentrancy
  */
 
 // =============================================================================

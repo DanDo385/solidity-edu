@@ -7,19 +7,18 @@ import "@openzeppelin/contracts/token/ERC20/extensions/IERC4626.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * @title VaultPrecisionSolution - ERC-4626 Vault with Correct Rounding
- * @notice Complete implementation with proper mathematical rounding
- * @dev This is the reference solution showing correct rounding in all operations
- *
- * KEY PRINCIPLES IMPLEMENTED:
- * 1. ✅ Deposit rounds DOWN shares (vault keeps extra value)
- * 2. ✅ Mint rounds UP assets (user pays more)
- * 3. ✅ Withdraw rounds UP shares (user burns more)
- * 4. ✅ Redeem rounds DOWN assets (user receives less)
- * 5. ✅ Preview functions match action rounding
- * 6. ✅ Edge cases handled (zero supply, zero assets)
- * 7. ✅ No division by zero possible
- * 8. ✅ Vault invariants maintained
+ * @title VaultPrecisionSolution
+ * @notice ERC-4626 vault with correct rounding to prevent precision loss attacks
+ * 
+ * PURPOSE: Demonstrates critical rounding rules that prevent vault insolvency
+ * CS CONCEPTS: Integer division rounding, precision attacks, invariant maintenance
+ * 
+ * CONNECTIONS:
+ * - Project 11: ERC-4626 standard (this shows correct rounding)
+ * - Project 20: Share-based accounting (precision critical here)
+ * - Project 44: Inflation attacks (rounding prevents these)
+ * 
+ * KEY: Deposit/mint round opposite directions - prevents precision loss exploitation
  */
 contract VaultPrecisionSolution is ERC20, IERC4626 {
     using SafeERC20 for IERC20;

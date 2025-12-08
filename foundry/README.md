@@ -47,6 +47,22 @@ Every pattern includes:
 - **Storage Diagrams**: Visual representation of memory layout
 - **Gas Analysis**: Concrete cost measurements
 
+### Enhanced Solution Files
+
+All solution files (`src/solution/*.sol`) have been enhanced with:
+
+- **Computer Science Concepts**: Explanations from first principles (hash tables, state machines, memory management, etc.)
+- **Purpose Statements**: Clear descriptions of real-world use cases for each contract
+- **Syntax Explanations**: Detailed comments explaining Solidity syntax and patterns
+- **Cross-Project Connections**: References showing how concepts build on each other across projects
+- **Progressive Learning**: Early projects (01-05) have comprehensive explanations; later projects (06-50) have streamlined comments that reinforce concepts
+
+**Learning Approach**: The solution files are designed to reinforce learning by:
+- Explaining CS concepts that apply across all programming languages
+- Showing how Solidity patterns connect to fundamental computer science
+- Building connections between projects to reinforce understanding
+- Demonstrating how simple concepts combine into complex DeFi protocols
+
 ---
 
 ## 🎯 Where to Start?

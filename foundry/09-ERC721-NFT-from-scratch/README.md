@@ -296,6 +296,21 @@ Your tests should verify:
 - [ ] Write deployment script
 - [ ] Write comprehensive test suite
 - [ ] Test safe transfer callbacks
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC721NFTSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC721NFTSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC721NFTSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains hash tables (tokenId → owner), count tracking, delegation patterns
+- **Connections to Project 08**: Compares ERC721 (non-fungible) vs ERC20 (fungible) - similar patterns, different use cases
+- **Connections to Projects 01-03**: Uses mapping storage, events, and function patterns from earlier projects
+- **Real-World Context**: Foundation for NFT marketplaces, digital art, gaming assets
+
 - [ ] Review solution implementation
 
 ## 💡 Pro Tips

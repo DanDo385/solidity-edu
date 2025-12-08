@@ -108,6 +108,21 @@ Traditional Flow:
 **REAL-WORLD ANALOGY**: 
 Like needing to sign two separate forms at a bank - one to authorize a transaction, then another to actually do it. Permit is like signing both forms at once!
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC20PermitSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC20PermitSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC20PermitSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains cryptographic signatures (ECDSA), domain separation, permit pattern
+- **Connections to Project 08**: ERC20 base (permit is an extension)
+- **Connections to Project 19**: EIP-712 typed structured data signing
+- **Real-World Context**: Enables gasless approvals - critical for DeFi UX
+
 ## EIP-2612 Solution
 
 ### Permit Workflow

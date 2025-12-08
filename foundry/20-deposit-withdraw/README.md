@@ -426,7 +426,14 @@ forge test --gas-report
 
 ### Task 3: Study the Solution
 
-Compare your implementation with `src/solution/Project20Solution.sol`:
+Compare your implementation with `src/solution/DepositWithdrawSolution.sol`:
+
+**Solution File Features**:
+- **CS Concepts**: Explains proportional math, share-based accounting, precision handling
+- **Connections to Project 11**: ERC-4626 uses this exact pattern for vault operations
+- **Connections to Project 06**: Running totals pattern for efficient balance tracking
+- **Connections to Project 02**: CEI pattern for secure deposits/withdrawals
+- **Real-World Context**: Foundation for all yield vaults (Yearn, Aave, Compound)
 
 - Understand the share conversion math
 - See how rounding favors the vault

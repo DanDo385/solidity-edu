@@ -331,6 +331,21 @@ Your tests should verify:
 - [ ] Write deployment script
 - [ ] Write comprehensive test suite
 - [ ] Test all edge cases
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC20TokenSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC20TokenSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC20TokenSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains hash tables (balances), nested mappings (allowances), delegation pattern
+- **Connections to Projects 01-07**: Combines ALL previous concepts - storage, functions, events, CEI, access control
+- **ERC20 Standard**: Complete implementation of the most important token standard (500,000+ tokens use it)
+- **Real-World Context**: Foundation for all DeFi protocols - DEXs, lending, yield farming all use ERC20
+
 - [ ] Review solution implementation
 - [ ] Compare with OpenZeppelin ERC20
 

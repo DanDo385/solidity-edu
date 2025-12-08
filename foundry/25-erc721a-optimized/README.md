@@ -436,6 +436,22 @@ At 50 gwei and $2000 ETH:
 3. Test edge cases (first/last in batch)
 4. Benchmark transfer costs
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC721AOptimizedSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC721AOptimizedSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC721AOptimizedSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains storage packing, ownership inference, batch operations
+- **Connections to Project 09**: Standard ERC721 (this optimizes it)
+- **Connections to Project 01**: Storage packing for gas optimization
+- **Connections to Project 06**: Batch operations pattern
+- **Real-World Context**: 77% gas savings vs standard ERC721 - used by Azuki and major NFT collections
+
 ## Running the Project
 
 ```bash

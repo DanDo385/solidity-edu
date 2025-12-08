@@ -6,28 +6,19 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /**
- * @title Project29Solution - Merkle Proof Allowlist NFT
- * @notice Complete implementation of an NFT with Merkle tree allowlist
- * @dev This is the solution contract demonstrating best practices
- *
- * MERKLE TREE CONSTRUCTION (Off-Chain):
- * =====================================
- * This contract expects a Merkle tree constructed as follows:
- *
- * 1. Create leaf nodes by hashing each allowlisted address:
- *    leaf = keccak256(abi.encodePacked(address))
- *
- * 2. Build the tree bottom-up:
- *    - Sort pairs to ensure deterministic tree construction
- *    - Hash pairs together: keccak256(abi.encodePacked(left, right))
- *    - Continue until you reach the root
- *
- * 3. Store only the root on-chain (this contract)
- *
- * 4. Generate proofs for each address off-chain
- *    - Proof = array of sibling hashes from leaf to root
- *
- * Example using merkletreejs (TypeScript):
+ * @title MerkleAllowlistSolution
+ * @notice Merkle tree-based allowlist for gas-efficient whitelisting
+ * 
+ * PURPOSE: Verify allowlist membership without storing all addresses on-chain
+ * CS CONCEPTS: Merkle trees, cryptographic proofs, hash functions
+ * 
+ * CONNECTIONS:
+ * - Project 01: keccak256 hashing (used for Merkle tree construction)
+ * - Project 14: ABI encoding for leaf node construction
+ * - Project 09: NFT minting with allowlist restriction
+ * 
+ * KEY: Store only root hash on-chain, verify membership with proof (O(log n) verification)
+ */
  * ```typescript
  * import { MerkleTree } from 'merkletreejs';
  * import keccak256 from 'keccak256';

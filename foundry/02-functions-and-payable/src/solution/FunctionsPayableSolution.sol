@@ -3,8 +3,70 @@ pragma solidity ^0.8.20;
 
 /**
  * @title FunctionsPayableSolution
- * @notice Minimal reference for visibility, payable flows, and safe ETH handling.
- * @dev Focuses on syntax and CEI ordering; the README carries the full theory and examples.
+ * @notice Educational contract demonstrating function visibility, payable functions, and ETH handling
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        CONTRACT PURPOSE
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * This contract builds on Project 01's storage concepts and introduces:
+ * 
+ * 1. **Function Visibility**: public, external, internal, private
+ *    - Controls who can call functions
+ *    - Affects gas costs and call patterns
+ *    - Essential for access control and code organization
+ * 
+ * 2. **Payable Functions**: Receiving native ETH
+ *    - Functions that can receive ETH with transactions
+ *    - msg.value contains the amount sent
+ *    - Critical for DeFi protocols and payment systems
+ * 
+ * 3. **Checks-Effects-Interactions (CEI) Pattern**
+ *    - THE most important security pattern in Solidity
+ *    - Prevents reentrancy attacks
+ *    - Used by all secure DeFi protocols
+ * 
+ * 4. **Special Functions**: receive() and fallback()
+ *    - Handle unexpected calls and plain ETH transfers
+ *    - Important for contract composability
+ * 
+ * REAL-WORLD USE CASES:
+ * - Simple banking contracts (deposit/withdraw)
+ * - Payment escrow systems
+ * - Foundation for DeFi protocols (lending, staking)
+ * - Any contract that handles native ETH
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                    COMPUTER SCIENCE CONCEPTS
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * 1. **Function Visibility (Access Control)**
+ *    - Similar to public/private/protected in OOP languages
+ *    - Controls function callability (who can call)
+ *    - Affects gas costs (external saves calldata copy)
+ * 
+ * 2. **Message Passing with Value**
+ *    - Functions can receive value (ETH) along with call
+ *    - Similar to sending money with a message
+ *    - msg.value contains amount in wei
+ * 
+ * 3. **State Machine Pattern (CEI)**
+ *    - Checks: Validate inputs first
+ *    - Effects: Update state second
+ *    - Interactions: External calls last
+ *    - Prevents reentrancy (critical security pattern)
+ * 
+ * 4. **Function Overloading (receive/fallback)**
+ *    - Special functions for handling unexpected calls
+ *    - receive(): Plain ETH transfers
+ *    - fallback(): Unknown function calls
+ * 
+ * CONNECTION TO PROJECT 01:
+ * - Uses mapping storage pattern for balances
+ * - Uses owner pattern for access control
+ * - Builds on storage layout concepts
+ * 
+ * @dev This is the SECOND project - builds on storage concepts from Project 01
  */
 contract FunctionsPayableSolution {
     address public owner; // Slot 0: set once, reused for access checks.

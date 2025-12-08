@@ -2,21 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project 25 Solution: ERC-721A Optimized NFT Collection
- * @notice Complete implementation of ERC-721A with gas-optimized batch minting
- * @author Azuki Team (concept) - Educational implementation
- * @dev This demonstrates the core optimizations of ERC-721A
- *
- * Key Optimizations:
- * 1. Batch minting: O(1) storage writes regardless of quantity
- * 2. Ownership inference: Scan backwards to find batch owner
- * 3. Storage packing: Multiple values in single slots
- * 4. Sequential IDs: Predictable and optimized token numbering
- *
- * Gas Savings Example (5 tokens):
- * - Standard ERC-721: ~750,000 gas
- * - ERC-721A:        ~175,000 gas
- * - Savings:          ~575,000 gas (77% reduction!)
+ * @title ERC721AOptimizedSolution
+ * @notice Gas-optimized ERC721 with batch minting (Azuki's ERC721A)
+ * 
+ * PURPOSE: Massive gas savings for NFT collections via batch minting
+ * CS CONCEPTS: Storage packing, ownership inference, batch operations
+ * 
+ * CONNECTIONS:
+ * - Project 09: Standard ERC721 (this optimizes it)
+ * - Project 01: Storage packing for gas optimization
+ * - Project 06: Batch operations pattern
+ * 
+ * KEY: O(1) storage writes for batch mints - 77% gas savings vs standard ERC721
  */
 
 contract OptimizedNFTSolution {

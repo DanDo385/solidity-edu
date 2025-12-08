@@ -476,7 +476,22 @@ function royaltyInfo(uint256 tokenId, uint256 salePrice)
 1. Review the concepts above
 2. Examine `src/Project28.sol` and complete the TODOs
 3. Run tests: `forge test --match-path test/Project28.t.sol`
-4. Compare with `src/solution/Project28Solution.sol`
+4. Compare with `src/solution/ERC2981RoyaltiesSolution.sol`
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ERC2981RoyaltiesSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployERC2981RoyaltiesSolution.s.sol` - Deployment script patterns
+- `test/solution/ERC2981RoyaltiesSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains royalty calculation patterns, payment distribution
+- **Connections to Project 09**: ERC721 NFT standard (royalties are NFT-specific)
+- **Real-World Context**: Enables creator royalties in NFT marketplaces
+
 5. Deploy: `forge script script/DeployProject28.s.sol`
 
 ## Additional Resources

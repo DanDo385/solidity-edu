@@ -304,6 +304,22 @@ keccak256(abi.encode(a, b, c))
 
  **Ready to Learn** - Critical encoding concepts
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ABIEncodingSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployABIEncodingSolution.s.sol` - Deployment script patterns
+- `test/solution/ABIEncodingSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains serialization, hash collisions, function dispatch mechanisms
+- **Connections to Project 01**: Storage slot calculation uses keccak256(abi.encodePacked(...))
+- **Connections to Project 02**: Function calls use selectors for routing
+- **Connections to Project 15**: Low-level calls use ABI encoding
+- **Real-World Context**: Critical for proxy patterns, function routing, and data encoding
+
 ## Next Steps
 
 After completing this project, you'll understand:

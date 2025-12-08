@@ -302,6 +302,21 @@ Your tests should verify:
 - [ ] Write comprehensive test suite
 - [ ] Verify attack succeeds on vulnerable contract
 - [ ] Verify attack fails on secure contracts
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ReentrancySecuritySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployReentrancySecuritySolution.s.sol` - Deployment script patterns
+- `test/solution/ReentrancySecuritySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains state machine attacks, race conditions, atomic state transitions
+- **Connections to Project 02**: Deep dive into CEI pattern - why it's THE most critical security pattern
+- **Attack Demonstrations**: Shows both vulnerable and secure implementations side-by-side
+- **Real-World Context**: References The DAO hack ($60M) and how CEI pattern prevents it
+
 - [ ] Review solution implementation
 - [ ] Understand CEI pattern deeply
 

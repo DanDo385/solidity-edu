@@ -491,6 +491,22 @@ By completing this project, you will learn:
 └── README.md                      # This file
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MerkleAllowlistSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMerkleAllowlistSolution.s.sol` - Deployment script patterns
+- `test/solution/MerkleAllowlistSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains Merkle trees, cryptographic proofs, hash functions
+- **Connections to Project 01**: keccak256 hashing (used for Merkle tree construction)
+- **Connections to Project 14**: ABI encoding for leaf node construction
+- **Connections to Project 09**: NFT minting with allowlist restriction
+- **Real-World Context**: Gas-efficient whitelisting - store only root hash, verify with proof (O(log n))
+
 ## Tasks
 
 1. Implement Merkle proof verification

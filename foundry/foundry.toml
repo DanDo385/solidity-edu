@@ -14,8 +14,6 @@ evm_version = "paris"
 # Extra output for better debugging
 extra_output = ["storageLayout", "metadata"]
 
-# Skip compilation output for test, script, lib, and solution files
-skip = ["**/test/**", "**/script/**", "**/lib/**", "**/solution/**"]
 
 # Verbose test output
 verbosity = 2

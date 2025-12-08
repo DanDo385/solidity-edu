@@ -898,11 +898,17 @@ Open `test/FunctionsPayable.t.sol` and write comprehensive tests:
 ### Task 4: Study the Solutions
 
 After implementing your own solutions, compare with:
-- `src/solution/FunctionsPayableSolution.sol` - Reference contract implementation
+- `src/solution/FunctionsPayableSolution.sol` - Reference contract implementation with CS concept explanations
 - `script/solution/DeployFunctionsPayableSolution.s.sol` - Deployment script patterns
 - `test/solution/FunctionsPayableSolution.t.sol` - Comprehensive test examples
 
 **Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains function visibility (access control), message passing with value, state machines (CEI pattern)
+- **Connections to Project 01**: References storage patterns and builds on them
+- **Security Patterns**: Detailed explanation of Checks-Effects-Interactions (CEI) pattern - the most critical security pattern in Solidity
+- **Real-World Context**: Examples of how these patterns are used in production DeFi protocols
 
 ### Task 5: Compile and Test
 

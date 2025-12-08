@@ -508,6 +508,22 @@ Test Harvest and Yield Accrual:
   ✓ User can withdraw 1095 tokens
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/YieldVaultSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployYieldVaultSolution.s.sol` - Deployment script patterns
+- `test/solution/YieldVaultSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains strategy pattern, yield compounding, performance fee calculation
+- **Connections to Project 11**: ERC-4626 base implementation
+- **Connections to Project 20**: Share-based accounting for yield distribution
+- **Connections to Project 18**: Oracle integration for strategy valuation
+- **Real-World Context**: Strategies are pluggable - vault can switch strategies without user action
+
 ## Resources
 
 - [ERC4626 Specification](https://eips.ethereum.org/EIPS/eip-4626)

@@ -300,6 +300,22 @@ Your tests should verify:
 - [ ] Write comprehensive test suite
 - [ ] Test upgrade scenarios
 - [ ] Understand storage collision risks
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/UpgradeableProxySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployUpgradeableProxySolution.s.sol` - Deployment script patterns
+- `test/solution/UpgradeableProxySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains delegation pattern, storage layout separation, fallback functions
+- **Connections to Project 01**: EIP-1967 storage slots (keccak256-based, like mappings)
+- **Connections to Project 02**: delegatecall (executes code in proxy's context)
+- **Connections to Project 04**: Access control for upgrades
+- **Real-World Context**: Enables bug fixes and upgrades without losing state or user funds
+
 - [ ] Review solution implementation
 
 ## 💡 Pro Tips

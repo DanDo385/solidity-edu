@@ -456,6 +456,21 @@ forge script script/DeployProject34.s.sol --rpc-url <RPC_URL> --broadcast
 - LP token oracle vulnerabilities
 - Synthetic asset oracle risks
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/OracleManipulationSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployOracleManipulationSolution.s.sol` - Deployment script patterns
+- `test/solution/OracleManipulationSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains oracle manipulation attacks, flashloan synergies, price manipulation
+- **Connections to Project 18**: Chainlink oracles (this shows vulnerable patterns to avoid)
+- **Connections to Project 11**: ERC-4626 vaults (vulnerable oracles can manipulate vault pricing)
+- **Real-World Context**: Oracle manipulation has drained millions - understanding attacks is critical for defense
+
 ---
 
 **⚠️ Educational Purpose Only**

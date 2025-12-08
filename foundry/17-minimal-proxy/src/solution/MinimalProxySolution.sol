@@ -4,38 +4,18 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/proxy/Clones.sol";
 
 /**
- * @title SimpleWallet
- * @notice A simple wallet implementation that can be cloned
- * @dev This contract demonstrates the minimal proxy pattern (EIP-1167)
- *
- * REAL-WORLD ANALOGY: Minimal proxies are like using a template or blueprint.
- * Instead of building a new house from scratch (full deployment), you use a
- * template and just customize it (clone). The template (implementation) is
- * deployed once, then cloned cheaply many times.
- *
- * GAS OPTIMIZATION: Minimal Proxy Pattern (EIP-1167)
- * - Deploy implementation: ~350,000 gas (one-time cost)
- * - Deploy clone: ~41,000 gas (per clone)
- * - Initialize clone: ~50,000 gas
- * - Total per clone: ~91,000 gas vs ~350,000 for direct deployment
- * - Savings: ~259,000 gas per clone (74% reduction!)
- *
- * GAS COST BREAKDOWN:
- * - Full deployment: ~350,000 gas (includes constructor bytecode)
- * - Clone deployment: ~41,000 gas (just proxy bytecode, ~55 bytes)
- * - Savings: ~309,000 gas (88% reduction on deployment)
- *
- * TRADE-OFF:
- *   ✅ Massive gas savings for multiple deployments
- *   ✅ All clones share same implementation (upgradeable)
- *   ❌ Slight overhead on each call (delegatecall)
- *   ❌ Storage layout must match implementation
- *
- * LANGUAGE COMPARISON:
- *   TypeScript: Similar to class inheritance or prototype pattern
- *   Go: Similar to embedding structs (composition)
- *   Rust: Similar to trait objects or dynamic dispatch
- *   Solidity: Minimal proxy uses delegatecall for code reuse
+ * @title MinimalProxySolution
+ * @notice EIP-1167 minimal proxy pattern - gas-efficient contract cloning
+ * 
+ * PURPOSE: Deploy many contracts cheaply by cloning a single implementation
+ * CS CONCEPTS: Code reuse via delegatecall, template pattern, gas optimization
+ * 
+ * CONNECTIONS:
+ * - Project 10: Uses delegatecall (like upgradeable proxies)
+ * - Project 15: Low-level calls for cloning mechanism
+ * - Project 16: CREATE2 for deterministic clone addresses
+ * 
+ * KEY: ~41k gas per clone vs ~350k for full deployment (88% savings!)
  */
 contract SimpleWallet {
     // ============================================================

@@ -2,37 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title SafeETHTransferSolution - Safe ETH Transfer Library
- * @notice Complete implementation of pull payment pattern with detailed explanations
- * @dev This solution demonstrates best practices for safe ETH transfers
- *
- * ARCHITECTURE OVERVIEW:
- * ┌──────────────────────────────────────────────────────────────┐
- * │                    Safe ETH Transfer                         │
- * ├──────────────────────────────────────────────────────────────┤
- * │                                                              │
- * │  1. Users deposit ETH → stored in pendingWithdrawals        │
- * │  2. Users withdraw ETH → pull pattern (self-service)        │
- * │  3. Failed withdrawals → revert (preserves state)           │
- * │  4. Reentrancy protection → CEI pattern                     │
- * │                                                              │
- * │  ┌──────────┐         ┌──────────────┐                     │
- * │  │  User A  │────────>│   Contract   │                     │
- * │  └──────────┘ deposit │              │                     │
- * │                       │  Withdrawal  │                     │
- * │  ┌──────────┐         │    Queue     │                     │
- * │  │  User B  │<────────│              │                     │
- * │  └──────────┘withdraw └──────────────┘                     │
- * │                                                              │
- * └──────────────────────────────────────────────────────────────┘
- *
- * KEY SECURITY FEATURES:
- * - Pull payment pattern (no DoS risk)
- * - Checks-Effects-Interactions pattern (reentrancy protection)
- * - Safe ETH transfer with .call (EIP-1884 compatible)
- * - Proper error handling
- * - Event emission for transparency
- * - Accounting integrity
+ * @title SafeETHTransferSolution
+ * @notice Safe ETH transfer patterns - pull payments and reentrancy protection
+ * 
+ * PURPOSE: Demonstrates secure ETH handling patterns used in production
+ * CS CONCEPTS: Pull payment pattern (DoS prevention), mutex pattern (reentrancy guard)
+ * 
+ * CONNECTIONS:
+ * - Project 02: CEI pattern, safe ETH transfers with .call
+ * - Project 07: Reentrancy protection patterns
+ * - Project 05: Error handling for failed transfers
+ * 
+ * KEY PATTERN: Pull payments (user initiates) vs push (contract sends) - prevents DoS
  */
 
 /**

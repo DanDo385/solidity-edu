@@ -258,11 +258,17 @@ Open `test/ErrorsReverts.t.sol` and write comprehensive tests:
 ### Task 5: Study the Solutions
 
 After implementing your own solutions, compare with:
-- `src/solution/ErrorsRevertsSolution.sol` - Reference contract implementation
+- `src/solution/ErrorsRevertsSolution.sol` - Reference contract implementation with CS concept explanations
 - `script/solution/DeployErrorsRevertsSolution.s.sol` - Deployment script patterns
 - `test/solution/ErrorsRevertsSolution.t.sol` - Comprehensive test examples
 
 **Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains exception handling, gas optimization (custom errors vs strings), invariant checking, transaction atomicity
+- **Connections to Projects 01-04**: References storage patterns, function visibility, access control, and error handling in modifiers
+- **Gas Optimization**: Demonstrates how custom errors save ~27+ gas per error compared to string messages
+- **Real-World Context**: Shows error handling patterns used throughout all production contracts
 
 ### Task 6: Compile and Test
 

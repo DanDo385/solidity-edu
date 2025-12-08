@@ -2,8 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title TargetContract
- * @notice A simple contract to test low-level calls against
+ * @title LowLevelCallsSolution
+ * @notice Low-level call operations: call, delegatecall, staticcall
+ * 
+ * PURPOSE: Understanding EVM call mechanisms and their security implications
+ * CS CONCEPTS: Message passing, execution context, call vs delegatecall
+ * 
+ * CONNECTIONS:
+ * - Project 02: .call{value:}() for ETH transfers
+ * - Project 10: delegatecall for proxy patterns
+ * - Project 14: ABI encoding for call data
+ * 
+ * KEY: call (target context) vs delegatecall (caller context) - critical difference!
  */
 contract TargetContract {
     uint256 public value;

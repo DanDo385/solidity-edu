@@ -2,31 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Multi-Signature Wallet - Complete Solution
- * @author Solidity Education
- * @notice A production-grade multi-signature wallet with comprehensive security features
- * @dev This implementation follows industry best practices and security patterns
- *
- * Security Features:
- * - M-of-N threshold signatures for transaction execution
- * - Nonce-based replay protection
- * - Checks-Effects-Interactions pattern to prevent reentrancy
- * - Comprehensive input validation
- * - Owner management via multi-sig consensus
- * - Emergency owner recovery capabilities
- * - Gas-efficient confirmation tracking
- *
- * Architecture:
- * - Transaction lifecycle: Submit → Confirm → Execute
- * - Owner management requires multi-sig approval
- * - Threshold enforcement on every execution
- * - Event emission for full transparency
- *
- * Gas Optimizations:
- * - Packed struct layout
- * - Cached array lengths in loops
- * - uint256 for all numeric values (EVM-native)
- * - Minimal storage writes
+ * @title MultiSigWalletSolution
+ * @notice M-of-N multi-signature wallet for secure fund management
+ * 
+ * PURPOSE: Require multiple approvals before executing transactions
+ * CS CONCEPTS: Threshold cryptography, consensus mechanisms, state machines
+ * 
+ * CONNECTIONS:
+ * - Project 04: Access control patterns (extended to multi-party)
+ * - Project 07: CEI pattern for secure execution
+ * - Project 05: Error handling for invalid transactions
+ * 
+ * KEY: Transaction lifecycle - Submit → Confirm (M times) → Execute
  */
 contract MultiSigWalletSolution {
     /*//////////////////////////////////////////////////////////////

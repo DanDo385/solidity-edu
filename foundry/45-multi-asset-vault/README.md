@@ -486,6 +486,22 @@ struct PackedAsset {
 }
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MultiAssetVaultSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMultiAssetVaultSolution.s.sol` - Deployment script patterns
+- `test/solution/MultiAssetVaultSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains portfolio valuation, weighted NAV calculations, rebalancing algorithms
+- **Connections to Project 11**: ERC-4626 vault standard (this extends it to multiple assets)
+- **Connections to Project 18**: Oracle integration for multi-asset pricing
+- **Connections to Project 20**: Share-based accounting for basket ownership
+- **Real-World Context**: Index fund/ETF pattern - diversified exposure in single vault
+
 ## Testing Checklist
 
 - [ ] NAV calculation with multiple assets

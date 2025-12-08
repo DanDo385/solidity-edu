@@ -297,7 +297,14 @@ Open `src/Project18.sol` and implement:
 
 ### Task 2: Study the Solution
 
-Compare with `src/solution/Project18Solution.sol`:
+Compare with `src/solution/ChainlinkOracleSolution.sol`:
+
+**Solution File Features**:
+- **CS Concepts**: Explains external data validation, circuit breakers, staleness detection
+- **Connections to Project 04**: Access control for oracle configuration
+- **Connections to Project 05**: Error handling for oracle failures
+- **Connections to Project 13**: Time-based staleness checks
+- **Real-World Context**: Production-ready oracle integration used in all DeFi protocols
 - Understand all safety checks
 - See how circuit breaker works
 - Learn proper error handling

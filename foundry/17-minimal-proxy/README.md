@@ -442,6 +442,22 @@ Implement a complete clone factory system:
 4. **Gas Comparison**: Compare gas costs between clone and new deployment
 5. **Multiple Clones**: Deploy and test multiple independent clones
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/MinimalProxySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployMinimalProxySolution.s.sol` - Deployment script patterns
+- `test/solution/MinimalProxySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains code reuse via delegatecall, template pattern, gas optimization
+- **Connections to Project 10**: Uses delegatecall (like upgradeable proxies)
+- **Connections to Project 15**: Low-level calls for cloning mechanism
+- **Connections to Project 16**: CREATE2 for deterministic clone addresses
+- **Real-World Context**: 88% gas savings vs full deployment - used in production for multi-instance contracts
+
 ## Testing Checklist
 
 - [ ] Deploy implementation contract

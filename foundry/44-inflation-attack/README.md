@@ -380,7 +380,24 @@ After completing this project, you should understand:
 1. **Study the skeleton**: Review `src/Project44.sol` and read all comments
 2. **Attempt implementation**: Try to implement the vulnerable vault and attacker
 3. **Run tests**: `forge test --match-contract Project44Test -vvv`
-4. **Compare with solution**: Check `src/solution/Project44Solution.sol`
+4. **Compare with solution**: Check `src/solution/InflationAttackSolution.sol`
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/InflationAttackSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployInflationAttackSolution.s.sol` - Deployment script patterns
+- `test/solution/InflationAttackSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains precision attacks, first-deposit exploits, rounding manipulation
+- **Connections to Project 11**: ERC-4626 vaults (this shows the attack)
+- **Connections to Project 20**: Share-based accounting (precision is critical)
+- **Connections to Project 42**: Correct rounding prevents these attacks
+- **Real-World Context**: First-deposit attacks can drain vaults - virtual shares/assets prevent this
+
 5. **Experiment**: Try different mitigation strategies
 
 ## Tasks

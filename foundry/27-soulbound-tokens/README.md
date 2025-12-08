@@ -493,7 +493,12 @@ forge test --match-path test/Project27.t.sol -vvv
 
 ### Step 4: Compare with Solution
 
-Study `src/solution/Project27Solution.sol` to see best practices.
+Study `src/solution/SoulboundTokensSolution.sol` to see best practices.
+
+**Solution File Features**:
+- **CS Concepts**: Explains transfer prevention patterns, revocation mechanisms
+- **Connections to Project 09**: ERC721 base with transfer restrictions
+- **Real-World Context**: Used for credentials, achievements, identity tokens
 
 ## Testing
 

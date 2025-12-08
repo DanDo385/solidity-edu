@@ -520,6 +520,21 @@ selfdestruct(payable(targetContract));
 3. Try implementing the TODOs yourself
 4. Run tests: `forge test`
 5. Compare with solution in `src/solution/SafeETHTransferSolution.sol`
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/SafeETHTransferSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeploySafeETHTransferSolution.s.sol` - Deployment script patterns
+- `test/solution/SafeETHTransferSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains pull payment pattern (DoS prevention), mutex pattern (reentrancy guard)
+- **Connections to Projects 02 & 07**: Builds on CEI pattern and safe ETH transfer patterns
+- **Security Patterns**: Demonstrates pull-over-push pattern to prevent DoS attacks
+- **Real-World Context**: Pattern used in production contracts (OpenZeppelin, Uniswap)
 6. Deploy: `forge script script/DeploySafeETHTransfer.s.sol`
 
 Happy learning!

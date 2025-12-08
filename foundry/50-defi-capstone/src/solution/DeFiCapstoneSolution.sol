@@ -15,9 +15,19 @@ import "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
 import "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 
 /**
- * @title DeFi Protocol Capstone - Complete Solution
- * @notice Production-ready DeFi protocol with full integration
- * @dev Combines: ERC20, ERC721, ERC4626, Governance, Oracles, Flash Loans
+ * @title DeFiCapstoneSolution
+ * @notice Complete DeFi protocol combining all learned concepts
+ * 
+ * PURPOSE: Capstone project integrating tokens, vaults, governance, oracles, flash loans
+ * CS CONCEPTS: Protocol design, composability, upgradeability, security patterns
+ * 
+ * CONNECTIONS:
+ * - All previous projects: Combines ERC20, ERC721, ERC4626, proxies, oracles
+ * - Project 10: Upgradeable proxy pattern
+ * - Project 18: Oracle integration
+ * - Project 19: Governance with signed messages
+ * 
+ * KEY: Real-world DeFi protocol demonstrating composability and security best practices
  */
 
 // ============================================================================

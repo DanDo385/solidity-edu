@@ -2,23 +2,18 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title BlockTimeLogicSolution - Block Properties & Time Logic (Complete Implementation)
- * @notice Complete solution demonstrating safe time-based logic patterns
- * @dev This contract shows best practices for working with block.timestamp and block.number
- *
- * KEY LEARNINGS IMPLEMENTED:
- * - block.timestamp for long-duration locks (hours/days)
- * - block.number for predictable event timing
- * - Rate limiting to prevent spam
- * - Cooldown periods for two-step processes
- * - Linear vesting calculations
- * - Proper time comparisons using >=
- *
- * SECURITY CONSIDERATIONS:
- * - All time comparisons use >= instead of ==
- * - Timestamp manipulation (±15 seconds) is negligible for our use cases
- * - Reentrancy protection via checks-effects-interactions pattern
- * - blockhash randomness is NOT secure (educational only)
+ * @title BlockTimeLogicSolution
+ * @notice Time-based logic using block.timestamp and block.number
+ * 
+ * PURPOSE: Demonstrates safe time comparisons, rate limiting, vesting, cooldowns
+ * CS CONCEPTS: Time-based state machines, rate limiting, linear interpolation
+ * 
+ * CONNECTIONS:
+ * - Project 01: Storage patterns for time locks
+ * - Project 02: CEI pattern for time-based operations
+ * - Project 04: Modifiers for time-based access control
+ * 
+ * KEY: Always use >= for time comparisons (not ==) - accounts for miner manipulation
  */
 contract BlockTimeLogicSolution {
     /*//////////////////////////////////////////////////////////////

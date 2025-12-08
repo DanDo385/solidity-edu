@@ -659,6 +659,21 @@ View your on-chain NFT metadata:
 4. Paste into browser address bar
 5. See your fully on-chain metadata and artwork!
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/OnChainSVGSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployOnChainSVGSolution.s.sol` - Deployment script patterns
+- `test/solution/OnChainSVGSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains string concatenation, Base64 encoding, data URI construction
+- **Connections to Project 09**: ERC721 NFT standard (this adds on-chain metadata)
+- **Connections to Project 01**: String storage costs (on-chain metadata is expensive but permanent)
+- **Real-World Context**: Fully decentralized NFTs - no IPFS dependency
+
 ## Resources
 
 - [SVG Tutorial - MDN](https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial)

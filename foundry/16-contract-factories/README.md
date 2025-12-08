@@ -486,6 +486,22 @@ forge test --match-path test/ContractFactory.t.sol -vvv
 # Check skeleton
 forge build
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/ContractFactorySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployContractFactorySolution.s.sol` - Deployment script patterns
+- `test/solution/ContractFactorySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains deterministic hashing, address prediction, counterfactual deployments
+- **Connections to Project 01**: keccak256 for address calculation (like mapping storage slots)
+- **Connections to Project 14**: ABI encoding for bytecode construction
+- **Connections to Project 17**: Used with minimal proxies for gas-efficient cloning
+- **Real-World Context**: Enables counterfactual deployments, upgrade patterns, address-based logic
+
 # See solution
 cat src/solution/ContractFactorySolution.sol
 

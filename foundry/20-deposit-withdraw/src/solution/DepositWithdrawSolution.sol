@@ -2,42 +2,19 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title Project20Solution - Deposit/Withdraw Accounting
- * @notice Complete implementation of share-based deposit/withdraw accounting
- *
- * ════════════════════════════════════════════════════════════════════════════
- * CONCEPTUAL OVERVIEW
- * ════════════════════════════════════════════════════════════════════════════
- *
- * This contract demonstrates share-based accounting, which is fundamental to:
- * - Yield vaults (Yearn, Beefy)
- * - Lending protocols (Aave, Compound)
- * - Liquidity mining
- * - ERC-4626 Tokenized Vault Standard
- *
- * WHY SHARES?
- * ===========
- * Direct accounting (tracking each user's deposit) doesn't handle yield:
- *   Alice deposits 100 tokens
- *   Vault earns 10 tokens
- *   How much does Alice own? Still 100? Or 110?
- *
- * Share-based accounting solves this:
- *   Alice deposits 100 tokens → gets 100 shares
- *   Vault earns 10 tokens (110 total, 100 shares)
- *   Each share now worth 1.1 tokens
- *   Alice's 100 shares = 110 tokens
- *
- * MATH EXPLAINED:
- * ===============
- *
- * DEPOSIT (assets → shares):
- *   shares = (assets * totalShares) / totalAssets
- *
- *   Example: Vault has 1000 assets, 900 shares
- *   User deposits 100 assets
- *   shares = (100 * 900) / 1000 = 90 shares
- *   (User gets proportional ownership)
+ * @title DepositWithdrawSolution
+ * @notice Share-based deposit/withdraw accounting for yield-bearing vaults
+ * 
+ * PURPOSE: Proportional ownership accounting that handles yield automatically
+ * CS CONCEPTS: Proportional math, share-based accounting, precision handling
+ * 
+ * CONNECTIONS:
+ * - Project 11: ERC-4626 uses this exact pattern
+ * - Project 06: Running totals for totalAssets/totalShares
+ * - Project 02: CEI pattern for deposits/withdrawals
+ * 
+ * KEY MATH: shares = (assets * totalShares) / totalAssets (proportional minting)
+ * Enables yield distribution without tracking individual user balances
  *
  * WITHDRAW (shares → assets):
  *   assets = (shares * totalAssets) / totalShares

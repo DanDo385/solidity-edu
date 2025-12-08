@@ -481,7 +481,23 @@ After completing this project, you will understand:
 2. Examine the skeleton code in `src/Project46.sol`
 3. Try to implement the TODOs yourself
 4. Run tests: `forge test --match-contract Project46Test -vvv`
-5. Compare with solution in `src/solution/Project46Solution.sol`
+5. Compare with solution in `src/solution/VaultInsolvencySolution.sol`
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/VaultInsolvencySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployVaultInsolvencySolution.s.sol` - Deployment script patterns
+- `test/solution/VaultInsolvencySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains insolvency handling, proportional withdrawals, loss distribution
+- **Connections to Project 11**: ERC-4626 vaults (insolvency is a critical edge case)
+- **Connections to Project 20**: Share-based accounting (how losses affect shares)
+- **Real-World Context**: Strategy losses can cause insolvency - must handle gracefully
+
 6. Deploy locally: `forge script script/DeployProject46.s.sol`
 
 Good luck, and remember: handling insolvency is about protecting users during the worst-case scenarios!

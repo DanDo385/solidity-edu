@@ -134,24 +134,148 @@ contract DatatypesStorageSolution {
         return _arr[0]; // Calldata is zero-copy; only valid in external functions.
     }
 
-    // HELPERS ----------------------------------------------------------------
+    // ════════════════════════════════════════════════════════════════════════
+    // HELPER FUNCTIONS - Utility Operations
+    // ════════════════════════════════════════════════════════════════════════
+    
+    /**
+     * @notice Check if address has a balance
+     * @dev BOOLEAN LOGIC (Computer Science: Predicate Functions)
+     * 
+     * Simple predicate function that returns true/false.
+     * 
+     * MAPPING DEFAULT VALUES:
+     * - Unset keys return 0 (zero value)
+     * - balances[_address] returns 0 if never set
+     * - 0 > 0 evaluates to false
+     * 
+     * SYNTAX: return balances[_address] > 0;
+     * - Comparison operator: > (greater than)
+     * - Returns bool (true or false)
+     */
     function hasBalance(address _address) public view returns (bool) {
-        return balances[_address] > 0;
+        // Check if balance is greater than zero
+        // Unset mapping keys return 0, so this works correctly
+        return balances[_address] > 0; // SLOAD + comparison: ~103 gas (warm)
     }
 
+    /**
+     * @notice Example of packed struct in memory
+     * @dev STRUCT PACKING DEMONSTRATION
+     * 
+     * This function creates a packed struct in memory to demonstrate
+     * the packing concept (though packing only saves gas in storage).
+     * 
+     * BLOCK PROPERTIES:
+     * - block.timestamp: Current block timestamp (Unix epoch)
+     * - Available in all functions
+     * - Set by miner/validator
+     * 
+     * TYPE CASTING:
+     * - uint64(block.timestamp): Casts uint256 to uint64
+     * - May truncate if timestamp > 2^64 - 1 (unlikely before year 2262)
+     * 
+     * SYNTAX: PackedData memory example = PackedData({...});
+     * - Creates struct instance in memory
+     * - Named parameter syntax for clarity
+     * - Memory structs don't benefit from packing (only storage does)
+     */
     function getPackedDataExample()
         public
         view
         returns (uint128, uint128, uint64, address, bool)
     {
+        // Create struct in memory (packing doesn't save gas here, only in storage)
         PackedData memory example = PackedData({
             smallNumber1: 100,
             smallNumber2: 200,
-            timestamp: uint64(block.timestamp),
+            timestamp: uint64(block.timestamp), // Type casting: uint256 → uint64
             user: address(0x1234567890123456789012345678901234567890),
             flag: true
         });
 
+        // Return struct fields
         return (example.smallNumber1, example.smallNumber2, example.timestamp, example.user, example.flag);
     }
 }
+
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                          KEY TAKEAWAYS - PROJECT 01
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * 1. STORAGE LAYOUT IS FUNDAMENTAL
+ *    ✅ Each contract has 2^256 storage slots
+ *    ✅ Value types stored directly in slots
+ *    ✅ Reference types use computed slots
+ *    ✅ Understanding layout = gas optimization
+ * 
+ * 2. DATA LOCATIONS MATTER
+ *    ✅ storage: Persistent, expensive (~20k gas per write)
+ *    ✅ memory: Temporary, cheaper (~3 gas per read)
+ *    ✅ calldata: Zero-copy, read-only (most efficient!)
+ * 
+ * 3. MAPPINGS = HASH TABLES
+ *    ✅ O(1) lookup time (average case)
+ *    ✅ Storage slot = keccak256(key, base_slot)
+ *    ✅ Perfect for key-value lookups
+ *    ✅ No iteration capability
+ * 
+ * 4. ARRAYS = DYNAMIC ARRAYS
+ *    ✅ O(1) indexed access
+ *    ✅ O(n) iteration/search
+ *    ✅ Length stored in base slot
+ *    ✅ Elements at keccak256(slot) + index
+ * 
+ * 5. STRUCTS = COMPOSITE TYPES
+ *    ✅ Group related data together
+ *    ✅ Fields stored sequentially
+ *    ✅ Packing saves gas (multiple small types in one slot)
+ * 
+ * 6. STORAGE IS EXPENSIVE
+ *    ✅ Write: ~20,000 gas (zero to non-zero)
+ *    ✅ Read: ~100 gas (warm) or ~2,100 gas (cold)
+ *    ✅ Cache values you use multiple times!
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                    CONNECTIONS TO FUTURE PROJECTS
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * • Project 02: Functions & Payable
+ *   - Learn function visibility (public, external, internal, private)
+ *   - Understand payable functions and ETH handling
+ *   - Build on storage patterns from Project 01
+ * 
+ * • Project 03: Events & Logging
+ *   - Events are cheaper than storage for historical data
+ *   - Indexed parameters enable efficient filtering
+ *   - Essential for off-chain indexing
+ * 
+ * • Project 04: Modifiers & Restrictions
+ *   - Access control using owner pattern (from Project 01)
+ *   - Custom modifiers for code reuse
+ *   - Pause functionality
+ * 
+ * • Project 06: Mappings, Arrays & Gas
+ *   - Deep dive into gas optimization
+ *   - When to use mappings vs arrays
+ *   - Running totals pattern
+ * 
+ * • Project 08: ERC20 Token
+ *   - Uses mappings for balances (from Project 01)
+ *   - Uses events for transfers (from Project 03)
+ *   - Combines all concepts into real-world token
+ * 
+ * ═══════════════════════════════════════════════════════════════════════════
+ *                        COMPUTER SCIENCE CONCEPTS
+ * ═══════════════════════════════════════════════════════════════════════════
+ * 
+ * • Hash Tables: Mappings are hash tables with O(1) average-case operations
+ * • Dynamic Arrays: Arrays provide O(1) access but O(n) search
+ * • Memory Management: Understanding storage vs memory vs calldata
+ * • Data Structures: Choosing the right structure for the problem
+ * • Big-Endian Storage: EVM stores values in big-endian format
+ * • Storage Packing: Optimizing storage layout to save gas
+ * 
+ * Master these concepts - they're the foundation for everything else!
+ */

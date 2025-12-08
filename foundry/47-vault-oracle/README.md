@@ -374,6 +374,21 @@ Basic structure with TODOs for implementing:
 - Safety checks
 - Vault operations using oracle data
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/VaultOracleSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployVaultOracleSolution.s.sol` - Deployment script patterns
+- `test/solution/VaultOracleSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains TWAP (Time-Weighted Average Price), circular buffers, multi-oracle consensus
+- **Connections to Project 18**: Chainlink oracle integration (this extends it)
+- **Connections to Project 11**: ERC-4626 vaults with oracle-based pricing
+- **Real-World Context**: TWAP prevents oracle manipulation - used in production DeFi protocols
+
 ### Project47Solution.sol (Complete)
 
 Full implementation featuring:

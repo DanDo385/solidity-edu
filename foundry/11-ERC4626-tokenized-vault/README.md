@@ -196,6 +196,12 @@ Open `src/ERC4626Vault.sol` and implement:
 ### Task 2: Study the Solution
 
 Compare with `src/solution/ERC4626VaultSolution.sol`:
+
+**Solution File Features**:
+- **CS Concepts**: Explains proportional ownership math, precision handling, composability patterns
+- **Connections to Project 08**: Vault shares are ERC20 tokens (inherits all ERC20 functionality)
+- **Connections to Project 20**: Uses share-based accounting pattern for yield distribution
+- **Real-World Context**: Standard used by Yearn, Aave, Compound for yield-bearing vaults
 - Understand share/asset conversion math
 - See rounding direction choices (favor vault)
 - Learn security patterns (reentrancy, donation attacks)

@@ -629,11 +629,17 @@ Open `test/EventsLogging.t.sol` and write comprehensive tests:
 ### Task 4: Study the Solutions
 
 After implementing your own solutions, compare with:
-- `src/solution/EventsLoggingSolution.sol` - Reference contract implementation
+- `src/solution/EventsLoggingSolution.sol` - Reference contract implementation with CS concept explanations
 - `script/solution/DeployEventsLoggingSolution.s.sol` - Deployment script patterns
 - `test/solution/EventsLoggingSolution.t.sol` - Comprehensive test examples
 
 **Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains event-driven architecture, logging vs storage trade-offs, bloom filters for indexed parameters
+- **Connections to Projects 01-02**: References storage patterns and function visibility concepts
+- **ERC20 Patterns**: Demonstrates Transfer and Approval events that are required by ERC20 standard (Project 08)
+- **Real-World Context**: Shows how events enable off-chain indexing and frontend updates
 
 ### Task 5: Compile and Test
 

@@ -15,39 +15,18 @@ interface IERC20 {
 
 /**
  * @title ERC4626VaultSolution
- * @notice Complete implementation of ERC-4626 Tokenized Vault Standard
- * @dev This contract implements the ERC-4626 standard for tokenized vaults.
- *      It wraps an ERC-20 asset and issues share tokens representing ownership.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- *                        CONCEPTUAL OVERVIEW
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * ERC-4626 TOKENIZED VAULT: DeFi Yield Standard
- * ═════════════════════════════════════════════
- *
- * An ERC-4626 vault is a wrapper around an ERC-20 asset that:
- * 1. Accepts deposits of underlying asset (USDC, DAI, WETH, etc.)
- * 2. Mints share tokens representing proportional ownership
- * 3. Can deploy assets to yield strategies (Aave, Compound, Curve)
- * 4. Allows withdrawals by burning shares
- *
- * REAL-WORLD ANALOGY:
- * Like a mutual fund:
- * - **Assets** = Underlying investments (USDC, DAI)
- * - **Shares** = Fund shares (yUSDC, vDAI)
- * - **Deposit** = Buying fund shares
- * - **Withdraw** = Selling fund shares
- * - **Yield** = Returns from investments
- *
- * CONNECTION TO PROJECT 08: ERC20 Tokens!
- * ═════════════════════════════════════════
- *
- * Vault shares are ERC20 tokens! Users can transfer, approve, and trade them.
- * This makes vaults composable with other DeFi protocols.
- *
- * SHARE MATH: The Core Formula
- * ═════════════════════════════
+ * @notice ERC-4626 tokenized vault - wraps ERC20 assets with yield generation
+ * 
+ * PURPOSE: Standard for yield-bearing vaults (Aave, Compound, Curve wrappers)
+ * CS CONCEPTS: Proportional ownership (shares), precision math, composability
+ * 
+ * CONNECTIONS:
+ * - Project 08: Vault shares are ERC20 tokens (inherits ERC20 functionality)
+ * - Project 02: Payable functions for deposits, CEI pattern for withdrawals
+ * - Project 06: Running totals pattern for total assets/shares
+ * 
+ * CORE MATH: shares = (assets * totalShares) / totalAssets (proportional minting)
+ */
  *
  * shares = (assets * totalSupply) / totalAssets
  * assets = (shares * totalAssets) / totalSupply

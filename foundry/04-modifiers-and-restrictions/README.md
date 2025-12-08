@@ -435,11 +435,17 @@ Open `test/ModifiersRestrictions.t.sol` and write comprehensive tests:
 ### Task 5: Study the Solutions
 
 After implementing your own solutions, compare with:
-- `src/solution/ModifiersRestrictionsSolution.sol` - Reference contract implementation
+- `src/solution/ModifiersRestrictionsSolution.sol` - Reference contract implementation with CS concept explanations
 - `script/solution/DeployModifiersRestrictionsSolution.s.sol` - Deployment script patterns
 - `test/solution/ModifiersRestrictionsSolution.t.sol` - Comprehensive test examples
 
 **Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains aspect-oriented programming (modifiers), access control patterns, state machines (pause pattern)
+- **Connections to Projects 01-03**: References storage patterns, owner pattern from earlier projects, event emission
+- **Generalization**: Shows how manual owner checks from Project 02 become reusable modifiers
+- **Real-World Context**: Demonstrates patterns used in production contracts (OpenZeppelin, Uniswap)
 
 ### Task 6: Compile and Test
 

@@ -350,6 +350,21 @@ The test suite demonstrates:
     └── DeployProject38.s.sol          # Deployment script
 ```
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/SignatureReplaySolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeploySignatureReplaySolution.s.sol` - Deployment script patterns
+- `test/solution/SignatureReplaySolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains signature replay attacks, nonce-based protection, chainId separation
+- **Connections to Project 19**: EIP-712 signatures (this shows replay protection)
+- **Connections to Project 13**: Time-based deadlines for signature expiration
+- **Real-World Context**: Replay attacks can drain funds - nonces and chainId are essential
+
 ## Resources
 
 - [EIP-712: Typed Structured Data Hashing](https://eips.ethereum.org/EIPS/eip-712)

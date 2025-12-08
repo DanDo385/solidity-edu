@@ -452,6 +452,21 @@ This project is for EDUCATIONAL PURPOSES ONLY:
 - Governance is a complex socio-technical problem
 - No single solution prevents all attacks
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/GovernanceAttackSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployGovernanceAttackSolution.s.sol` - Deployment script patterns
+- `test/solution/GovernanceAttackSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains flashloan attacks, vote buying, quorum manipulation, proposal spam
+- **Connections to Project 08**: Governance tokens (ERC20 with voting power)
+- **Connections to Project 40**: Multi-sig patterns (governance is multi-party decision making)
+- **Real-World Context**: Governance attacks have drained millions - understanding attack vectors is critical
+
 ## Going Further
 
 1. Research Compound and Curve governance models

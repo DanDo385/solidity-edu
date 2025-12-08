@@ -555,7 +555,22 @@ forge test --match-test testOverflowExploit -vvv
 ### Learning Path
 
 1. **Read this README** thoroughly
-2. **Study the solution** (`src/solution/Project32Solution.sol`)
+2. **Study the solution** (`src/solution/OverflowLabSolution.sol`)
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/OverflowLabSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployOverflowLabSolution.s.sol` - Deployment script patterns
+- `test/solution/OverflowLabSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains integer overflow/underflow, arithmetic safety, unchecked blocks
+- **Connections to Project 01**: Arithmetic operations and overflow protection
+- **Real-World Context**: Solidity 0.8.0+ automatically checks, but understanding is critical
+
 3. **Run the tests** to see exploits in action
 4. **Complete the TODOs** in `src/Project32.sol`
 5. **Experiment** with different overflow scenarios

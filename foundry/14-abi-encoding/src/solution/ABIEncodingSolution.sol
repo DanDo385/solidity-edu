@@ -3,20 +3,17 @@ pragma solidity ^0.8.20;
 
 /**
  * @title ABIEncodingSolution
- * @notice Complete implementation demonstrating ABI encoding, function selectors, and security
- * @dev Educational contract showing encoding methods and their security implications
- *
- * REAL-WORLD ANALOGY: ABI encoding is like packaging data for shipping:
- * - abi.encode: Like a padded box with labels - safe but takes more space
- * - abi.encodePacked: Like cramming items tightly - efficient but can mix up items
- * - Function selectors: Like shipping labels - tell the EVM which function to call
+ * @notice ABI encoding, function selectors, and encoding security
  * 
- * Key Concepts Demonstrated:
- * 1. abi.encode vs abi.encodePacked - padding and collision risks
- * 2. Function selector calculation and usage
- * 3. Hash collision vulnerabilities
- * 4. Manual function routing with fallback
- * 5. Gas optimization with pre-computed selectors
+ * PURPOSE: Understanding how data is encoded for EVM calls and storage
+ * CS CONCEPTS: Serialization, hash collisions, function dispatch
+ * 
+ * CONNECTIONS:
+ * - Project 01: Storage slot calculation uses keccak256(abi.encodePacked(...))
+ * - Project 02: Function calls use selectors for routing
+ * - Project 15: Low-level calls use ABI encoding
+ * 
+ * KEY: abi.encode (padded, safe) vs abi.encodePacked (tight, collision risk)
  */
 contract ABIEncodingSolution {
     // ============================================================

@@ -536,3 +536,18 @@ forge test --match-path test/BlockTimeLogic.t.sol --gas-report
 - Can identify vulnerable time-based code
 - Know when each approach is appropriate
 - Can use vm.warp() and vm.roll() for testing
+
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/BlockTimeLogicSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployBlockTimeLogicSolution.s.sol` - Deployment script patterns
+- `test/solution/BlockTimeLogicSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains time-based state machines, rate limiting, linear interpolation (vesting)
+- **Connections to Projects 01-04**: References storage patterns, access control, and modifier patterns
+- **Security Patterns**: Demonstrates safe time comparisons (always use >=, not ==)
+- **Real-World Context**: Used in vesting schedules, time-locked vaults, rate limiting

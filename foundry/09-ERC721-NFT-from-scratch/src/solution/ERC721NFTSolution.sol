@@ -12,41 +12,17 @@ interface IERC721Receiver {
 
 /**
  * @title ERC721NFTSolution
- * @notice Complete ERC721 NFT implementation from scratch
- * @dev This contract implements the ERC721 non-fungible token standard.
- *      Unlike ERC20 (fungible), each ERC721 token is unique and identified by tokenId.
- *
- * ═══════════════════════════════════════════════════════════════════════════
- *                        CONCEPTUAL OVERVIEW
- * ═══════════════════════════════════════════════════════════════════════════
- *
- * ERC721 NFT STANDARD: Digital Ownership
- * ═════════════════════════════════════
- *
- * ERC721 enables non-fungible tokens (NFTs) - unique, indivisible tokens.
- * Each token has a unique tokenId and can have different metadata.
- *
- * KEY DIFFERENCES FROM ERC20:
- * - ERC20: Fungible (all tokens identical, transfer by amount)
- * - ERC721: Non-fungible (each token unique, transfer by tokenId)
- * - ERC20: balanceOf returns amount
- * - ERC721: balanceOf returns count, ownerOf returns owner
- *
- * REAL-WORLD ANALOGY:
- * Like trading cards vs currency:
- * - ERC20 = Currency (all dollars identical)
- * - ERC721 = Trading cards (each card unique)
- * - TokenId = Card number
- * - Metadata URI = Card image/details
- *
- * CONNECTION TO PROJECT 08: ERC20 Comparison!
- * ═══════════════════════════════════════════
- *
- * ERC721 shares some concepts with ERC20:
- * - Both use mappings for ownership/balance tracking
- * - Both have transfer and approval mechanisms
- * - Both emit Transfer events
- * But ERC721 tracks individual tokens, not amounts!
+ * @notice Complete ERC721 NFT implementation - non-fungible tokens
+ * 
+ * PURPOSE: Digital ownership of unique, indivisible tokens (vs ERC20's fungible tokens)
+ * CS CONCEPTS: Hash tables (tokenId → owner), count tracking (balanceOf), delegation
+ * 
+ * CONNECTIONS:
+ * - Project 01: Mapping storage (tokenId → owner, address → count)
+ * - Project 08: Similar approval pattern but per-token (not amount-based)
+ * - Project 03: Transfer events (required by standard)
+ * 
+ * KEY DIFFERENCE FROM ERC20: Tracks individual tokens (tokenId) vs amounts
  */
 contract ERC721NFTSolution {
     // ════════════════════════════════════════════════════════════════════════

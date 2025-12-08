@@ -540,6 +540,22 @@ function previewWithdraw(uint256 assets) public view returns (uint256) {
 6. Test attack prevention
 7. Verify preview functions match actions
 
+### Study the Solutions
+
+After implementing your own solutions, compare with:
+- `src/solution/VaultPrecisionSolution.sol` - Reference contract implementation with CS concept explanations
+- `script/solution/DeployVaultPrecisionSolution.s.sol` - Deployment script patterns
+- `test/solution/VaultPrecisionSolution.t.sol` - Comprehensive test examples
+
+**Important**: Try to implement everything yourself first! The solutions are there to help you learn, not to copy.
+
+**Solution File Features**:
+- **CS Concepts**: Explains integer division rounding, precision attacks, invariant maintenance
+- **Connections to Project 11**: ERC-4626 standard (this shows correct rounding)
+- **Connections to Project 20**: Share-based accounting (precision critical here)
+- **Connections to Project 44**: Inflation attacks (rounding prevents these)
+- **Real-World Context**: Critical for vault security - rounding must favor vault to prevent insolvency
+
 ## Running the Project
 
 ```bash
