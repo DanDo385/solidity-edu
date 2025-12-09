@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Script.sol";
-import "forge-std/console.sol";
-import "../src/FunctionsPayable.sol";
+import { Script } from "forge-std/Script.sol";
+import { console } from "forge-std/console.sol";
+import { FunctionsPayable } from "../src/FunctionsPayable.sol";
 
 /**
  * @title DeployFunctionsPayable

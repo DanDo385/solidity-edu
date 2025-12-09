@@ -75,8 +75,12 @@ contract FunctionsPayableSolution {
     event Deposit(address indexed from, uint256 amount);
     event Withdraw(address indexed to, uint256 amount);
 
-    constructor() {
+    constructor() payable {
         owner = msg.sender; // Classic deployer-owns pattern you’ll generalize in Project 04.
+        if (msg.value > 0) {
+            emit Deposit(msg.sender, msg.value);
+        }
+       
     }
 
     // VISIBILITY & PURE/VIEWS -------------------------------------------------
@@ -139,6 +143,10 @@ contract FunctionsPayableSolution {
     // HELPERS -----------------------------------------------------------------
     function viewBalance(address account) public view returns (uint256) {
         return balances[account];
+    }
+
+    function getContractBalance() public view returns (uint256) {
+        return address(this).balance;
     }
 
     function demoInternalCall(uint256 x) public pure returns (uint256 doubled, uint256 tripled) {

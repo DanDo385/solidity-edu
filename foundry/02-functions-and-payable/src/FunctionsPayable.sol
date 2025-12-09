@@ -189,6 +189,7 @@ contract FunctionsPayable {
      */
     function getBalance(address _address) public view returns (uint256) {
         // TODO: Implement
+        return balances[_address];
     }
 
     /**
@@ -207,6 +208,7 @@ contract FunctionsPayable {
      */
     function publicFunction() public pure returns (string memory) {
         // TODO: Return "This is public"
+        return "This is public";
     }
 
     /**
@@ -215,6 +217,7 @@ contract FunctionsPayable {
      */
     function callInternalFunction() public pure returns (string memory) {
         // TODO: Call and return result from internalFunction()
+        return internalFunction();
     }
 
     /**
@@ -223,6 +226,7 @@ contract FunctionsPayable {
      */
     function callPrivateFunction() public pure returns (string memory) {
         // TODO: Call and return result from privateFunction()
+        return privateFunction();
     }
 
     // ============================================================
@@ -235,6 +239,7 @@ contract FunctionsPayable {
      */
     function internalFunction() internal pure returns (string memory) {
         // TODO: Return "This is internal"
+        return "This is internal";
     }
 
     // ============================================================
@@ -247,5 +252,6 @@ contract FunctionsPayable {
      */
     function privateFunction() private pure returns (string memory) {
         // TODO: Return "This is private"
+        return "This is private";
     }
 }

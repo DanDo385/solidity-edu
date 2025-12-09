@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/Test.sol";
-import "../src/FunctionsPayable.sol";
+import { Test } from "forge-std/Test.sol";
+import { FunctionsPayable } from "../src/FunctionsPayable.sol";
 
 // Note: Once you've implemented FunctionsPayable.sol, you can test it here.
 // For now, you can also compare against the solution by temporarily importing:
