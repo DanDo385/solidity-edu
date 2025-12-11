@@ -1,6 +1,6 @@
-# Solidity 50-Project Mastery Curriculum 🔥
+# Solidity 47-Project Mastery Curriculum 🔥
 
-> **Master Solidity from First Principles through 50 Progressively Complex Mini-Projects**
+> **Master Solidity from First Principles through 47 Progressively Complex Mini-Projects**
 > Learn *WHY* Solidity works the way it does, not just syntax.
 
 ## Table of Contents
@@ -9,7 +9,7 @@
 - [Learning Philosophy](#-learning-philosophy)
 - [Where to Start?](#-where-to-start)
 - [Quick Start](#-quick-start)
-- [Complete Project Curriculum](#-complete-50-project-curriculum)
+- [Complete Project Curriculum](#-complete-47-project-curriculum)
 - [Learning Tracks & Paths](#-learning-tracks--paths)
 - [Project Navigation Guide](#-project-navigation-guide)
 - [Progress Tracker](#-progress-tracker)
@@ -236,7 +236,125 @@ forge build --sizes
 
 ---
 
-## 📖 Complete 50-Project Curriculum
+## 🧭 Navigating the Project
+
+### Project Structure
+
+Each mini-project follows a consistent structure:
+
+```
+foundry/
+├── 01-datatypes-and-storage/
+│   ├── README.md              # Project-specific learning guide
+│   ├── foundry.toml           # Project configuration
+│   ├── src/
+│   │   ├── Contract.sol       # Skeleton contract (your work)
+│   │   └── solution/
+│   │       └── ContractSolution.sol  # Reference implementation
+│   ├── test/
+│   │   ├── Contract.t.sol     # Test suite (your tests)
+│   │   └── solution/
+│   │       └── ContractSolution.t.sol  # Reference tests
+│   └── script/
+│       ├── Deploy.s.sol       # Deployment script
+│       └── solution/
+│           └── DeploySolution.s.sol  # Reference deployment
+├── 02-functions-and-payable/
+│   └── ... (same structure)
+└── ... (47 projects total)
+```
+
+### Running Tests
+
+**Test All Projects**:
+```bash
+# From the foundry directory
+forge test
+
+# With verbose output
+forge test -vvv
+
+# With gas reporting
+forge test --gas-report
+```
+
+**Test Specific Project**:
+```bash
+# Navigate to project directory
+cd 01-datatypes-and-storage
+
+# Run tests for this project only
+forge test
+
+# Run specific test function
+forge test --match-test test_SetNumber
+
+# Run tests matching a pattern
+forge test --match-path "test/*.t.sol"
+```
+
+**Common Test Commands**:
+```bash
+# Run with detailed traces (helpful for debugging)
+forge test -vvvv
+
+# Run fuzz tests with custom runs
+forge test --fuzz-runs 10000
+
+# Create gas snapshots for optimization tracking
+forge snapshot
+
+# Compare gas usage with previous snapshot
+forge snapshot --diff
+
+# Get coverage report
+forge coverage
+```
+
+### Building Contracts
+
+```bash
+# Build all contracts
+forge build
+
+# Build with verbose output
+forge build -vv
+
+# Force rebuild (ignore cache)
+forge build --force
+
+# View contract sizes (24KB limit)
+forge build --sizes
+```
+
+### Common Workflows
+
+**Starting a New Project**:
+1. Read the project README thoroughly
+2. Review the skeleton contract in `src/`
+3. Implement the TODOs in the skeleton
+4. Write tests in `test/`
+5. Run `forge test` to verify
+6. Compare with `src/solution/` and `test/solution/`
+7. Deploy locally with `forge script`
+
+**Debugging Failures**:
+1. Run with `-vvvv` for full traces
+2. Add `console.log()` statements (import from `forge-std/console.sol`)
+3. Use `forge test --debug <test_name>` for interactive debugging
+4. Check gas usage with `--gas-report`
+
+**Gas Optimization**:
+1. Create baseline: `forge snapshot`
+2. Make optimizations
+3. Compare: `forge snapshot --diff`
+4. Review gas report: `forge test --gas-report`
+
+---
+
+## 📖 Complete 47-Project Curriculum
+
+**Note**: The curriculum includes 47 projects total. Projects 21, 24, and 41 are not included in the sequence.
 
 Each project is a standalone Foundry workspace with:
 - Skeleton contracts to complete
@@ -317,11 +435,13 @@ Each project is a standalone Foundry workspace with:
 
 ---
 
-### 🏦 4626 VAULT MASTERY & DEFI ENGINEERING (Projects 41-50)
+### 🏦 4626 VAULT MASTERY & DEFI ENGINEERING (Projects 11, 42-50)
+
+**Note**: Project 41 is not included in this track. The ERC-4626 base vault is covered in Project 11, and advanced vault topics continue from Project 42 onwards.
 
 | # | Project | Core Concepts | Status |
 |---|---------|--------------|--------|
-| 41 | [ERC-4626 Base Vault](./11-ERC4626-tokenized-vault/) | convertToShares, deposit/mint/withdraw/redeem | ✅ Complete |
+| 11 | [ERC-4626 Base Vault](./11-ERC4626-tokenized-vault/) | convertToShares, deposit/mint/withdraw/redeem | ✅ Complete |
 | 42 | [ERC-4626 Precision & Rounding](./42-vault-precision/) | Rounding modes, denominator issues | ✅ Complete |
 | 43 | [Yield-Bearing Vault](./43-yield-vault/) | Interest accrual, harvest, reinvest | ✅ Complete |
 | 44 | [Inflation Attack Demo](./44-inflation-attack/) | Donation attack, mitigation patterns | ✅ Complete |
@@ -552,7 +672,7 @@ Use this section to track your progress through the 50 projects.
 | 11 - ERC-4626 Tokenized Vault | ⬜ | Vault standard, share math, DeFi yield | - |
 | 12-50 - Continue tracking... | ⬜ | ... | - |
 
-**Total Estimated Time**: 150-200 hours for complete mastery
+**Total Estimated Time**: 140-190 hours for complete mastery of all 47 projects
 
 ### Learning Objectives by Project Category
 
@@ -636,7 +756,7 @@ Use this section to track your progress through the 50 projects.
 
 ### Completion Checklist
 
-After completing all 50 projects, you should be able to:
+After completing all 47 projects, you should be able to:
 
 - [ ] Read and understand production Solidity code
 - [ ] Identify common security vulnerabilities
