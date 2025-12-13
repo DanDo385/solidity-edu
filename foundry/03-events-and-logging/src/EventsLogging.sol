@@ -22,6 +22,7 @@ contract EventsLogging {
     // ============================================================
 
     // TODO: Declare public address variable 'owner'
+    address public owner;
     // TODO: Declare mapping 'balances' from address to uint256
     // TODO: Declare mapping 'allowances' from address to address to uint256
 
