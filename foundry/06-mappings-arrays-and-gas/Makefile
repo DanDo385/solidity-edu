@@ -17,6 +17,9 @@ build-filtered: build
 	@find out -type f -path "*/script/*" -delete 2>/dev/null || true
 	@find out -type f -path "*/lib/*" -delete 2>/dev/null || true
 	@rm -rf out/Test.sol out/Script.sol out/Vm.sol out/console.sol out/safeconsole.sol 2>/dev/null || true
+	@find out -type d -name "*.t.sol" -exec rm -rf {} + 2>/dev/null || true
+	@find out -type d -name "*.s.sol" -exec rm -rf {} + 2>/dev/null || true
+	@rm -rf out/src 2>/dev/null || true
 	@rm -rf out/Std*.sol out/IMulticall3.sol out/Base.sol 2>/dev/null || true
 	@echo "Done! out directory now contains only src contract artifacts (excluding solution files)"
 
